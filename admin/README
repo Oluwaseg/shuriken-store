@@ -1,0 +1,75 @@
+---
+
+## Setting Up Vite with React Helmet Async
+
+If you're using `react-helmet-async` in your Vite-powered React application, you might need to configure Vite to properly handle this dependency. Here’s how you can do it:
+ 
+### Installation
+
+First, make sure you have `react-helmet-async` installed:
+
+```bash
+npm install react-helmet-async
+```
+
+### Configuring Vite
+
+To ensure `react-helmet-async` is properly pre-bundled by Vite, you need to add it to the `optimizeDeps.include` array in your Vite configuration file.
+
+1. **Open your `vite.config.js`** file (or create it if it doesn’t exist).
+
+2. **Add `react-helmet-async` to `optimizeDeps.include`**:
+
+   ```js
+   // vite.config.js
+   import { defineConfig } from "vite";
+   import react from "@vitejs/plugin-react";
+
+   export default defineConfig({
+     plugins: [react()],
+     optimizeDeps: {
+       include: ["react-helmet-async"],
+     },
+   });
+   ```
+
+3. **Restart your development server** to apply the changes:
+
+   ```bash
+   npm run dev
+   ```
+
+### Using React Helmet Async
+
+Import and use `react-helmet-async` in your React components:
+
+```jsx
+import React from "react";
+import { Helmet, HelmetProvider } from "react-helmet-async";
+
+const App = () => (
+  <HelmetProvider>
+    <div>
+      <Helmet>
+        <title>Your Page Title</title>
+        <meta name="description" content="Your page description" />
+      </Helmet>
+      {/* Your app components */}
+    </div>
+  </HelmetProvider>
+);
+
+export default App;
+```
+
+### Troubleshooting
+
+- **Ensure Dependencies are Up to Date**: Make sure you have the latest version of `react-helmet-async` and Vite.
+
+- **Clear Cache**: If you encounter issues, try clearing Vite's cache or deleting `node_modules` and reinstalling dependencies.
+
+- **Check for Vite Config Issues**: Ensure there are no other configuration issues in your `vite.config.js`.
+
+For more information, refer to the [Vite Documentation](https://vitejs.dev/) and [React Helmet Async Documentation](https://github.com/staylor/react-helmet-async).
+
+---

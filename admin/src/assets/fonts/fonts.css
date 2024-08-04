@@ -1,0 +1,125 @@
+/* src/assets/fonts/fonts.css */
+
+/* Calesta Font */
+@font-face {
+    font-family: 'Calesta';
+    src: url('./calesta-font/Calesta-BF65a067113384e.woff') format('woff'),
+         url('./calesta-font/Calesta-BF65a06711c7595.ttf') format('truetype'),
+         url('./calesta-font/Calesta-BF65a067124ad8f.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+ /* Nomina Font */
+@font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-Black-BF65a5e15339c61.otf') format('opentype');
+    font-weight: 900; /* Assuming black is the heaviest */
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-BlackItalic-BF65a5e1523b17b.otf') format('opentype');
+    font-weight: 900;
+    font-style: italic;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-Bold-BF65a5e1533b23c.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-BoldItalic-BF65a5e152d87b2.otf') format('opentype');
+    font-weight: bold;
+    font-style: italic;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-ExtraBold-BF65a5e152db529.otf') format('opentype');
+    font-weight: 800; /* Assuming extrabold is heavier than bold but lighter than black */
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-ExtraBoldItalic-BF65a5e1534b10f.otf') format('opentype');
+    font-weight: 800;
+    font-style: italic;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-ExtraLight-BF65a5e1535aed6.otf') format('opentype');
+    font-weight: 200; /* Assuming extralight is very light */
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-ExtralightItalic-BF65a5e152ec3cd.otf') format('opentype');
+    font-weight: 200;
+    font-style: italic;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-Italic-BF65a5e1534d081.otf') format('opentype');
+    font-weight: normal;
+    font-style: italic;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-Light-BF65a5e1535171d.otf') format('opentype');
+    font-weight: 300; /* Assuming light is lighter than regular */
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-LightItalic-BF65a5e15336432.otf') format('opentype');
+    font-weight: 300;
+    font-style: italic;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-Medium-BF65a5e1533fa86.otf') format('opentype');
+    font-weight: 500; /* Assuming medium is between regular and bold */
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-MediumItalic-BF65a5e15338328.otf') format('opentype');
+    font-weight: 500;
+    font-style: italic;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-Regular-BF65a5e1536119d.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-Semibold-BF65a5e15360128.otf') format('opentype');
+    font-weight: 600; /* Assuming semibold is lighter than bold but heavier than medium */
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'Nomina';
+    src: url('./nomina-font-family/NominaTrial-SemiboldItalic-BF65a5e1533cbf6.otf') format('opentype');
+    font-weight: 600;
+    font-style: italic;
+  }
+  
