@@ -50,6 +50,29 @@
   animation: spinShuriken 8s linear infinite;
 }
 
+.carousel-container {
+  position: relative;
+}
+
+.delete-button {
+  position: absolute;
+  top: 28px;
+  right: 5px;
+  background-color: #ef4444;
+  color: #ffffff;
+  padding: 8px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.delete-button:hover {
+  background-color: #dc2626;
+}
+.carousel .control-prev,
+.carousel .control-next {
+  display: none;
+}
 @media (max-width: 640px) {
   .table-container {
     overflow-x: auto;
