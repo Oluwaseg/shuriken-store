@@ -1,10 +1,8 @@
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../redux/store";
-import { logoutUser } from "../../redux/authSlice";
 import { useEffect, useState, useRef } from "react";
 import SubMenu from "./SubMenu";
 import { motion } from "framer-motion";
-import toast, { Toaster } from "react-hot-toast";
 import { IoIosArrowBack } from "react-icons/io";
 import { SlSettings } from "react-icons/sl";
 import { AiOutlineAppstore } from "react-icons/ai";
@@ -13,8 +11,7 @@ import { HiOutlineDatabase } from "react-icons/hi";
 import { TbReportAnalytics } from "react-icons/tb";
 import { RiBuilding3Line } from "react-icons/ri";
 import { useMediaQuery } from "react-responsive";
-import { MdMenu } from "react-icons/md";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import Circle from "../../components/logo/Circle";
 import Shuriken from "../../components/logo/Shuriken";
 
@@ -24,14 +21,21 @@ interface SubMenuItem {
   menus: { name: string; path: string }[];
 }
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isOpen: boolean;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
   const isTabletMid = useMediaQuery({ query: "(max-width: 768px)" });
-  const [open, setOpen] = useState(isTabletMid ? false : true);
   const [logoSize, setLogoSize] = useState("w-12 h-12");
+  const [open, setOpen] = useState(isOpen);
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const { pathname } = useLocation();
+
+  useEffect(() => {
+    setOpen(isOpen);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isTabletMid) {
@@ -39,13 +43,26 @@ const Sidebar: React.FC = () => {
     } else {
       setOpen(true);
     }
-  }, [isTabletMid]);
+  }, [isTabletMid, pathname]);
 
   useEffect(() => {
-    if (isTabletMid) {
-      setOpen(false);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    if (isTabletMid && open) {
+      document.addEventListener("mousedown", handleClickOutside);
     }
-  }, [pathname]);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isTabletMid, open]);
 
   const Nav_animation = isTabletMid
     ? {
@@ -99,39 +116,16 @@ const Sidebar: React.FC = () => {
     },
   ];
 
-  const handleLogout = () => {
-    dispatch(logoutUser())
-      .unwrap()
-      .then(() => {
-        toast.success("Logout successful");
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
-      })
-      .catch((error: { message: string }) => {
-        console.error("Logout failed:", error.message);
-        toast.error("Logout failed. Please try again.");
-      });
-  };
-
   return (
     <div>
-      <div
-        onClick={() => {
-          if (isTabletMid) {
-            setOpen(false);
-          }
-        }}
-        className={`md:hidden fixed inset-0 max-h-screen z-[998] bg-black/50 ${
-          open && isTabletMid ? "block" : "hidden"
-        }`}
-      ></div>
       <motion.div
         ref={sidebarRef}
         variants={Nav_animation}
         initial={{ x: isTabletMid ? -250 : 0 }}
         animate={open ? "open" : "closed"}
-        className={`bg-white dark:bg-gray-800 text-gray shadow-xl z-[9999] md:z-[10] max-w-[16rem] w-[16rem] overflow-hidden md:relative fixed h-screen`}
+        className={`bg-white dark:bg-gray-800 text-gray shadow-xl z-[9999] md:z-[10] max-w-[16rem] w-[16rem] overflow-hidden md:relative fixed ${
+          isTabletMid ? "top-16" : "top-0"
+        } h-screen`}
       >
         <div className="flex items-center gap-2.5 font-medium border-b py-3 border-slate-300 mx-3">
           <div className={`relative ${logoSize}`}>
@@ -187,39 +181,11 @@ const Sidebar: React.FC = () => {
               </NavLink>
             </li>
           </ul>
-          {open && (
-            <div className="flex-1 text-sm z-50 max-h-48 my-auto whitespace-pre w-full font-medium">
-              <div className="flex border-y border-slate-300 p-4 items-center justify-between">
-                <div>
-                  <p>Admin</p>
-                  <small>Panel</small>
-                </div>
-                <p
-                  onClick={handleLogout}
-                  className="text-teal-500 py-1.5 px-3 text-xs bg-teal-50 rounded-xl cursor-pointer"
-                >
-                  Logout
-                </p>
-              </div>
-            </div>
-          )}
         </div>
         <motion.div
-          onClick={() => {
-            setOpen(!open);
-          }}
+          onClick={() => setOpen(!open)}
           animate={
-            open
-              ? {
-                  x: 0,
-                  y: 0,
-                  rotate: 0,
-                }
-              : {
-                  x: -10,
-                  y: -200,
-                  rotate: 180,
-                }
+            open ? { x: 0, y: 0, rotate: 0 } : { x: -10, y: -200, rotate: 180 }
           }
           transition={{ duration: 0 }}
           className="absolute w-fit h-fit md:block z-50 hidden right-2 bottom-3 cursor-pointer"
@@ -227,10 +193,6 @@ const Sidebar: React.FC = () => {
           <IoIosArrowBack size={25} />
         </motion.div>
       </motion.div>
-      <div className="m-3 md:hidden" onClick={() => setOpen(true)}>
-        <MdMenu size={25} />
-      </div>
-      <Toaster position="top-right" />
     </div>
   );
 };

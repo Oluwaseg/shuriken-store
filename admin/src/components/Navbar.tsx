@@ -3,6 +3,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../redux/store";
 import { FaSearch, FaMoon, FaSun } from "react-icons/fa";
 import { toggleDarkMode } from "../redux/darkModeSlice";
+import { MdMenu } from "react-icons/md";
+import { logoutUser } from "../redux/authSlice";
+import toast from "react-hot-toast";
 
 interface User {
   avatar: { url: string }[];
@@ -10,7 +13,11 @@ interface User {
   role: string;
 }
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  toggleSidebar: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
   const dispatch = useDispatch<AppDispatch>();
   const isDarkMode = useSelector(
     (state: RootState) => state.darkMode.isDarkMode
@@ -23,6 +30,21 @@ const Navbar: React.FC = () => {
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   const toggleMode = () => dispatch(toggleDarkMode());
+
+  const handleLogout = () => {
+    dispatch(logoutUser())
+      .unwrap()
+      .then(() => {
+        toast.success("Logout successful");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 1000);
+      })
+      .catch((error: { message: string }) => {
+        console.error("Logout failed:", error.message);
+        toast.error("Logout failed. Please try again.");
+      });
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -39,7 +61,6 @@ const Navbar: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Apply dark mode class to the HTML element
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
     } else {
@@ -53,7 +74,10 @@ const Navbar: React.FC = () => {
         isDarkMode ? "bg-gray-800 text-white" : "bg-white text-black"
       } shadow-md p-4 flex items-center justify-between`}
     >
-      {/* Middle: Search Input */}
+      <div className="md:hidden" onClick={toggleSidebar}>
+        <MdMenu size={25} className="cursor-pointer" />
+      </div>
+
       <div className="flex-grow flex items-center mx-4 max-w-md">
         <div className="relative w-full">
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500" />
@@ -65,7 +89,6 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Right: Mode Toggle and User Avatar */}
       <div className="flex items-center gap-4">
         <button onClick={toggleMode} aria-label="Toggle Dark Mode">
           {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
@@ -90,7 +113,10 @@ const Navbar: React.FC = () => {
               <li className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
                 {user?.role || "Role"}
               </li>
-              <li className="px-4 py-2 border-t hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+              <li
+                className="px-4 py-2 border-t hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                onClick={handleLogout}
+              >
                 Logout
               </li>
             </ul>

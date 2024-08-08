@@ -4,6 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import EditUserModal from "../modals/EditUser";
 import ConfirmDeleteModal from "../modals/DeleteUser";
+import PagePreloader from "../../components/PagePreloader";
 
 interface User {
   _id: string;
@@ -21,10 +22,18 @@ const UsersTable: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetchUsers();
+    const timer = setTimeout(() => setLoading(false), 3000);
+    return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      fetchUsers();
+    }
+  }, [loading]);
 
   const fetchUsers = async () => {
     try {
@@ -66,6 +75,10 @@ const UsersTable: React.FC = () => {
     toast.success("User deleted successfully.");
     handleModalClose();
   };
+
+  if (loading) {
+    return <PagePreloader />;
+  }
 
   return (
     <section className="container mx-auto mt-8 px-4">

@@ -13,18 +13,15 @@ import CreateCategory from "./pages/AddCategory";
 import Login from "./pages/Login";
 import ProtectedRoute from "./services/ProtectedRoutes";
 import Preloader from "./components/Preloader";
-import { RootState, AppDispatch } from "./redux/store";
-import { toggleDarkMode } from "./redux/darkModeSlice";
+import { RootState } from "./redux/store";
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
-  const dispatch = useDispatch<AppDispatch>();
   const isDarkMode = useSelector(
     (state: RootState) => state.darkMode.isDarkMode
   );
 
   useEffect(() => {
-    // Simulate loading
     const timer = setTimeout(() => {
       setLoading(false);
     }, 2000);
@@ -32,7 +29,6 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Apply dark mode class to body
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
     } else {

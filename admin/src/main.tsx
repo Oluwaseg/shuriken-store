@@ -6,6 +6,7 @@ import { store } from "./redux/store";
 import App from "./App";
 import "./index.css";
 import "./assets/fonts/fonts.css";
+import "./services/interceptor";
 
 const rootElement = document.getElementById("root") as HTMLElement;
 
