@@ -41,10 +41,15 @@ export const createOrder = catchAsync(async (req, res, next) => {
       user: req.user._id,
     });
 
+    // Populate user details
+    const populatedOrder = await Order.findById(order._id)
+      .populate("user", "name email avatar")
+      .exec();
+
     // Send response
     res.status(201).json({
       success: true,
-      order,
+      order: populatedOrder,
     });
   } catch (error) {
     next(new ErrorHandler(error.message, 500));
@@ -56,7 +61,7 @@ export const getSingleOrder = catchAsync(async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id).populate(
       "user",
-      "name email"
+      "name email avatar"
     );
 
     if (!order) {
@@ -88,7 +93,9 @@ export const myOrders = catchAsync(async (req, res, next) => {
 // Get all orders (admin)
 export const getAllOrders = catchAsync(async (req, res, next) => {
   try {
-    const orders = await Order.find();
+    const orders = await Order.find()
+      .populate("user", "name email avatar") // Populate user details
+      .exec();
 
     let totalAmount = 0;
 

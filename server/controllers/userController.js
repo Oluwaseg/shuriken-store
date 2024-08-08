@@ -1,5 +1,7 @@
 import crypto from "crypto";
+import Order from "../models/Order.js";
 import User from "../models/User.js";
+import Cart from "../models/Cart.js";
 import { ErrorHandler } from "../utils/errorHandler.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import { sendToken } from "../utils/jwtToken.js";
@@ -353,20 +355,46 @@ export const updateUserRole = catchAsync(async (req, res, next) => {
 });
 
 // Delete User -- Admin
+// export const deleteUser = catchAsync(async (req, res, next) => {
+//   const user = await User.findById(req.params.id);
+
+//   if (!user) {
+//     return next(
+//       new ErrorHandler(`User does not exist with id: ${req.params.id}`, 404)
+//     );
+//   }
+
+//   // Remove user from database
+//   await User.findByIdAndDelete(req.params.id);
+
+//   res.status(200).json({
+//     success: true,
+//     message: "User deleted successfully",
+//   });
+// });
+
 export const deleteUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+  try {
+    const user = await User.findById(req.params.id);
 
-  if (!user) {
-    return next(
-      new ErrorHandler(`User does not exist with id: ${req.params.id}`, 404)
-    );
+    if (!user) {
+      return next(
+        new ErrorHandler(`User does not exist with id: ${req.params.id}`, 404)
+      );
+    }
+
+    await Order.deleteMany({ user: req.params.id });
+
+    await Cart.deleteMany({ user: req.params.id });
+
+    await User.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message:
+        "User and all associated orders and cart items deleted successfully",
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
   }
-
-  // Remove user from database
-  await User.findByIdAndDelete(req.params.id);
-
-  res.status(200).json({
-    success: true,
-    message: "User deleted successfully",
-  });
 });

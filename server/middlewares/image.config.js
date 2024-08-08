@@ -28,7 +28,7 @@ const uploadProductImage = multer({ storage: productStorage });
 const userStorage = new CloudinaryStorage({
   cloudinary: cloudinary.v2,
   params: {
-    folder: "user-image",
+    folder: "shop/user-image",
     allowed_formats: ["jpg", "jpeg", "png"],
     transformation: [{ width: 800, height: 600, crop: "limit" }],
     unique_filename: true,
