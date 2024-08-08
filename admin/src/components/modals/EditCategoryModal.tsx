@@ -39,7 +39,7 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
         className="fixed inset-0 bg-gray-500 opacity-75"
         onClick={onClose}
       ></div>
-      <div className="bg-white p-6 rounded-lg shadow-lg z-10 w-full max-w-md">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg z-10 w-full max-w-md">
         <h3 className="text-lg font-semibold mb-4">Edit Category</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -55,7 +55,7 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              className="mt-1 block dark:bg-gray-800 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
             />
           </div>
           <div>
@@ -69,7 +69,7 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              className="mt-1 block dark:bg-gray-800 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               rows={4}
             />
           </div>
@@ -77,13 +77,13 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white font-semibold rounded-md"
+              className="px-4 py-2 bg-red-600 dark:bg-red-800 dark:hover:bg-red-700 dark:bg-opacity-50 duration-300 text-white font-semibold rounded-md"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md"
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 duration-200 dark:bg-opacity-60 text-white font-semibold rounded-md"
             >
               Save
             </button>

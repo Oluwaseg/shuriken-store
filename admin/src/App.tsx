@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import RootLayout from "./layouts/RootLayout";
 import AllApps from "./pages/AllApps";
 import Users from "./pages/Users";
@@ -8,22 +9,36 @@ import Settings from "./pages/Settings";
 import Products from "./pages/Products";
 import Category from "./pages/Category";
 import Create from "./pages/Create";
-import ProductsList from "./pages/ProductsList";
 import CreateCategory from "./pages/AddCategory";
-import Categories from "./pages/Category";
 import Login from "./pages/Login";
 import ProtectedRoute from "./services/ProtectedRoutes";
 import Preloader from "./components/Preloader";
+import { RootState, AppDispatch } from "./redux/store";
+import { toggleDarkMode } from "./redux/darkModeSlice";
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
+  const dispatch = useDispatch<AppDispatch>();
+  const isDarkMode = useSelector(
+    (state: RootState) => state.darkMode.isDarkMode
+  );
 
   useEffect(() => {
+    // Simulate loading
     const timer = setTimeout(() => {
       setLoading(false);
     }, 2000);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    // Apply dark mode class to body
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDarkMode]);
 
   if (loading) {
     return <Preloader />;
@@ -81,10 +96,27 @@ const App: React.FC = () => {
             </RootLayout>
           </ProtectedRoute>
         }
-      >
-        <Route path="create" element={<Create />} />
-        <Route path="list" element={<ProductsList />} />
-      </Route>
+      />
+      <Route
+        path="/products/create"
+        element={
+          <ProtectedRoute>
+            <RootLayout>
+              <Create />
+            </RootLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/categories/create"
+        element={
+          <ProtectedRoute>
+            <RootLayout>
+              <CreateCategory />
+            </RootLayout>
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/categories"
         element={
@@ -94,10 +126,7 @@ const App: React.FC = () => {
             </RootLayout>
           </ProtectedRoute>
         }
-      >
-        <Route path="create" element={<CreateCategory />} />
-        <Route path="list" element={<Categories />} />
-      </Route>
+      />
     </Routes>
   );
 };

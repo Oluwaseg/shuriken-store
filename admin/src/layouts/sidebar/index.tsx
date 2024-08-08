@@ -4,8 +4,6 @@ import { logoutUser } from "../../redux/authSlice";
 import { useEffect, useState, useRef } from "react";
 import SubMenu from "./SubMenu";
 import { motion } from "framer-motion";
-import Circle from "../../components/logo/Circle";
-import Shuriken from "../../components/logo/Shuriken";
 import toast, { Toaster } from "react-hot-toast";
 import { IoIosArrowBack } from "react-icons/io";
 import { SlSettings } from "react-icons/sl";
@@ -17,6 +15,8 @@ import { RiBuilding3Line } from "react-icons/ri";
 import { useMediaQuery } from "react-responsive";
 import { MdMenu } from "react-icons/md";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import Circle from "../../components/logo/Circle";
+import Shuriken from "../../components/logo/Shuriken";
 
 interface SubMenuItem {
   name: string;
@@ -46,10 +46,6 @@ const Sidebar: React.FC = () => {
       setOpen(false);
     }
   }, [pathname]);
-
-  useEffect(() => {
-    setLogoSize(open ? "w-12 h-12" : "w-8 h-8");
-  }, [open]);
 
   const Nav_animation = isTabletMid
     ? {
@@ -89,16 +85,16 @@ const Sidebar: React.FC = () => {
       name: "Products",
       icon: RiBuilding3Line,
       menus: [
+        { name: "Products", path: "/products" },
         { name: "Create", path: "/products/create" },
-        // { name: "List", path: "/products/list" },
       ],
     },
     {
       name: "Categories",
       icon: TbReportAnalytics,
       menus: [
+        { name: "Categories", path: "/categories" },
         { name: "Create", path: "/categories/create" },
-        // { name: "List", path: "/categories/list" },
       ],
     },
   ];
@@ -121,9 +117,13 @@ const Sidebar: React.FC = () => {
   return (
     <div>
       <div
-        onClick={() => setOpen(false)}
+        onClick={() => {
+          if (isTabletMid) {
+            setOpen(false);
+          }
+        }}
         className={`md:hidden fixed inset-0 max-h-screen z-[998] bg-black/50 ${
-          open ? "block" : "hidden"
+          open && isTabletMid ? "block" : "hidden"
         }`}
       ></div>
       <motion.div
@@ -131,7 +131,7 @@ const Sidebar: React.FC = () => {
         variants={Nav_animation}
         initial={{ x: isTabletMid ? -250 : 0 }}
         animate={open ? "open" : "closed"}
-        className="bg-white text-gray shadow-xl z-[999] max-w-[16rem] w-[16rem] overflow-hidden md:relative fixed h-screen"
+        className={`bg-white dark:bg-gray-800 text-gray shadow-xl z-[9999] md:z-[10] max-w-[16rem] w-[16rem] overflow-hidden md:relative fixed h-screen`}
       >
         <div className="flex items-center gap-2.5 font-medium border-b py-3 border-slate-300 mx-3">
           <div className={`relative ${logoSize}`}>
@@ -147,7 +147,6 @@ const Sidebar: React.FC = () => {
             </span>
           )}
         </div>
-
         <div className="flex flex-col h-full">
           <ul className="whitespace-pre px-2.5 text-[0.9rem] py-5 flex flex-col gap-1 font-medium overflow-x-hidden scrollbar-thin scrollbar-track-white scrollbar-thumb-slate-100 md:h-[68%] h-[70%]">
             <li>
@@ -192,8 +191,8 @@ const Sidebar: React.FC = () => {
             <div className="flex-1 text-sm z-50 max-h-48 my-auto whitespace-pre w-full font-medium">
               <div className="flex border-y border-slate-300 p-4 items-center justify-between">
                 <div>
-                  <p>Spark</p>
-                  <small>No-cost $0/month</small>
+                  <p>Admin</p>
+                  <small>Panel</small>
                 </div>
                 <p
                   onClick={handleLogout}

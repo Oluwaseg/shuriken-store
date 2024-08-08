@@ -78,37 +78,7 @@ const LoginForm: React.FC = () => {
               <Shuriken className="w-1/2 h-1/2 object-contain" />
             </div>
           </div>
-
-          <motion.span
-            className="text-2xl whitespace-pre font-semibold"
-            initial={{ rotate: 0, y: 0, color: "#000" }}
-            animate={{
-              rotate: [0, 360],
-              y: [0, -10, 0],
-              color: ["#000", "#ff6347", "#000"],
-            }}
-            transition={{
-              rotate: {
-                duration: 2,
-                ease: "easeInOut",
-              },
-              y: {
-                duration: 2,
-                ease: "easeInOut",
-                repeat: Infinity,
-                repeatType: "loop",
-              },
-              color: {
-                duration: 1.5,
-                ease: "easeInOut",
-                repeat: Infinity,
-                repeatType: "loop",
-                repeatDelay: 0.5,
-              },
-            }}
-          >
-            Admin Panel
-          </motion.span>
+          <h1>Admin Panel</h1>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>

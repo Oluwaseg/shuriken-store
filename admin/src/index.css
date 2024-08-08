@@ -1,5 +1,3 @@
-/* @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&family=Play:wght@700&display=swap");  */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,20 +10,21 @@
     font-family: "Nomina", sans-serif;
   }
 
+  body {
+    @apply bg-primary text-gray-800;
+  }
+
+  .dark body {
+    @apply bg-gray-900 text-white;
+  }
+
   .fonts {
     font-family: "Calesta", serif;
-  }
-  body {
-    /* background: #f1f1f1; */
-    @apply bg-primary;
-  }
-  h1 {
-    @apply text-xl font-medium capitalize;
   }
 }
 
 .link {
-  @apply p-2.5 flex rounded-md gap-6 items-center md:cursor-pointer cursor-default duration-300 font-medium;
+  @apply p-2.5 flex rounded-md gap-6 items-center md:cursor-pointer cursor-default duration-300 font-bold;
 }
 
 .active {
@@ -69,6 +68,7 @@
 .delete-button:hover {
   background-color: #dc2626;
 }
+
 .carousel .control-prev,
 .carousel .control-next {
   display: none;

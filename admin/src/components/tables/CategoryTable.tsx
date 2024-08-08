@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import EditCategoryModal from "../modals/EditCategoryModal";
 import DeleteCategoryModal from "../modals/DeleteCategoryModal";
 
@@ -63,10 +64,10 @@ const CategoryTable: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 bg-white shadow-md rounded-lg">
+    <div className="max-w-7xl mx-auto p-4  dark:bg-transparent">
       <h2 className="text-2xl font-semibold mb-4">Categories</h2>
       <table className="min-w-full divide-y divide-gray-200 bg-white">
-        <thead className="bg-gray-200 text-gray-700">
+        <thead className="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white">
           <tr>
             <th className="px-4 py-2 text-left text-sm font-semibold">Name</th>
             <th className="px-4 py-2 text-left text-sm font-semibold">
@@ -97,14 +98,16 @@ const CategoryTable: React.FC = () => {
                   <button
                     onClick={() => handleEditClick(category)}
                     className="text-blue-500 hover:text-blue-700 transition-colors"
+                    aria-label="Edit"
                   >
-                    Edit
+                    <FaEdit />
                   </button>
                   <button
                     onClick={() => handleDeleteClick(category)}
                     className="text-red-500 hover:text-red-700 transition-colors"
+                    aria-label="Delete"
                   >
-                    Delete
+                    <FaTrashAlt />
                   </button>
                 </div>
               </td>

@@ -94,13 +94,13 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     }
   };
   return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-gray-500  bg-opacity-75 flex items-center justify-center z-[10] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto z-[1000]">
         <div className="relative">
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+            className="absolute top-2 right-2 text-gray-500 dark:text-white hover:text-gray-700"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -118,7 +118,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
             </svg>
           </button>
           <div className="p-6">
-            <h2 className="text-3xl font-semibold text-gray-900 mb-6">
+            <h2 className="text-3xl font-semibold text-gray-900 dark:text-white mb-6">
               Edit Product
             </h2>
             <form
@@ -130,7 +130,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 <div className="col-span-1">
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-900"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Product Name
                   </label>
@@ -141,14 +141,14 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     value={productData.name}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full rounded-md border border-gray-300 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
 
                 <div className="col-span-1">
                   <label
                     htmlFor="description"
-                    className="block text-sm font-medium text-gray-900"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Description
                   </label>
@@ -159,14 +159,14 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     value={productData.description}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full rounded-md border border-gray-300 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
 
                 <div className="col-span-1">
                   <label
                     htmlFor="price"
-                    className="block text-sm font-medium text-gray-900"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Price
                   </label>
@@ -177,7 +177,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     value={productData.price}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full rounded-md border border-gray-300 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     placeholder="0.00"
                   />
                 </div>
@@ -185,7 +185,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 <div className="col-span-1">
                   <label
                     htmlFor="stock"
-                    className="block text-sm font-medium text-gray-900"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Stock
                   </label>
@@ -195,7 +195,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     value={productData.stock}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full rounded-md border border-gray-300 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   >
                     <option value="">Select stock quantity</option>
                     {[...Array(100).keys()].map((num) => (
@@ -209,7 +209,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 <div className="col-span-1">
                   <label
                     htmlFor="category"
-                    className="block text-sm font-medium text-gray-900"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Category
                   </label>
@@ -219,7 +219,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     value={productData.category}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full rounded-md border border-gray-300 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   >
                     <option value="">Select category</option>
                     {categories.map((cat) => (
@@ -233,7 +233,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                 <div className="col-span-1">
                   <label
                     htmlFor="brand"
-                    className="block text-sm font-medium text-gray-900"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Brand
                   </label>
@@ -244,14 +244,14 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     value={productData.brand}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full rounded-md border border-gray-300 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
 
                 <div className="col-span-2">
                   <label
                     htmlFor="images"
-                    className="block text-sm font-medium text-gray-900"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Product Images
                   </label>
@@ -265,7 +265,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     className="mt-1"
                   />
                   <div className="mt-4">
-                    <h3 className="text-lg font-medium text-gray-900">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                       New Images
                     </h3>
                     <div className="flex gap-4 mt-2">
