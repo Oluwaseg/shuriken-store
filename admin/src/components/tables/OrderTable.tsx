@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { FaTrash, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { Order } from "./types/type";
 import { fetchOrders, updateOrderStatus, deleteOrder } from "./apis/orders";
 
@@ -87,7 +88,7 @@ const OrderTable: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-pre">
                 Order Date
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                 Order Items
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -121,7 +122,12 @@ const OrderTable: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {order._id}
+                  <Link
+                    to={`/orders/${order._id}`}
+                    className="text-secondary hover:underline"
+                  >
+                    {order._id}
+                  </Link>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   {new Date(order.createdAt).toLocaleDateString()}
@@ -153,10 +159,12 @@ const OrderTable: React.FC = () => {
                     className="border border-gray-300 dark:border-gray-600 rounded-md p-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200"
                   >
                     <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
                     <option value="Shipped">Shipped</option>
                     <option value="Delivered">Delivered</option>
                   </select>
                 </td>
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   {order.totalPrice}
                 </td>
@@ -219,6 +227,8 @@ const OrderTable: React.FC = () => {
           </div>
         </div>
       )}
+
+      <Toaster position="top-right" />
     </div>
   );
 };

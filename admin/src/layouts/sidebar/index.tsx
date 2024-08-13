@@ -123,7 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         variants={Nav_animation}
         initial={{ x: isTabletMid ? -250 : 0 }}
         animate={open ? "open" : "closed"}
-        className={`bg-white dark:bg-gray-800 text-gray shadow-xl z-[9999] md:z-[10] max-w-[16rem] w-[16rem] overflow-hidden md:relative fixed ${
+        className={`bg-primary dark:bg-gray-900 text-gray shadow-xl z-[9999] md:z-[10] max-w-[16rem] w-[16rem] overflow-hidden md:relative fixed ${
           isTabletMid ? "top-16" : "top-0"
         } h-screen`}
       >

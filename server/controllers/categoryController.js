@@ -1,6 +1,7 @@
 import { ErrorHandler } from "../utils/errorHandler.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import Category from "../models/Category.js";
+import Product from "../models/Product.js";
 
 export const createCategory = catchAsync(async (req, res, next) => {
   try {
@@ -26,6 +27,30 @@ export const getAllCategories = catchAsync(async (req, res, next) => {
     categories,
   });
 });
+
+export const getCategoriesWithProductCount = catchAsync(
+  async (req, res, next) => {
+    const categories = await Category.find();
+
+    const categoryProductCounts = await Promise.all(
+      categories.map(async (category) => {
+        const productCount = await Product.countDocuments({
+          category: category._id,
+        });
+        return {
+          ...category._doc,
+          productCount,
+        };
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      count: categoryProductCounts.length,
+      categories: categoryProductCounts,
+    });
+  }
+);
 
 export const getCategoryById = catchAsync(async (req, res, next) => {
   const category = await Category.findById(req.params.id);

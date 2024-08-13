@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { toast, Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import ImageCarousel from "../previews/ImageCarousel";
 
 interface Category {
@@ -274,7 +274,7 @@ const CreateProduct: React.FC = () => {
             className={`rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-gray-300 ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-secondary hover:bg-indigo-700"
+                : "bg-secondary hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
             }`}
           >
             {loading ? "Submitting..." : "Create Product"}

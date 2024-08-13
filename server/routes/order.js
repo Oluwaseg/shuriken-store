@@ -13,13 +13,13 @@ import {
 } from "../controllers/orderController.js";
 
 const router = express.Router();
-router.post("/order/new", isAuthenticated, createOrder);
+router.post("/orders/new", isAuthenticated, createOrder);
 
 // Get Logged in User Orders
-router.get("/order/me", isAuthenticated, myOrders);
+router.get("/orders/me", isAuthenticated, myOrders);
 
 // Get Single Order
-router.get("/order/:id", isAuthenticated, getSingleOrder);
+router.get("/orders/:id", isAuthenticated, getSingleOrder);
 
 // Get All Orders -- Admin
 router.get(
@@ -31,7 +31,7 @@ router.get(
 
 // Update Order Status -- Admin
 router.put(
-  "/admin/order/:id",
+  "/admin/orders/:id",
   isAuthenticated,
   authorizeRoles("admin"),
   updateOrder
@@ -39,7 +39,7 @@ router.put(
 
 // Delete Order -- Admin
 router.delete(
-  "/admin/order/:id",
+  "/admin/orders/:id",
   isAuthenticated,
   authorizeRoles("admin"),
   deleteOrder

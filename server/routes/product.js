@@ -8,6 +8,7 @@ import {
   createReview,
   getProductReviews,
   deleteReview,
+  getTotalProducts,
 } from "../controllers/productController.js";
 import {
   isAuthenticated,
@@ -39,6 +40,13 @@ router.delete(
   isAuthenticated,
   authorizeRoles("admin"),
   deleteProduct
+);
+
+router.get(
+  "/admin/products/count",
+  isAuthenticated,
+  authorizeRoles("admin"),
+  getTotalProducts
 );
 
 // Review routes

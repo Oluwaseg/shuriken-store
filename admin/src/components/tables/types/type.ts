@@ -48,6 +48,7 @@ export interface User {
   name: string;
   email: string;
   avatar?: Avatar[];
+  createdAt: string;
 }
 
 export interface Order {
@@ -65,3 +66,7 @@ export interface Order {
   user: User;
   createdAt: Date;
 }
+export type OrderResponse = {
+  success: boolean;
+  order: Order;
+};

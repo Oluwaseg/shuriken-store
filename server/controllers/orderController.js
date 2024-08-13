@@ -94,7 +94,7 @@ export const myOrders = catchAsync(async (req, res, next) => {
 export const getAllOrders = catchAsync(async (req, res, next) => {
   try {
     const orders = await Order.find()
-      .populate("user", "name email avatar") // Populate user details
+      .populate("user", "name email avatar")
       .exec();
 
     let totalAmount = 0;
@@ -114,45 +114,78 @@ export const getAllOrders = catchAsync(async (req, res, next) => {
   }
 });
 
-// update order status -- Admin
+// Update order status -- Admin
 export const updateOrder = catchAsync(async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const orderId = req.params.id;
+    const { status } = req.body;
 
+    // Fetch the order
+    const order = await Order.findById(orderId);
     if (!order) {
       return next(new ErrorHandler("Order not found with this Id", 404));
     }
-    if (order.orderStatus === "Delivered") {
+
+    // Define allowed status transitions
+    const allowedTransitions = {
+      Pending: ["Processing", "Cancelled"],
+      Processing: ["Shipped", "Pending"],
+      Shipped: ["Delivered", "Processing"],
+      Delivered: ["Returned"],
+      Cancelled: [],
+    };
+
+    // Check if the transition is allowed
+    if (!allowedTransitions[order.orderStatus]?.includes(status)) {
       return next(
-        new ErrorHandler("You have already delivered this order", 400)
+        new ErrorHandler(
+          `Invalid status transition from ${order.orderStatus} to ${status}`,
+          400
+        )
       );
     }
 
-    if (req.body.status === "Shipped") {
-      order.orderItems.forEach(async (o) => {
-        await updateStock(o.product, o.quantity);
-      });
+    // Handle stock updates if transitioning to "Shipped" or reverting from "Delivered"
+    if (status === "Shipped" && order.orderStatus === "Processing") {
+      await Promise.all(
+        order.orderItems.map((item) => updateStock(item.product, item.quantity))
+      );
+    } else if (status === "Processing" && order.orderStatus === "Shipped") {
+      // Optional: handle restocking if needed
+      await Promise.all(
+        order.orderItems.map((item) =>
+          updateStock(item.product, -item.quantity)
+        )
+      );
     }
-    order.orderStatus = req.body.status;
 
-    if (req.body.status === "Delivered") {
-      order.deliveredAt = Date.now();
-    }
+    // Update order status and relevant fields
+    order.orderStatus = status;
+    if (status === "Delivered") order.deliveredAt = Date.now();
+    if (status === "Shipped" && order.orderStatus === "Processing")
+      order.shippedAt = Date.now();
+    if (status === "Processing" && order.orderStatus === "Pending")
+      order.processingAt = Date.now();
 
     await order.save({ validateBeforeSave: false });
+
     res.status(200).json({
       success: true,
       message: "Order updated successfully",
       order,
     });
   } catch (error) {
+    console.error("Error updating order:", error);
     next(new ErrorHandler(error.message, 500));
   }
 });
 
-async function updateStock(id, quantity) {
-  const product = await Product.findById(id);
-  product.Stock -= quantity;
+async function updateStock(productId, quantity) {
+  const product = await Product.findById(productId);
+  if (!product) {
+    throw new ErrorHandler("Product not found", 404);
+  }
+  product.stock -= quantity;
   await product.save({ validateBeforeSave: false });
 }
 

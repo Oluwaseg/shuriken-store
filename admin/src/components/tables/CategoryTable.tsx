@@ -5,7 +5,6 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import EditCategoryModal from "../modals/EditCategoryModal";
 import DeleteCategoryModal from "../modals/DeleteCategoryModal";
 
-// Type definition for category
 interface Category {
   id: string;
   name: string;
@@ -81,19 +80,19 @@ const CategoryTable: React.FC = () => {
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-300">
+        <tbody className="bg-white divide-y divide-gray-300 dark:bg-gray-900 dark:border dark:border-gray-700">
           {categories.map((category) => (
             <tr key={category.id}>
-              <td className="px-4 py-2 text-sm text-gray-900">
+              <td className="px-4 py-2 text-sm text-gray-900 dark:text-white dark:border">
                 {category.name}
               </td>
-              <td className="px-4 py-2 text-sm text-gray-600">
+              <td className="px-4 py-2 text-sm text-gray-600 dark:text-white dark:border">
                 {category.description}
               </td>
-              <td className="px-4 py-2 text-sm text-gray-600">
+              <td className="px-4 py-2 text-sm text-gray-600 dark:text-white dark:border">
                 {new Date(category.createdAt).toLocaleDateString()}
               </td>
-              <td className="px-4 py-2 text-sm text-gray-600">
+              <td className="px-4 py-2 text-sm text-gray-600 dark:text-white dark:border">
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleEditClick(category)}

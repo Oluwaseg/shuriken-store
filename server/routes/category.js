@@ -5,6 +5,7 @@ import {
   getCategoryById,
   updateCategory,
   deleteCategory,
+  getCategoriesWithProductCount,
 } from "../controllers/categoryController.js";
 import {
   isAuthenticated,
@@ -20,6 +21,7 @@ router.post(
   createCategory
 );
 router.get("/category", getAllCategories);
+router.get("/categories", getCategoriesWithProductCount);
 router.get("/category/:id", getCategoryById);
 router.put(
   "/category/:id",

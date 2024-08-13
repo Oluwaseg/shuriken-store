@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { MdDelete } from "react-icons/md";
 import axios from "axios";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import ImageCarousel from "../previews/Image";
 import { Product, Category } from "../tables/types/type";
 
@@ -323,6 +323,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
           </div>
         </div>
       </div>
+      <Toaster position="top-right" />
     </div>
   );
 };

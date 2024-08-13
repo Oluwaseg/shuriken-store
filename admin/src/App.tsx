@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import RootLayout from "./layouts/RootLayout";
-import AllApps from "./pages/AllApps";
+import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import Orders from "./pages/Orders";
 import Settings from "./pages/Settings";
@@ -11,6 +11,7 @@ import Category from "./pages/Category";
 import Create from "./pages/Create";
 import CreateCategory from "./pages/AddCategory";
 import Login from "./pages/Login";
+import OrderDetailPage from "./pages/OrderDetailPage";
 import ProtectedRoute from "./services/ProtectedRoutes";
 import Preloader from "./components/Preloader";
 import { RootState } from "./redux/store";
@@ -48,7 +49,7 @@ const App: React.FC = () => {
         element={
           <ProtectedRoute>
             <RootLayout>
-              <AllApps />
+              <Dashboard />
             </RootLayout>
           </ProtectedRoute>
         }
@@ -69,6 +70,16 @@ const App: React.FC = () => {
           <ProtectedRoute>
             <RootLayout>
               <Orders />
+            </RootLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/orders/:orderId"
+        element={
+          <ProtectedRoute>
+            <RootLayout>
+              <OrderDetailPage />
             </RootLayout>
           </ProtectedRoute>
         }

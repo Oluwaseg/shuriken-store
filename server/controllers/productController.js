@@ -217,3 +217,15 @@ export const getProductReviews = catchAsync(async (req, res, next) => {
     reviews: product.reviews,
   });
 });
+
+export const getTotalProducts = catchAsync(async (req, res, next) => {
+  try {
+    const products = await Product.find();
+    res.status(200).json({
+      success: true,
+      count: products.length,
+    });
+  } catch (error) {
+    next(new ErrorHandler(error.message, 500));
+  }
+});
