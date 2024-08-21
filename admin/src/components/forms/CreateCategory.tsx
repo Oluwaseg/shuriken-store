@@ -23,14 +23,16 @@ const CreateCategory: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-semibold mb-4">Create Category</h2>
+    <div className="max-w-md mx-auto p-4 bg-white dark:bg-gray-800 shadow-md rounded-lg mt-10">
+      <h2 className="text-2xl font-semibold dark:text-white mb-4">
+        Create Category
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label
             htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700 dark:text-white"
           >
             Name
           </label>
@@ -40,14 +42,15 @@ const CreateCategory: React.FC = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            placeholder="Enter Category Name"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm bg-primary dark:bg-gray-800 dark:text-white"
           />
         </div>
 
         <div>
           <label
             htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-700 dark:text-white"
           >
             Description
           </label>
@@ -55,14 +58,15 @@ const CreateCategory: React.FC = () => {
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            placeholder="Enter Category Description"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm bg-primary dark:bg-gray-800 dark:text-white"
             rows={4}
           />
         </div>
 
         <button
           type="submit"
-          className="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full px-4 py-2 bg-secondary text-white font-semibold rounded-md shadow-sm hover:bg-secondary hover:bg-opacity-50 duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           Create Category
         </button>

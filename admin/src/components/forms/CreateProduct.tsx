@@ -104,9 +104,9 @@ const CreateProduct: React.FC = () => {
       <form
         onSubmit={handleSubmit}
         encType="multipart/form-data"
-        className="space-y-8 bg-white shadow-lg rounded-lg p-8"
+        className="space-y-8 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8"
       >
-        <h2 className="text-3xl font-semibold text-gray-900 mb-6">
+        <h2 className="text-3xl font-semibold text-gray-900 dark:text-white mb-6">
           Create Product
         </h2>
 
@@ -114,7 +114,7 @@ const CreateProduct: React.FC = () => {
           <div className="col-span-full">
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-sm font-medium text-gray-900 dark:text-white"
             >
               Product Name
             </label>
@@ -125,14 +125,14 @@ const CreateProduct: React.FC = () => {
               value={productData.name}
               onChange={handleChange}
               required
-              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
 
           <div className="col-span-full">
             <label
               htmlFor="description"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-sm font-medium text-gray-900 dark:text-white"
             >
               Description
             </label>
@@ -143,14 +143,14 @@ const CreateProduct: React.FC = () => {
               value={productData.description}
               onChange={handleChange}
               required
-              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
 
           <div>
             <label
               htmlFor="price"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-sm font-medium text-gray-900 dark:text-white"
             >
               Price
             </label>
@@ -165,7 +165,7 @@ const CreateProduct: React.FC = () => {
                 value={productData.price}
                 onChange={handleChange}
                 required
-                className="mt-2 block w-full rounded-md border border-gray-300 pl-8 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="mt-2 block w-full rounded-md border border-gray-300 pl-8 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                 placeholder="0.00"
               />
             </div>
@@ -174,7 +174,7 @@ const CreateProduct: React.FC = () => {
           <div>
             <label
               htmlFor="stock"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-sm font-medium text-gray-900 dark:text-white"
             >
               Stock
             </label>
@@ -184,10 +184,10 @@ const CreateProduct: React.FC = () => {
               value={productData.stock}
               onChange={handleChange}
               required
-              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             >
               <option value="">Select stock quantity</option>
-              {[...Array(100).keys()].map((num) => (
+              {[...Array(200).keys()].map((num) => (
                 <option key={num + 1} value={num + 1}>
                   {num + 1}
                 </option>
@@ -198,7 +198,7 @@ const CreateProduct: React.FC = () => {
           <div>
             <label
               htmlFor="category"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-sm font-medium text-gray-900 dark:text-white"
             >
               Category
             </label>
@@ -208,7 +208,7 @@ const CreateProduct: React.FC = () => {
               value={productData.category}
               onChange={handleChange}
               required
-              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             >
               <option value="">Select category</option>
               {categories.map((cat) => (
@@ -222,7 +222,7 @@ const CreateProduct: React.FC = () => {
           <div>
             <label
               htmlFor="brand"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-sm font-medium text-gray-900 dark:text-white"
             >
               Brand
             </label>
@@ -232,14 +232,14 @@ const CreateProduct: React.FC = () => {
               id="brand"
               value={productData.brand}
               onChange={handleChange}
-              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
 
           <div className="col-span-full">
             <label
               htmlFor="images"
-              className="block text-sm font-medium text-gray-900"
+              className="block text-sm font-medium text-gray-900 dark:text-white"
             >
               Images
             </label>
@@ -250,7 +250,7 @@ const CreateProduct: React.FC = () => {
               multiple
               key={fileInputKey}
               onChange={handleFileChange}
-              className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-gray-100 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200"
+              className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-gray-100 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200 "
             />
             {images.length > 0 && (
               <div className="mt-4">
@@ -263,7 +263,7 @@ const CreateProduct: React.FC = () => {
         <div className="flex items-center justify-end gap-x-6">
           <button
             type="button"
-            className="text-sm font-semibold text-gray-900"
+            className="text-sm font-semibold text-gray-900 dark:text-white"
             onClick={() => navigate("/products")}
           >
             Cancel
@@ -273,8 +273,8 @@ const CreateProduct: React.FC = () => {
             disabled={loading}
             className={`rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-gray-300 ${
               loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-secondary hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+                ? "bg-green-400 cursor-not-allowed"
+                : "bg-secondary hover:bg-secondary hover:bg-opacity-75 duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-none ring-0"
             }`}
           >
             {loading ? "Submitting..." : "Create Product"}

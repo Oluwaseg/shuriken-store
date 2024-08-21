@@ -9,19 +9,19 @@ interface User {
 interface ConfirmDeleteModalProps {
   user: User;
   onClose: () => void;
-  onSuccess: () => void; // Add the onSuccess callback here
+  onSuccess: () => void;
 }
 
 const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   user,
   onClose,
-  onSuccess, // Destructure onSuccess from props
+  onSuccess,
 }) => {
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/user/admin/user/${user._id}`);
-      onSuccess(); // Call onSuccess after successful delete
-      onClose(); // Optionally close the modal
+      await axios.delete(`/api/admin/user/${user._id}`);
+      onSuccess();
+      onClose();
     } catch (error) {
       console.error("Error deleting user", error);
     }

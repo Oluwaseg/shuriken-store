@@ -3,7 +3,7 @@ import { User, Order } from "../components/tables/types/type";
 
 export const fetchTotalCustomers = async (): Promise<number> => {
   try {
-    const response = await axios.get("api/user/admin/users");
+    const response = await axios.get("api/admin/users");
     return response.data.count;
   } catch (error) {
     console.error("Error fetching total customers:", error);
@@ -42,7 +42,7 @@ export const fetchUserData = async (): Promise<{
   values: number[];
 }> => {
   try {
-    const response = await axios.get(`/api/user/admin/users`);
+    const response = await axios.get(`/api/admin/users`);
     const users: User[] = response.data.users;
 
     const labels = [

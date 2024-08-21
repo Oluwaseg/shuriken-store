@@ -11,7 +11,7 @@ interface User {
 interface EditUserModalProps {
   user: User;
   onClose: () => void;
-  onSuccess: () => void; // Add this line to define the onSuccess prop
+  onSuccess: () => void;
 }
 
 const EditUserModal: React.FC<EditUserModalProps> = ({
@@ -25,7 +25,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({
 
   const handleSave = async () => {
     try {
-      await axios.put(`/api/user/admin/user/${user._id}`, {
+      await axios.put(`/api/admin/user/${user._id}`, {
         name,
         email,
         role,

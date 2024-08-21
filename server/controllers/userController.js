@@ -61,7 +61,28 @@ export const verifyOTP = catchAsync(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
-export const loginUser = catchAsync(async (req, res, next) => {
+export const resendOTP = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  if (user.isVerified) {
+    return next(new ErrorHandler("User already verified", 400));
+  }
+
+  await sendOTP(user);
+
+  res.status(200).json({
+    success: true,
+    message: "A new OTP has been sent to your email address.",
+  });
+});
+
+export const userLogin = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -72,6 +93,39 @@ export const loginUser = catchAsync(async (req, res, next) => {
 
   if (!user) {
     return next(new ErrorHandler("User not found", 404));
+  }
+  const isPasswordMatched = await user.comparePassword(password);
+
+  if (!isPasswordMatched) {
+    return next(new ErrorHandler("Invalid email or password", 401));
+  }
+
+  if (!user.isVerified) {
+    return next(
+      new ErrorHandler(
+        "User not verified. Please verify your email address.",
+        400
+      )
+    );
+  }
+
+  sendToken(user, 200, res);
+});
+export const adminLogin = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(new ErrorHandler("Please Enter Email & Password", 400));
+  }
+
+  const user = await User.findOne({ email }).select("+password");
+
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  if (user.role !== "admin") {
+    return next(new ErrorHandler("Not authorized as admin", 403));
   }
 
   const isPasswordMatched = await user.comparePassword(password);
@@ -105,86 +159,40 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = user.getResetPasswordToken();
   await user.save({ validateBeforeSave: false });
 
-  const resetUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/api/user/password/reset/${resetToken}`;
+  const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
   const message = `
-    <html>
-    <head>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 0;
-          padding: 0;
-          background-color: #f4f4f4;
-          color: #333;
-        }
-        .container {
-          max-width: 600px;
-          margin: 0 auto;
-          background-color: #fff;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-          background-color: #007bff;
-          color: #fff;
-          padding: 10px 20px;
-          text-align: center;
-          border-radius: 8px 8px 0 0;
-        }
-        .content {
-          padding: 20px;
-        }
-        .footer {
-          text-align: center;
-          padding: 10px;
-          font-size: 12px;
-          color: #888;
-        }
-        .btn {
-          display: inline-block;
-          padding: 10px 20px;
-          margin: 20px 0;
-          font-size: 16px;
-          color: #fff !important;
-          background-color: #007bff;
-          text-decoration: none;
-          border-radius: 5px;
-        }
-        .btn:hover {
-          background-color: #0056b3;
-        }
-        hr {
-          margin: 20px 0;
-          border: 0;
-          border-top: 1px solid #ddd;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>ShopIT Password Recovery</h1>
-        </div>
-        <div class="content">
-          <p>Hi ${user.name},</p>
-          <p>We received a request to reset your password. Click the link below to set a new password:</p>
-          <a href="${resetUrl}" class="btn">Reset Password</a>
-          <hr>
-          <p>If the button above does not work, you can copy and paste the following URL into your browser:</p>
-          <p><a href="${resetUrl}">${resetUrl}</a></p>
-          <p>If you did not request this password reset, please ignore this email.</p>
-          <p>Thank you,<br>The ShopIT Team</p>
-        </div>
-        <div class="footer">
-          <p>&copy; ${new Date().getFullYear()} ShopIT. All rights reserved.</p>
-        </div>
-      </div>
-    </body>
-    </html>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4; padding: 20px;">
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+        <tr>
+          <td style="background-color: #007bff; color: #fff; padding: 10px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1>ShopIT Password Recovery</h1>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 20px;">
+            <p>Hi ${user.name},</p>
+            <p>We received a request to reset your password. Click the link below to set a new password:</p>
+            <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; margin: 20px 0; font-size: 16px; color: #fff !important; background-color: #007bff; text-decoration: none; border-radius: 5px;">Reset Password</a>
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
+            <p>If the button above does not work, you can copy and paste the following URL into your browser:</p>
+            <p><a href="${resetUrl}">${resetUrl}</a></p>
+            <p>If you did not request this password reset, please ignore this email.</p>
+            <p>Thank you,<br>The ShopIT Team</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: center; padding: 10px; font-size: 12px; color: #888;">
+            <p>&copy; ${new Date().getFullYear()} ShopIT. All rights reserved.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
   `;
 
   try {
@@ -266,12 +274,10 @@ const deleteOldAvatar = async (public_id) => {
 };
 
 export const updateProfile = catchAsync(async (req, res, next) => {
-  const { name, email } = req.body;
+  const newUserData = {};
 
-  const newUserData = {
-    name,
-    email,
-  };
+  if (req.body.name) newUserData.name = req.body.name;
+  if (req.body.email) newUserData.email = req.body.email;
 
   if (req.file) {
     const newAvatar = {
@@ -397,4 +403,30 @@ export const deleteUser = catchAsync(async (req, res, next) => {
   } catch (error) {
     return next(new ErrorHandler(error.message, 500));
   }
+});
+
+export const updateUserShippingInfo = catchAsync(async (req, res, next) => {
+  const { userId, shippingInfo } = req.body;
+
+  if (!shippingInfo || !userId) {
+    return next(
+      new ErrorHandler("User ID and shipping info are required", 400)
+    );
+  }
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { shippingInfo },
+    { new: true }
+  );
+
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Shipping info updated successfully",
+    user,
+  });
 });

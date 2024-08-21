@@ -1,7 +1,8 @@
 import express from "express";
 import {
   register,
-  loginUser,
+  userLogin,
+  adminLogin,
   logout,
   forgotPassword,
   resetPassword,
@@ -13,6 +14,7 @@ import {
   updateUserRole,
   deleteUser,
   verifyOTP,
+  resendOTP,
 } from "../controllers/userController.js";
 import {
   isAuthenticated,
@@ -21,29 +23,26 @@ import {
 import { uploadUserImage } from "../middlewares/image.config.js";
 const router = express.Router();
 
-router.post("/register", uploadUserImage.single("avatar"), register);
+router.post("/user/register", uploadUserImage.single("avatar"), register);
+router.post("/user/login", userLogin);
+router.post("/user/verify-otp", verifyOTP);
+router.post("/user/resend-otp", resendOTP);
+router.post("/user/logout", logout);
+router.post("/user/forgot-password", forgotPassword);
+router.put("/user/reset-password/:token", resetPassword);
 
-router.post("/verify-otp", verifyOTP);
-
-router.post("/login", loginUser);
-
-router.post("/logout", logout);
-
-router.post("/password/forgot", forgotPassword);
-
-router.put("/password/reset/:token", resetPassword);
-
-router.get("/me", isAuthenticated, getUserDetails);
-
+// User Routes
+router.get("/user/me", isAuthenticated, getUserDetails);
 router.put(
-  "/me/update",
+  "/user/me/update",
   uploadUserImage.single("avatar"),
   isAuthenticated,
   updateProfile
 );
+router.put("/user/password/update", isAuthenticated, updateUserPassword);
 
-router.put("/password/update", isAuthenticated, updateUserPassword);
-
+// Admin Routes
+router.post("/admin/login", adminLogin);
 router.get(
   "/admin/users",
   isAuthenticated,

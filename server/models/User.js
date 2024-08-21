@@ -44,6 +44,32 @@ const schema = new mongoose.Schema({
       url: { type: String, required: [true, "Image URL is required"] },
     },
   ],
+  shippingInfo: {
+    address: {
+      type: String,
+      required: false,
+    },
+    city: {
+      type: String,
+      required: false,
+    },
+    state: {
+      type: String,
+      required: false,
+    },
+    country: {
+      type: String,
+      required: false,
+    },
+    postalCode: {
+      type: Number,
+      required: false,
+    },
+    phoneNo: {
+      type: String,
+      required: false,
+    },
+  },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   otp: String,

@@ -8,23 +8,35 @@ const SHIPPING_COST = 15;
 export const createOrUpdateCart = catchAsync(async (req, res, next) => {
   const { userId, productId, quantity } = req.body;
 
+  // Find the product by its ID
   const product = await Product.findById(productId);
-  const price = product.price;
 
+  // Check if the product exists
+  if (!product) {
+    return res.status(404).json({
+      success: false,
+      message: "Product not found",
+    });
+  }
+
+  const price = product.price;
   const subtotal = price * quantity;
   const tax = subtotal * TAX_RATE;
   const shipping = SHIPPING_COST;
   const total = subtotal + tax + shipping;
 
+  // Find or create the cart
   let cart = await Cart.findOne({ user: userId });
   if (cart) {
     const itemIndex = cart.items.findIndex(
       (item) => item.product.toString() === productId
     );
     if (itemIndex >= 0) {
+      // Update quantity and price of existing item
       cart.items[itemIndex].quantity = quantity;
       cart.items[itemIndex].price = price;
     } else {
+      // Add new item to the cart
       cart.items.push({ product: productId, quantity, price });
     }
     cart.tax = tax;
@@ -32,6 +44,7 @@ export const createOrUpdateCart = catchAsync(async (req, res, next) => {
     cart.total = total;
     await cart.save();
   } else {
+    // Create a new cart if it doesn't exist
     cart = await Cart.create({
       user: userId,
       items: [{ product: productId, quantity, price }],
@@ -41,12 +54,16 @@ export const createOrUpdateCart = catchAsync(async (req, res, next) => {
     });
   }
 
+  // Return success response with the updated or created cart
   res.status(200).json({
     success: true,
     cart,
   });
 });
 
+
+
+// 4. Other cart-related functionalities (Existing ones)
 export const getCartByUserId = catchAsync(async (req, res, next) => {
   const cart = await Cart.findOne({ user: req.params.userId }).populate(
     "items.product"

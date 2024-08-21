@@ -4,7 +4,6 @@ import { loginUser } from "../redux/authSlice";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { motion } from "framer-motion";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import Circle from "./logo/Circle";
 import Shuriken from "./logo/Shuriken";
@@ -63,14 +62,14 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
+    <div className="flex items-center justify-center min-h-screen bg-primary dark:bg-gray-800 p-6">
       <HelmetProvider>
         <Helmet>
           <title>Admin Login</title>
           <meta name="description" content="Admin Login Page" />
         </Helmet>
       </HelmetProvider>
-      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+      <div className="w-full max-w-md bg-white dark:bg-gray-900 p-8 rounded-lg shadow-md">
         <div className="flex items-center justify-center gap-2.5 font-medium py-3 mb-3 mx-auto">
           <div className={`relative w-12 h-12`}>
             <Circle />
@@ -84,7 +83,7 @@ const LoginForm: React.FC = () => {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-white"
             >
               Email
             </label>
@@ -93,7 +92,7 @@ const LoginForm: React.FC = () => {
               id="email"
               placeholder="admin@admin.com"
               {...register("email", { required: "Email is required" })}
-              className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm ${
+              className={`mt-1 block w-full px-3 py-2 border border-gray-300 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm ${
                 errors.email ? "border-red-500" : ""
               }`}
             />
@@ -104,7 +103,7 @@ const LoginForm: React.FC = () => {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-white"
             >
               Password
             </label>
@@ -114,7 +113,7 @@ const LoginForm: React.FC = () => {
                 id="password"
                 placeholder="•••••••••"
                 {...register("password", { required: "Password is required" })}
-                className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm ${
+                className={`mt-1 block w-full px-3 py-2 border border-gray-300 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm ${
                   errors.password ? "border-red-500" : ""
                 }`}
               />

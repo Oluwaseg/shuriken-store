@@ -37,9 +37,7 @@ const UsersTable: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get<{ users: User[] }>(
-        "/api/user/admin/users"
-      );
+      const response = await axios.get<{ users: User[] }>("/api/admin/users");
       setUsers(response.data.users);
     } catch (error) {
       console.error("Error fetching users", error);

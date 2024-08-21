@@ -14,13 +14,10 @@ import cart from "./routes/cart.js";
 const app = express();
 
 // Middleware
-// app.use(cors());
-
-// app.options("*", cors());
 
 const corsOptions = {
-  origin: "http://localhost:5173", // Replace with your frontend origin
-  credentials: true, // Allow credentials (cookies, headers, etc.)
+  origin: process.env.CLIENT_URL,
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
@@ -31,10 +28,10 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 30 * 60 * 1000, // 30 minutes
+      maxAge: 30 * 60 * 1000,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
-      sameSite: "strict", // CSRF protection
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     },
   })
 );
@@ -45,7 +42,7 @@ app.use(cookieParser());
 app.use(errorMiddleware);
 
 // routes
-app.use("/api/user", user);
+app.use("/api", user);
 app.use("/api/", product);
 app.use("/api", order);
 app.use("/api", category);

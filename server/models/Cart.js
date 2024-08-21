@@ -24,6 +24,32 @@ const cartSchema = new mongoose.Schema({
       },
     },
   ],
+  shippingInfo: {
+    address: {
+      type: String,
+      required: true,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    state: {
+      type: String,
+      required: true,
+    },
+    country: {
+      type: String,
+      required: true,
+    },
+    postalCode: {
+      type: Number,
+      required: true,
+    },
+    phoneNo: {
+      type: String,
+      required: true,
+    },
+  },
   tax: {
     type: Number,
     default: 0,

@@ -1,61 +1,46 @@
 import Product from "../models/Product.js";
 import Order from "../models/Order.js";
+import Cart from "../models/Cart.js";
+import User from "../models/User.js";
 import { ErrorHandler } from "../utils/errorHandler.js";
 import { catchAsync } from "../utils/catchAsync.js";
 
 export const createOrder = catchAsync(async (req, res, next) => {
-  try {
-    const {
-      shippingInfo,
-      orderItems,
-      paymentInfo,
-      itemsPrice,
-      taxPrice,
-      shippingPrice,
-      totalPrice,
-    } = req.body;
+  const { userId, shippingInfo } = req.body;
 
-    // Validate the required fields
-    if (
-      !shippingInfo ||
-      !orderItems ||
-      !paymentInfo ||
-      !itemsPrice ||
-      !taxPrice ||
-      !shippingPrice ||
-      !totalPrice
-    ) {
-      return next(new ErrorHandler("All fields are required", 400));
-    }
+  // Fetch the cart and user
+  const cart = await Cart.findOne({ user: userId });
+  const user = await User.findById(userId);
 
-    // Create the order
-    const order = await Order.create({
-      shippingInfo,
-      orderItems,
-      paymentInfo,
-      itemsPrice,
-      taxPrice,
-      shippingPrice,
-      totalPrice,
-      paidAt: Date.now(),
-      user: req.user._id,
-    });
-
-    // Populate user details
-    const populatedOrder = await Order.findById(order._id)
-      .populate("user", "name email avatar")
-      .exec();
-
-    // Send response
-    res.status(201).json({
-      success: true,
-      order: populatedOrder,
-    });
-  } catch (error) {
-    next(new ErrorHandler(error.message, 500));
+  if (!cart || !user) {
+    return next(new ErrorHandler("Cart or user not found", 404));
   }
-});
 
+  // Use the shipping info from the user model if not provided
+  const finalShippingInfo = shippingInfo || user.shippingInfo;
+
+  // Create an order
+  const order = await Order.create({
+    user: userId,
+    orderItems: cart.items,
+    shippingInfo: finalShippingInfo,
+    itemsPrice: cart.total,
+    taxPrice: cart.tax,
+    shippingPrice: cart.shipping,
+    totalPrice: cart.total + cart.tax + cart.shipping,
+    orderStatus: "Pending",
+  });
+
+  const populatedOrder = await Order.findById(order._id)
+    .populate("user", "name email avatar")
+    .exec();
+
+  res.status(201).json({
+    success: true,
+    order: populatedOrder,
+    message: "Order created successfully. Proceed to payment.",
+  });
+});
 // Get Single Order
 export const getSingleOrder = catchAsync(async (req, res, next) => {
   try {
