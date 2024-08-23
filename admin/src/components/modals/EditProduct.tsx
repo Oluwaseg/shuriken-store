@@ -96,7 +96,13 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
 
     setLoading(true);
 
-    // Create a new FormData object
+    let calculatedDiscountedPrice = productData.price;
+    if (productData.discount.isDiscounted) {
+      calculatedDiscountedPrice =
+        productData.price -
+        (productData.price * productData.discount.discountPercent) / 100;
+    }
+
     const formData = new FormData();
     formData.append("name", productData.name);
     formData.append("description", productData.description);
@@ -113,7 +119,11 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     if (productData.discount.isDiscounted) {
       formData.append(
         "discount.discountPercent",
-        productData.discount.discountPercent
+        String(productData.discount.discountPercent)
+      );
+      formData.append(
+        "discount.discountedPrice",
+        String(calculatedDiscountedPrice)
       );
     }
 
@@ -124,24 +134,21 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     if (productData.flashSale.isFlashSale) {
       formData.append(
         "flashSale.flashSalePrice",
-        productData.flashSale.flashSalePrice
+        String(productData.flashSale.flashSalePrice)
       );
       formData.append(
         "flashSale.flashSaleEndTime",
         productData.flashSale.flashSaleEndTime
       );
     }
+
     if (productData.subcategory) {
       formData.append("subcategory", productData.subcategory);
     }
+
     productData.images.forEach((img) => formData.append("images[]", img.url));
     newImages.forEach((img) => formData.append("images", img));
     imagesToRemove.forEach((img) => formData.append("removeImages", img));
-
-    // Log the FormData contents
-    // formData.forEach((value, key) => {
-    //   console.log(`${key}: ${value}`);
-    // });
 
     try {
       const response = await axios.put(

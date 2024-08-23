@@ -22,7 +22,7 @@ export interface Product {
   bestSeller: boolean;
   discount: {
     isDiscounted: boolean;
-    discountPercent: string;
+    discountPercent: number;
   };
   flashSale: {
     isFlashSale: boolean;
