@@ -10,13 +10,11 @@ export const createProduct = catchAsync(async (req, res, next) => {
 
     const productData = { ...req.body };
 
-    // Validate flash sale end time if flash sale is enabled
     if (productData.flashSale && productData.flashSale.isFlashSale) {
       if (!productData.flashSale.flashSaleEndTime) {
         return next(new ErrorHandler("Flash sale end time is required", 400));
       }
 
-      // Ensure that the flash sale end time is in the future
       if (new Date(productData.flashSale.flashSaleEndTime) <= new Date()) {
         return next(
           new ErrorHandler("Flash sale end time must be in the future", 400)
@@ -24,7 +22,6 @@ export const createProduct = catchAsync(async (req, res, next) => {
       }
     }
 
-    // Add the images to the product data if they exist
     if (req.files && req.files.length > 0) {
       productData.images = req.files.map((file) => ({
         url: file.path,
@@ -32,7 +29,6 @@ export const createProduct = catchAsync(async (req, res, next) => {
       }));
     }
 
-    // Add the user creating the product
     productData.user = req.user.id;
 
     const product = await Product.create(productData);
@@ -73,9 +69,10 @@ export const getProductById = catchAsync(async (req, res, next) => {
 });
 
 export const updateProduct = catchAsync(async (req, res, next) => {
+  console.log(req.body);
+
   const remove_images = req.body.remove_images || [];
 
-  // Handle image deletion if requested
   if (remove_images.length > 0) {
     await Promise.all(
       remove_images.map(async (imageUrl) => {
@@ -98,13 +95,11 @@ export const updateProduct = catchAsync(async (req, res, next) => {
     return next(new ErrorHandler("Product not found", 404));
   }
 
-  // Validate flash sale end time if flash sale is enabled
   if (req.body.flashSale && req.body.flashSale.isFlashSale) {
     if (!req.body.flashSale.flashSaleEndTime) {
       return next(new ErrorHandler("Flash sale end time is required", 400));
     }
 
-    // Ensure that the flash sale end time is in the future
     if (new Date(req.body.flashSale.flashSaleEndTime) <= new Date()) {
       return next(
         new ErrorHandler("Flash sale end time must be in the future", 400)
@@ -112,18 +107,39 @@ export const updateProduct = catchAsync(async (req, res, next) => {
     }
   }
 
-  const filteredImages = product.images.filter(
-    (img) => !remove_images.includes(img.url)
-  );
+  const updatedData = {
+    ...req.body,
+    images: [
+      ...product.images.filter((img) => !remove_images.includes(img.url)),
+      ...newImages,
+    ],
+  };
 
-  const updatedImages = [...filteredImages, ...newImages];
+  if (updatedData.discount) {
+    if (
+      updatedData.discount.isDiscounted &&
+      updatedData.discount.discountPercent
+    ) {
+      updatedData.discount.discountedPrice =
+        updatedData.price * (1 - updatedData.discount.discountPercent / 100);
+    } else {
+      updatedData.discount.discountedPrice = updatedData.price;
+    }
+  }
+
+  if (updatedData.flashSale) {
+    if (
+      updatedData.flashSale.isFlashSale &&
+      updatedData.flashSale.flashSalePrice
+    ) {
+      updatedData.flashSale.flashSalePrice =
+        updatedData.flashSale.flashSalePrice;
+    }
+  }
 
   const updatedProduct = await Product.findByIdAndUpdate(
     req.params.id,
-    {
-      ...req.body,
-      images: updatedImages,
-    },
+    updatedData,
     {
       new: true,
       runValidators: true,
