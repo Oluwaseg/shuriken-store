@@ -66,9 +66,12 @@ const productSchema = new mongoose.Schema({
     ref: "Category",
     required: true,
   },
+  subcategory: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Subcategory",
+  },
   brand: {
     type: String,
-    // required: [true, "Brand is required"],
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -76,6 +79,37 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   createdAt: { type: Date, default: Date.now },
+  bestSeller: {
+    type: Boolean,
+    default: false,
+  },
+
+  discount: {
+    isDiscounted: { type: Boolean, default: false },
+    discountPercent: { type: Number, default: 0 },
+    discountedPrice: { type: Number },
+  },
+
+  flashSale: {
+    isFlashSale: { type: Boolean, default: false },
+    flashSalePrice: { type: Number },
+    flashSaleEndTime: { type: Date },
+  },
+});
+
+productSchema.pre("save", function (next) {
+  if (this.discount.isDiscounted && this.discount.discountPercent) {
+    this.discount.discountedPrice =
+      this.price * (1 - this.discount.discountPercent / 100);
+  } else {
+    this.discount.discountedPrice = this.price;
+  }
+
+  if (this.flashSale.isFlashSale && this.flashSale.flashSalePrice) {
+    this.flashSale.flashSalePrice = this.flashSale.flashSalePrice;
+  }
+
+  next();
 });
 
 productSchema.virtual("id").get(function () {

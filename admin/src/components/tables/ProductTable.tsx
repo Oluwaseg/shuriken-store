@@ -76,6 +76,10 @@ const ProductsTable: React.FC = () => {
     setCurrentPage(page);
   };
 
+  const truncateText = (text: string, maxLength: number) => {
+    return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+  };
+
   return (
     <section className="container px-4 mx-auto">
       <div className="flex flex-col">
@@ -167,7 +171,7 @@ const ProductsTable: React.FC = () => {
                           {product._id}
                         </td>
                         <td className="px-4 py-4 text-sm font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap">
-                          {product.name}
+                          {truncateText(product.name, 10)}
                         </td>
                         <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap">
                           ${product.price}

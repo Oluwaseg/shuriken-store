@@ -9,13 +9,29 @@ interface Category {
   name: string;
 }
 
+interface Subcategory {
+  id: string;
+  name: string;
+}
+
 interface ProductData {
   name: string;
   description: string;
   price: string;
   stock: string;
   category: string;
+  subcategory?: string;
   brand: string;
+  bestSeller: boolean; // 'Yes' or 'No'
+  discount: {
+    isDiscounted: boolean;
+    discountPercent: string;
+  };
+  flashSale: {
+    isFlashSale: boolean;
+    flashSalePrice: string;
+    flashSaleEndTime: string;
+  };
 }
 
 const CreateProduct: React.FC = () => {
@@ -25,10 +41,22 @@ const CreateProduct: React.FC = () => {
     price: "",
     stock: "",
     category: "",
+    subcategory: "",
     brand: "",
+    bestSeller: false, // Default value
+    discount: {
+      isDiscounted: false,
+      discountPercent: "0",
+    },
+    flashSale: {
+      isFlashSale: false,
+      flashSalePrice: "0.00",
+      flashSaleEndTime: "",
+    },
   });
   const [images, setImages] = useState<File[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [fileInputKey, setFileInputKey] = useState<number>(Date.now());
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -48,11 +76,51 @@ const CreateProduct: React.FC = () => {
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    if (productData.category) {
+      const fetchSubcategories = async () => {
+        try {
+          const response = await axios.get<{ subcategories: Subcategory[] }>(
+            `/api/subcategories/${productData.category}`
+          );
+          setSubcategories(response.data.subcategories);
+        } catch (error) {
+          console.error("Error fetching subcategories:", error);
+        }
+      };
+
+      fetchSubcategories();
+    }
+  }, [productData.category]);
+
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setProductData({ ...productData, [name]: value });
+    if (name in productData.discount) {
+      setProductData({
+        ...productData,
+        discount: { ...productData.discount, [name]: value },
+      });
+    } else if (name in productData.flashSale) {
+      setProductData({
+        ...productData,
+        flashSale: { ...productData.flashSale, [name]: value },
+      });
+    } else {
+      setProductData({ ...productData, [name]: value });
+    }
+  };
+
+  const handleCheckboxChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    field: "discount" | "flashSale"
+  ) => {
+    const { checked, name } = e.target;
+    setProductData((prevState) => ({
+      ...prevState,
+      [field]: { ...prevState[field], [name]: checked },
+    }));
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +144,32 @@ const CreateProduct: React.FC = () => {
       formData.append("price", productData.price);
       formData.append("stock", productData.stock);
       formData.append("category", productData.category);
+      if (productData.subcategory)
+        formData.append("subcategory", productData.subcategory);
       formData.append("brand", productData.brand);
+      formData.append("bestSeller", String(productData.bestSeller));
+
+      formData.append(
+        "discount.isDiscounted",
+        String(productData.discount.isDiscounted)
+      );
+      formData.append(
+        "discount.discountPercent",
+        productData.discount.discountPercent
+      );
+
+      formData.append(
+        "flashSale.isFlashSale",
+        String(productData.flashSale.isFlashSale)
+      );
+      formData.append(
+        "flashSale.flashSalePrice",
+        productData.flashSale.flashSalePrice
+      );
+      formData.append(
+        "flashSale.flashSaleEndTime",
+        productData.flashSale.flashSaleEndTime
+      );
 
       images.forEach((img) => formData.append("images", img));
 
@@ -210,10 +303,33 @@ const CreateProduct: React.FC = () => {
               required
               className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             >
-              <option value="">Select category</option>
+              <option value="">Select a category</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label
+              htmlFor="subcategory"
+              className="block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Subcategory
+            </label>
+            <select
+              name="subcategory"
+              id="subcategory"
+              value={productData.subcategory || ""}
+              onChange={handleChange}
+              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            >
+              <option value="">Select a subcategory</option>
+              {subcategories.map((sub) => (
+                <option key={sub.id} value={sub.id}>
+                  {sub.name}
                 </option>
               ))}
             </select>
@@ -232,8 +348,131 @@ const CreateProduct: React.FC = () => {
               id="brand"
               value={productData.brand}
               onChange={handleChange}
+              required
               className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
+          </div>
+
+          <div>
+            <label
+              htmlFor="bestSeller"
+              className="block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Best Seller
+            </label>
+            <select
+              name="bestSeller"
+              id="bestSeller"
+              value={productData.bestSeller ? "true" : "false"}
+              onChange={handleChange}
+              required
+              className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            >
+              <option value="false">No</option>
+              <option value="true">Yes</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white">
+              Discount
+            </label>
+            <div className="flex items-center mt-2">
+              <input
+                type="checkbox"
+                id="isDiscounted"
+                name="isDiscounted"
+                checked={productData.discount.isDiscounted}
+                onChange={(e) => handleCheckboxChange(e, "discount")}
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="isDiscounted"
+                className="ml-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Is Discounted
+              </label>
+            </div>
+            {productData.discount.isDiscounted && (
+              <div className="mt-4 space-y-4">
+                <div>
+                  <label
+                    htmlFor="discountPercent"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Discount Percent
+                  </label>
+                  <input
+                    type="number"
+                    id="discountPercent"
+                    name="discountPercent"
+                    value={productData.discount.discountPercent}
+                    onChange={handleChange}
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-900 dark:text-white">
+              Flash Sale
+            </label>
+            <div className="flex items-center mt-2">
+              <input
+                type="checkbox"
+                id="isFlashSale"
+                name="isFlashSale"
+                checked={productData.flashSale.isFlashSale}
+                onChange={(e) => handleCheckboxChange(e, "flashSale")}
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label
+                htmlFor="isFlashSale"
+                className="ml-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Is Flash Sale
+              </label>
+            </div>
+            {productData.flashSale.isFlashSale && (
+              <div className="mt-4 space-y-4">
+                <div>
+                  <label
+                    htmlFor="flashSalePrice"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Flash Sale Price
+                  </label>
+                  <input
+                    type="number"
+                    id="flashSalePrice"
+                    name="flashSalePrice"
+                    value={productData.flashSale.flashSalePrice}
+                    onChange={handleChange}
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="flashSaleEndTime"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Flash Sale End Time
+                  </label>
+                  <input
+                    type="datetime-local"
+                    id="flashSaleEndTime"
+                    name="flashSaleEndTime"
+                    value={productData.flashSale.flashSaleEndTime}
+                    onChange={handleChange}
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="col-span-full">

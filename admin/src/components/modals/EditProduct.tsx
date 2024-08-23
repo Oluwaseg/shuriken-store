@@ -1,9 +1,9 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdClose } from "react-icons/md";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import ImageCarousel from "../previews/Image";
-import { Product, Category } from "../tables/types/type";
+import { Product, Category, Subcategory } from "../tables/types/type";
 
 interface EditProductModalProps {
   product: Product;
@@ -24,16 +24,52 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
   const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
   const [fileInputKey, setFileInputKey] = useState<number>(Date.now());
   const [loading, setLoading] = useState<boolean>(false);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
 
   useEffect(() => {
     setProductData(product);
   }, [product]);
 
+  useEffect(() => {
+    const fetchSubcategories = async () => {
+      if (!productData.category) {
+        setSubcategories([]);
+        return;
+      }
+
+      try {
+        const response = await axios.get<{ subcategories: Subcategory[] }>(
+          `/api/subcategories/${productData.category}`
+        );
+        setSubcategories(response.data.subcategories);
+      } catch (error) {
+        console.error("Error fetching subcategories:", error);
+      }
+    };
+
+    fetchSubcategories();
+  }, [productData.category]);
+
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setProductData((prev: Product) => ({ ...prev, [name]: value }));
+
+    if (name.startsWith("discount.") || name.startsWith("flashSale.")) {
+      const [mainKey, subKey] = name.split(".") as [keyof Product, string];
+
+      if (mainKey === "discount" || mainKey === "flashSale") {
+        setProductData((prev) => ({
+          ...prev,
+          [mainKey]: {
+            ...prev[mainKey],
+            [subKey]: value === "" ? null : value,
+          },
+        }));
+      }
+    } else {
+      setProductData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +83,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
   const handleRemoveImage = (index: number) => {
     const imageToRemove = productData.images[index].url;
     setImagesToRemove((prev) => [...prev, imageToRemove]);
-    setProductData((prev: Product) => ({
+    setProductData((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
     }));
@@ -60,23 +96,60 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
 
     setLoading(true);
 
+    // Create a new FormData object
+    const formData = new FormData();
+    formData.append("name", productData.name);
+    formData.append("description", productData.description);
+    formData.append("price", String(productData.price));
+    formData.append("stock", String(productData.stock));
+    formData.append("category", productData.category);
+    formData.append("brand", productData.brand);
+    formData.append("bestSeller", String(productData.bestSeller));
+
+    formData.append(
+      "discount.isDiscounted",
+      String(productData.discount.isDiscounted)
+    );
+    if (productData.discount.isDiscounted) {
+      formData.append(
+        "discount.discountPercent",
+        productData.discount.discountPercent
+      );
+    }
+
+    formData.append(
+      "flashSale.isFlashSale",
+      String(productData.flashSale.isFlashSale)
+    );
+    if (productData.flashSale.isFlashSale) {
+      formData.append(
+        "flashSale.flashSalePrice",
+        productData.flashSale.flashSalePrice
+      );
+      formData.append(
+        "flashSale.flashSaleEndTime",
+        productData.flashSale.flashSaleEndTime
+      );
+    }
+    if (productData.subcategory) {
+      formData.append("subcategory", productData.subcategory);
+    }
+    productData.images.forEach((img) => formData.append("images[]", img.url));
+    newImages.forEach((img) => formData.append("images", img));
+    imagesToRemove.forEach((img) => formData.append("removeImages", img));
+
+    // Log the FormData contents
+    // formData.forEach((value, key) => {
+    //   console.log(`${key}: ${value}`);
+    // });
+
     try {
-      const formData = new FormData();
-      formData.append("name", productData.name);
-      formData.append("description", productData.description);
-      formData.append("price", String(productData.price));
-      formData.append("stock", String(productData.stock));
-      formData.append("category", productData.category);
-      formData.append("brand", productData.brand);
-
-      productData.images.forEach((img) => formData.append("images[]", img.url));
-      newImages.forEach((img) => formData.append("images", img));
-      imagesToRemove.forEach((img) => formData.append("remove_images[]", img));
-
       const response = await axios.put(
         `/api/products/${product._id}`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
       );
 
       if (response.data.success) {
@@ -93,8 +166,10 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
       setLoading(false);
     }
   };
+
   return (
     <div className="fixed inset-0 bg-gray-500  bg-opacity-75 flex items-center justify-center z-[10] overflow-y-auto">
+      <Toaster position="top-right" />
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto z-[1000]">
         <div className="relative">
           <button
@@ -102,20 +177,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
             onClick={onClose}
             className="absolute top-2 right-2 text-gray-500 dark:text-white hover:text-gray-700"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-6 h-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <MdClose size={24} />
           </button>
           <div className="p-6">
             <h2 className="text-3xl font-semibold text-gray-900 dark:text-white mb-6">
@@ -127,7 +189,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
               className="space-y-6"
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                <div className="col-span-1">
+                <div className="col-span-full">
                   <label
                     htmlFor="name"
                     className="block text-sm font-medium text-gray-900 dark:text-white"
@@ -141,11 +203,11 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     value={productData.name}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
 
-                <div className="col-span-1">
+                <div className="col-span-full">
                   <label
                     htmlFor="description"
                     className="block text-sm font-medium text-gray-900 dark:text-white"
@@ -159,30 +221,35 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     value={productData.description}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
                 </div>
 
-                <div className="col-span-1">
+                <div>
                   <label
                     htmlFor="price"
                     className="block text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Price
                   </label>
-                  <input
-                    type="number"
-                    name="price"
-                    id="price"
-                    value={productData.price}
-                    onChange={handleChange}
-                    required
-                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    placeholder="0.00"
-                  />
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-sm">
+                      $
+                    </span>
+                    <input
+                      type="number"
+                      name="price"
+                      id="price"
+                      value={productData.price}
+                      onChange={handleChange}
+                      required
+                      className="mt-2 block w-full rounded-md border border-gray-300 pl-8 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="0.00"
+                    />
+                  </div>
                 </div>
 
-                <div className="col-span-1">
+                <div>
                   <label
                     htmlFor="stock"
                     className="block text-sm font-medium text-gray-900 dark:text-white"
@@ -192,13 +259,13 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   <select
                     name="stock"
                     id="stock"
-                    value={productData.stock}
+                    value={productData.stock.toString()}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   >
                     <option value="">Select stock quantity</option>
-                    {[...Array(100).keys()].map((num) => (
+                    {[...Array(200).keys()].map((num) => (
                       <option key={num + 1} value={num + 1}>
                         {num + 1}
                       </option>
@@ -206,7 +273,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   </select>
                 </div>
 
-                <div className="col-span-1">
+                <div>
                   <label
                     htmlFor="category"
                     className="block text-sm font-medium text-gray-900 dark:text-white"
@@ -219,18 +286,42 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     value={productData.category}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   >
-                    <option value="">Select category</option>
+                    <option value="">Select a category</option>
                     {categories.map((cat) => (
-                      <option key={cat._id} value={cat._id}>
+                      <option key={cat.id} value={cat.id}>
                         {cat.name}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div className="col-span-1">
+                <div>
+                  <label
+                    htmlFor="subcategory"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Subcategory
+                  </label>
+                  <select
+                    name="subcategory"
+                    id="subcategory"
+                    value={productData.subcategory || ""}
+                    onChange={handleChange}
+                    required={subcategories.length > 0}
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  >
+                    <option value="">Select a subcategory</option>
+                    {subcategories.map((subcat) => (
+                      <option key={subcat.id} value={subcat.id}>
+                        {subcat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
                   <label
                     htmlFor="brand"
                     className="block text-sm font-medium text-gray-900 dark:text-white"
@@ -244,8 +335,28 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     value={productData.brand}
                     onChange={handleChange}
                     required
-                    className="mt-1 block w-full dark:bg-gray-800 rounded-md border border-gray-300 p-3 text-gray-900 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="bestSeller"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Best Seller
+                  </label>
+                  <select
+                    name="bestSeller"
+                    id="bestSeller"
+                    value={String(productData.bestSeller)}
+                    onChange={handleChange}
+                    required
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  >
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </select>
                 </div>
 
                 <div className="col-span-2">
@@ -302,28 +413,132 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     />
                   </div>
                 </div>
+
+                <div className="col-span-full">
+                  <label
+                    htmlFor="discount.isDiscounted"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Is Discounted
+                  </label>
+                  <select
+                    name="discount.isDiscounted"
+                    id="discount.isDiscounted"
+                    value={String(productData.discount.isDiscounted)}
+                    onChange={handleChange}
+                    required
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  >
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </select>
+
+                  {productData.discount.isDiscounted && (
+                    <>
+                      <div className="mt-4">
+                        <label
+                          htmlFor="discount.discountPercent"
+                          className="block text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                          Discount Percent
+                        </label>
+                        <input
+                          type="number"
+                          name="discount.discountPercent"
+                          id="discount.discountPercent"
+                          value={productData.discount.discountPercent}
+                          onChange={handleChange}
+                          required
+                          className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          placeholder="0"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div className="col-span-full">
+                  <label
+                    htmlFor="flashSale.isFlashSale"
+                    className="block text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Is Flash Sale
+                  </label>
+                  <select
+                    name="flashSale.isFlashSale"
+                    id="flashSale.isFlashSale"
+                    value={String(productData.flashSale.isFlashSale)}
+                    onChange={handleChange}
+                    required
+                    className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  >
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </select>
+
+                  {productData.flashSale.isFlashSale && (
+                    <>
+                      <div className="mt-4">
+                        <label
+                          htmlFor="flashSale.flashSalePrice"
+                          className="block text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                          Flash Sale Price
+                        </label>
+                        <input
+                          type="number"
+                          name="flashSale.flashSalePrice"
+                          id="flashSale.flashSalePrice"
+                          value={productData.flashSale.flashSalePrice}
+                          onChange={handleChange}
+                          required={productData.flashSale.isFlashSale}
+                          className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                          placeholder="0"
+                        />
+                      </div>
+
+                      <div className="mt-4">
+                        <label
+                          htmlFor="flashSale.flashSaleEndTime"
+                          className="block text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                          Flash Sale End Time
+                        </label>
+                        <input
+                          type="datetime-local"
+                          name="flashSale.flashSaleEndTime"
+                          id="flashSale.flashSaleEndTime"
+                          value={productData.flashSale.flashSaleEndTime}
+                          onChange={handleChange}
+                          required={productData.flashSale.isFlashSale}
+                          className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
+
               <div className="flex justify-end">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 mr-2"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gray-500 hover:bg-gray-600"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
                 >
-                  {loading ? "Updating..." : "Update Product"}
+                  {loading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
           </div>
         </div>
       </div>
-      <Toaster position="top-right" />
     </div>
   );
 };

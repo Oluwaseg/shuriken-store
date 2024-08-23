@@ -18,13 +18,32 @@ export interface Product {
   ratings: number;
   numOfReviews: number;
   user: string;
+  subcategory?: string;
+  bestSeller: boolean;
+  discount: {
+    isDiscounted: boolean;
+    discountPercent: string;
+  };
+  flashSale: {
+    isFlashSale: boolean;
+    flashSalePrice: string;
+    flashSaleEndTime: string;
+  };
   createdAt: string;
   id: string;
 }
 
 export interface Category {
   _id: string;
+  id: string;
   name: string;
+}
+
+export interface Subcategory {
+  _id: string;
+  id: string;
+  name: string;
+  category: string;
 }
 
 export interface OrderItem {

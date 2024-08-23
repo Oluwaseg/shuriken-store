@@ -8,6 +8,14 @@ import {
   getCategoriesWithProductCount,
 } from "../controllers/categoryController.js";
 import {
+  createSubcategory,
+  getAllSubcategories,
+  getSubcategoriesByCategory,
+  getSubcategoryById,
+  updateSubcategory,
+  deleteSubcategory,
+} from "../controllers/subcategoryController.js";
+import {
   isAuthenticated,
   authorizeRoles,
 } from "../middlewares/authenticate.js";
@@ -34,6 +42,33 @@ router.delete(
   isAuthenticated,
   authorizeRoles("admin"),
   deleteCategory
+);
+
+router.post(
+  "/subcategory",
+  createSubcategory,
+  isAuthenticated,
+  authorizeRoles("admin")
+);
+
+router.get("/subcategories", getAllSubcategories);
+
+router.get("/subcategories/:categoryId", getSubcategoriesByCategory);
+
+router.get("/subcategory/:id", getSubcategoryById);
+
+router.put(
+  "/subcategory/:id",
+  updateSubcategory,
+  isAuthenticated,
+  authorizeRoles("admin")
+);
+
+router.delete(
+  "/subcategory/:id",
+  deleteSubcategory,
+  isAuthenticated,
+  authorizeRoles("admin")
 );
 
 export default router;

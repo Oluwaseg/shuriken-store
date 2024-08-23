@@ -6,23 +6,36 @@ import APIFeatures from "../utils/apiFeatures.js";
 
 export const createProduct = catchAsync(async (req, res, next) => {
   try {
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No images uploaded",
-      });
+    console.log(req.body);
+
+    const productData = { ...req.body };
+
+    // Validate flash sale end time if flash sale is enabled
+    if (productData.flashSale && productData.flashSale.isFlashSale) {
+      if (!productData.flashSale.flashSaleEndTime) {
+        return next(new ErrorHandler("Flash sale end time is required", 400));
+      }
+
+      // Ensure that the flash sale end time is in the future
+      if (new Date(productData.flashSale.flashSaleEndTime) <= new Date()) {
+        return next(
+          new ErrorHandler("Flash sale end time must be in the future", 400)
+        );
+      }
     }
 
-    const images = req.files.map((file) => ({
-      url: file.path,
-      public_id: file.filename,
-    }));
+    // Add the images to the product data if they exist
+    if (req.files && req.files.length > 0) {
+      productData.images = req.files.map((file) => ({
+        url: file.path,
+        public_id: file.filename,
+      }));
+    }
 
-    const product = await Product.create({
-      ...req.body,
-      images: images,
-      user: req.user.id,
-    });
+    // Add the user creating the product
+    productData.user = req.user.id;
+
+    const product = await Product.create(productData);
 
     res.status(201).json({
       success: true,
@@ -62,6 +75,7 @@ export const getProductById = catchAsync(async (req, res, next) => {
 export const updateProduct = catchAsync(async (req, res, next) => {
   const remove_images = req.body.remove_images || [];
 
+  // Handle image deletion if requested
   if (remove_images.length > 0) {
     await Promise.all(
       remove_images.map(async (imageUrl) => {
@@ -82,6 +96,20 @@ export const updateProduct = catchAsync(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
   if (!product) {
     return next(new ErrorHandler("Product not found", 404));
+  }
+
+  // Validate flash sale end time if flash sale is enabled
+  if (req.body.flashSale && req.body.flashSale.isFlashSale) {
+    if (!req.body.flashSale.flashSaleEndTime) {
+      return next(new ErrorHandler("Flash sale end time is required", 400));
+    }
+
+    // Ensure that the flash sale end time is in the future
+    if (new Date(req.body.flashSale.flashSaleEndTime) <= new Date()) {
+      return next(
+        new ErrorHandler("Flash sale end time must be in the future", 400)
+      );
+    }
   }
 
   const filteredImages = product.images.filter(

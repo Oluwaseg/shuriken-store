@@ -235,7 +235,13 @@ const Navbar: React.FC = () => {
               <NavLink
                 key={link.to}
                 to={link.to}
-                className="text-gray-500 text-lg bg-white dark:bg-gray-800 border-b border-gray-600 dark:border-white py-2 pl-6 hover:bg-gray-700 hover:text-white dark:hover:bg-gray-600 dark:text-white  transition-colors duration-300"
+                className={({ isActive }) =>
+                  `text-lg py-2 pl-6 transition-colors duration-300 ${
+                    isActive
+                      ? "bg-black text-white"
+                      : "bg-white dark:bg-gray-800 text-gray-500 hover:bg-gray-700 hover:text-white dark:text-white dark:hover:bg-gray-600"
+                  } border-b border-gray-600 dark:border-white`
+                }
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.text}
