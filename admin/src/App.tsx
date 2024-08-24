@@ -9,12 +9,12 @@ import Settings from "./pages/Settings";
 import Products from "./pages/Products";
 import Category from "./pages/Category";
 import Create from "./pages/Create";
-import CreateCategory from "./pages/AddCategory";
 import Login from "./pages/Login";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import ProtectedRoute from "./services/ProtectedRoutes";
 import Preloader from "./components/Preloader";
 import { RootState } from "./redux/store";
+import SubCategory from "./pages/SubCategory";
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -115,11 +115,11 @@ const App: React.FC = () => {
         }
       />
       <Route
-        path="/categories/create"
+        path="/subcategories"
         element={
           <ProtectedRoute>
             <RootLayout>
-              <CreateCategory />
+              <SubCategory />
             </RootLayout>
           </ProtectedRoute>
         }

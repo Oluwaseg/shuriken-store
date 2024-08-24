@@ -111,7 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       icon: TbReportAnalytics,
       menus: [
         { name: "Categories", path: "/categories" },
-        { name: "Create", path: "/categories/create" },
+        { name: "Sub-Categories", path: "/subcategories" },
       ],
     },
   ];

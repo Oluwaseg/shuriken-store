@@ -12,6 +12,10 @@ const subcategorySchema = new mongoose.Schema({
     required: true,
   },
   description: String,
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 subcategorySchema.virtual("id").get(function () {
