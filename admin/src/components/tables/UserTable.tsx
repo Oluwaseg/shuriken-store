@@ -91,10 +91,6 @@ const UsersTable: React.FC = () => {
                       <tr>
                         <th className="py-3.5 px-4 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
                           <div className="flex items-center gap-x-3">
-                            <input
-                              type="checkbox"
-                              className="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:border-gray-700"
-                            />
                             <span>#</span>
                           </div>
                         </th>
@@ -126,10 +122,6 @@ const UsersTable: React.FC = () => {
                         <tr key={user._id}>
                           <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-200">
                             <div className="inline-flex items-center gap-x-3">
-                              <input
-                                type="checkbox"
-                                className="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:border-gray-700"
-                              />
                               <span>{index + 1}</span>
                             </div>
                           </td>

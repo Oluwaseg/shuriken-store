@@ -8,7 +8,6 @@ import Orders from "./pages/Orders";
 import Settings from "./pages/Settings";
 import Products from "./pages/Products";
 import Category from "./pages/Category";
-import Create from "./pages/Create";
 import Login from "./pages/Login";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import ProtectedRoute from "./services/ProtectedRoutes";
@@ -100,16 +99,6 @@ const App: React.FC = () => {
           <ProtectedRoute>
             <RootLayout>
               <Products />
-            </RootLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/products/create"
-        element={
-          <ProtectedRoute>
-            <RootLayout>
-              <Create />
             </RootLayout>
           </ProtectedRoute>
         }

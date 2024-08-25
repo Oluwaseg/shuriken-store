@@ -103,7 +103,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       icon: RiBuilding3Line,
       menus: [
         { name: "Products", path: "/products" },
-        { name: "Create", path: "/products/create" },
+        { name: "Reviews", path: "/products/reviews" },
       ],
     },
     {

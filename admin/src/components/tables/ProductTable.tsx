@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import {
   FaEdit,
@@ -9,15 +8,14 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 import EditProductModal from "../modals/EditProduct";
-import { Product, Category } from "./types/type"; // Ensure you have these types defined
+import { Product, Category } from "./types/type";
 
-const ProductsTable: React.FC = () => {
+const ProductsTable: React.FC<{ key: number }> = ({ key }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [itemsPerPage] = useState<number>(20); // Set items per page
-  const navigate = useNavigate();
+  const [itemsPerPage] = useState<number>(20);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -46,7 +44,7 @@ const ProductsTable: React.FC = () => {
 
     fetchProducts();
     fetchCategories();
-  }, []);
+  }, [key]);
 
   const handleEdit = (product: Product) => {
     setSelectedProduct(product);
@@ -63,7 +61,6 @@ const ProductsTable: React.FC = () => {
     }
   };
 
-  // Pagination logic
   const indexOfLastProduct = currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
   const currentProducts = products.slice(
@@ -99,12 +96,8 @@ const ProductsTable: React.FC = () => {
                         className="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400"
                       >
                         <div className="flex items-center gap-x-3">
-                          <input
-                            type="checkbox"
-                            className="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700"
-                          />
                           <button className="flex items-center gap-x-2">
-                            <span>Product</span>
+                            <span>ID</span>
                           </button>
                         </div>
                       </th>
@@ -160,10 +153,6 @@ const ProductsTable: React.FC = () => {
                       <tr key={product._id}>
                         <td className="px-4 py-4 text-sm font-medium text-gray-700 dark:text-gray-200 whitespace-nowrap">
                           <div className="inline-flex items-center gap-x-3">
-                            <input
-                              type="checkbox"
-                              className="text-blue-500 border-gray-300 rounded dark:bg-gray-900 dark:ring-offset-gray-900 dark:border-gray-700"
-                            />
                             <span>{index + 1}</span>
                           </div>
                         </td>
