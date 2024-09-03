@@ -56,6 +56,17 @@ export interface Product {
   ratings: number;
   numOfReviews: number;
   user: string;
+  subcategory?: string;
+  bestSeller: boolean;
+  discount: {
+    isDiscounted: boolean;
+    discountPercent: number;
+  };
+  flashSale: {
+    isFlashSale: boolean;
+    flashSalePrice: string;
+    flashSaleEndTime: string;
+  };
   createdAt: string;
   id: string;
 }
@@ -69,20 +80,30 @@ export interface ProductsApiResponse<T> {
 
 export interface Category {
   _id: string;
+  id: string;
   name: string;
+  description: string;
+  createdAt: string;
 }
 
-// Cart Item type
+export interface Subcategory {
+  _id: string;
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  createdAt: string;
+}
+
 export interface CartItem {
-  product: Product | string; // Could be populated Product or just the ID
+  product: Product | string;
   quantity: number;
   price: number;
 }
 
-// Cart type
 export interface Cart {
   id: string;
-  user: string; // Reference to User ID
+  user: string;
   items: CartItem[];
   total: number;
   tax: number;
