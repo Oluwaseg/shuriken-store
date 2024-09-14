@@ -9,10 +9,20 @@ import {
   getTotalProducts,
 } from "../../api/product";
 import {
+  getAllCategories,
+  getCategoryById,
+  getCategoriesWithProductCount,
+  getAllSubcategories,
+  getSubcategoriesByCategory,
+  getSubcategoryById,
+} from "../../api/category";
+import {
   ProductsApiResponse,
   Product,
   Review,
   QueryParams,
+  Category,
+  Subcategory,
 } from "../../types/type";
 
 interface ProductState {
@@ -21,8 +31,16 @@ interface ProductState {
   product: Product | null;
   reviews: Review[];
   totalProducts: number;
+  categories: Category[];
+  subcategories: Subcategory[];
+  category: Category | null;
+  subcategory: Subcategory | null;
   loading: boolean;
   error: string | null;
+  reviewsLoading: boolean; // Specific to reviews
+  reviewsError: string | null;
+  reviewSubmissionLoading: boolean;
+  reviewSubmissionError: string | null;
 }
 
 const initialState: ProductState = {
@@ -31,8 +49,16 @@ const initialState: ProductState = {
   product: null,
   reviews: [],
   totalProducts: 0,
+  categories: [],
+  subcategories: [],
+  category: null,
+  subcategory: null,
   loading: false,
   error: null,
+  reviewsLoading: false,
+  reviewsError: null,
+  reviewSubmissionLoading: false,
+  reviewSubmissionError: null,
 };
 
 // Fetch all products
@@ -113,7 +139,7 @@ export const fetchProductReviews = createAsyncThunk(
         productId
       );
       if (response.success) {
-        return response.products;
+        return response.reviews;
       } else {
         throw new Error(response.message);
       }
@@ -145,7 +171,7 @@ export const createReview = createAsyncThunk(
         comment
       );
       if (response.success) {
-        return response.products;
+        return response.review;
       } else {
         throw new Error(response.message);
       }
@@ -188,6 +214,138 @@ export const fetchTotalProducts = createAsyncThunk(
       const response: ProductsApiResponse<number> = await getTotalProducts();
       if (response.success) {
         return response.products;
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        return rejectWithValue("An unknown error occurred");
+      }
+    }
+  }
+);
+
+// Fetch all categories
+export const fetchCategories = createAsyncThunk(
+  "products/fetchCategories",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response: ProductsApiResponse<Category[]> =
+        await getAllCategories();
+
+      if (response.success) {
+        return response.categories;
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        return rejectWithValue("An unknown error occurred");
+      }
+    }
+  }
+);
+
+// Fetch category by ID
+export const fetchCategoryById = createAsyncThunk(
+  "products/fetchCategoryById",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response: ProductsApiResponse<Category> = await getCategoryById(id);
+      if (response.success) {
+        return response.categories;
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        return rejectWithValue("An unknown error occurred");
+      }
+    }
+  }
+);
+
+// Fetch categories with product count
+export const fetchCategoriesWithProductCount = createAsyncThunk(
+  "products/fetchCategoriesWithProductCount",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response: ProductsApiResponse<Category[]> =
+        await getCategoriesWithProductCount();
+      if (response.success) {
+        return response.categories;
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        return rejectWithValue("An unknown error occurred");
+      }
+    }
+  }
+);
+
+// Fetch all subcategories
+export const fetchSubcategories = createAsyncThunk(
+  "products/fetchSubcategories",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response: ProductsApiResponse<Subcategory[]> =
+        await getAllSubcategories();
+      if (response.success) {
+        return response.subcategories;
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        return rejectWithValue("An unknown error occurred");
+      }
+    }
+  }
+);
+
+// Fetch subcategories by category ID
+export const fetchSubcategoriesByCategory = createAsyncThunk(
+  "products/fetchSubcategoriesByCategory",
+  async (categoryId: string, { rejectWithValue }) => {
+    try {
+      const response: ProductsApiResponse<Subcategory[]> =
+        await getSubcategoriesByCategory(categoryId);
+      if (response.success) {
+        return response.subcategories;
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        return rejectWithValue("An unknown error occurred");
+      }
+    }
+  }
+);
+
+// Fetch subcategory by ID
+export const fetchSubcategoryById = createAsyncThunk(
+  "products/fetchSubcategoryById",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      const response: ProductsApiResponse<Subcategory> =
+        await getSubcategoryById(id);
+      if (response.success) {
+        return response.subcategories;
       } else {
         throw new Error(response.message);
       }
@@ -249,34 +407,33 @@ const productSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // Fetch product reviews
       .addCase(fetchProductReviews.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.reviewsLoading = true; // Set reviewsLoading to true
+        state.reviewsError = null; // Reset reviewsError
       })
       .addCase(fetchProductReviews.fulfilled, (state, action) => {
-        state.loading = false;
+        state.reviewsLoading = false; // Set reviewsLoading to false
         state.reviews = action.payload || [];
       })
       .addCase(fetchProductReviews.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
+        state.reviewsLoading = false; // Set reviewsLoading to false
+        state.reviewsError = action.payload as string; // Set reviewsError
       })
 
       // Create or update review
       .addCase(createReview.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.reviewSubmissionLoading = true;
+        state.reviewSubmissionError = null;
       })
       .addCase(createReview.fulfilled, (state, action) => {
         if (action.payload) {
-          state.loading = false;
+          state.reviewSubmissionLoading = false;
           state.reviews = [...state.reviews, action.payload];
         }
       })
       .addCase(createReview.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
+        state.reviewSubmissionLoading = false;
+        state.reviewSubmissionError = action.payload as string;
       })
 
       // Delete review
@@ -305,6 +462,89 @@ const productSlice = createSlice({
         state.totalProducts = action.payload ?? 0;
       })
       .addCase(fetchTotalProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Fetch categories
+      .addCase(fetchCategories.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.categories = action.payload || [];
+      })
+      .addCase(fetchCategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Fetch category by ID
+      .addCase(fetchCategoryById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCategoryById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.category = action.payload ?? null;
+      })
+      .addCase(fetchCategoryById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Fetch categories with product count
+      .addCase(fetchCategoriesWithProductCount.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCategoriesWithProductCount.fulfilled, (state, action) => {
+        state.loading = false;
+        state.categories = action.payload || [];
+      })
+      .addCase(fetchCategoriesWithProductCount.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Fetch subcategories
+      .addCase(fetchSubcategories.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSubcategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.subcategories = action.payload || [];
+      })
+      .addCase(fetchSubcategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Fetch subcategories by category ID
+      .addCase(fetchSubcategoriesByCategory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSubcategoriesByCategory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.subcategories = action.payload || [];
+      })
+      .addCase(fetchSubcategoriesByCategory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      // Fetch subcategory by ID
+      .addCase(fetchSubcategoryById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSubcategoryById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.subcategory = action.payload ?? null;
+      })
+      .addCase(fetchSubcategoryById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

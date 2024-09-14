@@ -248,3 +248,31 @@ body {
   --rotation: 360;
   --translation: 150;
 }
+
+.custom-input {
+  @apply w-full sm:flex-1 outline-none bg-white dark:bg-gray-900 dark:text-white;
+
+  -webkit-box-shadow: 0 0 0 1000px white inset;
+  box-shadow: 0 0 0 1000px white inset;
+}
+
+.dark .custom-input {
+  -webkit-box-shadow: 0 0 0 1000px #111827 inset;
+  box-shadow: 0 0 0 1000px #111827 inset;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill::first-line {
+  -webkit-text-fill-color: #1a1a1a;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill::first-line {
+  -webkit-text-fill-color: #ffffff;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}

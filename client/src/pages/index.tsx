@@ -1,6 +1,6 @@
 import Hero from "../components/common/Hero";
+import ScrollButton from "../components/lib/ScrollButton";
 import BestSellers from "../components/template/BestSeller";
-import Footer from "../components/template/Footer";
 import Latest from "../components/template/Latest";
 import NewsLetter from "../components/template/NewsLetter";
 import OurPolicy from "../components/template/OurPolicy";
@@ -11,11 +11,11 @@ const index = () => {
     <div className="">
       <Hero />
       <Latest />
-      <BestSellers />
       <OurPolicy />
-      <NewsLetter />
-      <Footer />
+      <BestSellers />
       <ProductGrid />
+      <NewsLetter />
+      <ScrollButton />
     </div>
   );
 };

@@ -7,8 +7,6 @@ type Product = {
   image: string;
   price: string;
   rating: number;
-  isNew?: boolean;
-  isOnSale?: boolean;
 };
 
 const products: Product[] = [
@@ -19,7 +17,6 @@ const products: Product[] = [
       "https://cdn.rareblocks.xyz/collection/clarity-ecommerce/images/item-cards/4/product-1.png",
     price: "$99.00",
     rating: 4,
-    isNew: true,
   },
   {
     id: 2,
@@ -36,7 +33,6 @@ const products: Product[] = [
       "https://cdn.rareblocks.xyz/collection/clarity-ecommerce/images/item-cards/4/product-3.png",
     price: "$149.00",
     rating: 3,
-    isOnSale: true,
   },
   {
     id: 4,
@@ -56,14 +52,7 @@ const products: Product[] = [
   },
 ];
 
-const ProductCard: React.FC<Product> = ({
-  name,
-  image,
-  price,
-  rating,
-  isNew,
-  isOnSale,
-}) => {
+const ProductCard: React.FC<Product> = ({ name, image, price, rating }) => {
   return (
     <div className="relative group">
       <div className="overflow-hidden aspect-w-1 aspect-h-1">
@@ -73,20 +62,7 @@ const ProductCard: React.FC<Product> = ({
           alt={name}
         />
       </div>
-      {isNew && (
-        <div className="absolute left-3 top-3">
-          <p className="sm:px-3 sm:py-1.5 px-1.5 py-1 text-[8px] sm:text-xs font-bold tracking-wide text-gray-900 uppercase bg-white rounded-full">
-            New
-          </p>
-        </div>
-      )}
-      {isOnSale && (
-        <div className="absolute left-3 top-3">
-          <p className="sm:px-3 sm:py-1.5 px-1.5 py-1 text-[8px] sm:text-xs font-bold tracking-wide text-white uppercase bg-gray-900 rounded-full">
-            Sale
-          </p>
-        </div>
-      )}
+
       <div className="flex items-start justify-between mt-4 space-x-4">
         <div>
           <h3 className="text-xs font-bold text-gray-900 sm:text-sm md:text-base">

@@ -50,8 +50,13 @@ router.get(
 );
 
 // Review routes
-router.put("/products/:id/reviews", isAuthenticated, createReview);
-router.delete("/products/:id/reviews", isAuthenticated, deleteReview);
 router.get("/products/:id/reviews", getProductReviews);
+router.put("/products/:id/reviews", isAuthenticated, createReview);
+router.delete(
+  "/products/:id/reviews",
+  isAuthenticated,
+  authorizeRoles("admin", "user"),
+  deleteReview
+);
 
 export default router;

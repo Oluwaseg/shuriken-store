@@ -44,7 +44,7 @@ export const createOrUpdateReview = async (
   rating: number,
   comment: string
 ): Promise<ProductsApiResponse<Review>> => {
-  const response = await axiosInstance.post<ProductsApiResponse<Review>>(
+  const response = await axiosInstance.put<ProductsApiResponse<Review>>(
     `/products/${productId}/reviews`,
     { rating, comment }
   );
@@ -66,6 +66,7 @@ export const getProductReviews = async (
   const response = await axiosInstance.get<ProductsApiResponse<Review[]>>(
     `/products/${productId}/reviews`
   );
+
   return response.data;
 };
 

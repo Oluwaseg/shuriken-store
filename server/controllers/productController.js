@@ -183,15 +183,26 @@ export const createReview = catchAsync(async (req, res, next) => {
   );
 
   if (existingReview) {
+    // Update existing review
     existingReview.rating = rating;
     existingReview.comment = comment;
-    const updatedReview = existingReview;
+
+    product.ratings =
+      product.reviews.reduce((acc, review) => review.rating + acc, 0) /
+      product.reviews.length;
+
+    await product.save();
+
+    // Populate user details in the updated review
+    await product.populate("reviews.user", "name email avatar"); // Adjust fields as needed
+
     res.status(200).json({
       success: true,
       message: "Review updated successfully",
-      review: updatedReview,
+      review: existingReview,
     });
   } else {
+    // Add new review
     const newReview = {
       name: req.user.name,
       rating,
@@ -206,6 +217,9 @@ export const createReview = catchAsync(async (req, res, next) => {
       product.numOfReviews;
 
     await product.save();
+
+    // Populate user details in the new review
+    await product.populate("reviews.user", "name email avatar");
 
     res.status(201).json({
       success: true,
@@ -225,8 +239,10 @@ export const deleteReview = catchAsync(async (req, res, next) => {
   }
 
   const reviewIndex = product.reviews.findIndex(
-    (review) => review.user.toString() === userId.toString()
+    (review) =>
+      review.user.toString() === userId.toString() || req.user.role === "admin" // Allow admin to delete any review
   );
+
   if (reviewIndex === -1) {
     return next(new ErrorHandler("Review not found", 404));
   }
@@ -255,6 +271,9 @@ export const getProductReviews = catchAsync(async (req, res, next) => {
   if (!product) {
     return next(new ErrorHandler("Product not found", 404));
   }
+
+  // Populate user details in the reviews
+  await product.populate("reviews.user", "name email avatar");
 
   res.status(200).json({
     success: true,

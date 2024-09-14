@@ -6,7 +6,9 @@ export interface Avatar {
 }
 
 export interface User {
+  isAdmin: boolean;
   _id: string;
+  id: string;
   name: string;
   email: string;
   username: string;
@@ -36,7 +38,6 @@ export interface QueryParams {
 
 export interface Review {
   _id: string;
-  name: string;
   rating: number;
   comment: string;
   user: User;
@@ -49,13 +50,12 @@ export interface Product {
   description: string;
   price: number;
   stock: number;
-  category: string;
   brand: string;
   images: { url: string }[];
   reviews: Review[];
   ratings: number;
   numOfReviews: number;
-  user: string;
+  category: Category[];
   subcategory?: string;
   bestSeller: boolean;
   discount: {
@@ -76,6 +76,10 @@ export interface ProductsApiResponse<T> {
   message?: string;
   products?: T;
   product?: T;
+  categories?: T;
+  subcategories?: T;
+  review?: T;
+  reviews?: T;
 }
 
 export interface Category {
