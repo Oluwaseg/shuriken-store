@@ -1,8 +1,8 @@
-import cloudinary from "cloudinary";
-import Product from "../models/Product.js";
-import { ErrorHandler } from "../utils/errorHandler.js";
-import { catchAsync } from "../utils/catchAsync.js";
-import APIFeatures from "../utils/apiFeatures.js";
+import cloudinary from 'cloudinary';
+import Product from '../models/Product.js';
+import APIFeatures from '../utils/apiFeatures.js';
+import { catchAsync } from '../utils/catchAsync.js';
+import { ErrorHandler } from '../utils/errorHandler.js';
 
 export const createProduct = catchAsync(async (req, res, next) => {
   try {
@@ -12,12 +12,12 @@ export const createProduct = catchAsync(async (req, res, next) => {
 
     if (productData.flashSale && productData.flashSale.isFlashSale) {
       if (!productData.flashSale.flashSaleEndTime) {
-        return next(new ErrorHandler("Flash sale end time is required", 400));
+        return next(new ErrorHandler('Flash sale end time is required', 400));
       }
 
       if (new Date(productData.flashSale.flashSaleEndTime) <= new Date()) {
         return next(
-          new ErrorHandler("Flash sale end time must be in the future", 400)
+          new ErrorHandler('Flash sale end time must be in the future', 400)
         );
       }
     }
@@ -60,11 +60,28 @@ export const getAllProducts = catchAsync(async (req, res, next) => {
 export const getProductById = catchAsync(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
   if (!product) {
-    return next(new ErrorHandler("Product not found", 404));
+    return next(new ErrorHandler('Product not found', 404));
   }
   res.status(200).json({
     success: true,
     product,
+  });
+});
+
+export const getRelatedProducts = catchAsync(async (req, res, next) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    return next(new ErrorHandler('Product not found', 404));
+  }
+  const relatedProduct = await Product.find({
+    category: product.category,
+    _id: { $ne: product._id },
+  })
+    .limit(4)
+    .exec();
+  res.status(200).json({
+    success: true,
+    relatedProduct,
   });
 });
 
@@ -76,7 +93,7 @@ export const updateProduct = catchAsync(async (req, res, next) => {
   if (remove_images.length > 0) {
     await Promise.all(
       remove_images.map(async (imageUrl) => {
-        const public_id = imageUrl.split("/").pop().split(".")[0];
+        const public_id = imageUrl.split('/').pop().split('.')[0];
         await cloudinary.v2.uploader.destroy(public_id);
       })
     );
@@ -92,17 +109,17 @@ export const updateProduct = catchAsync(async (req, res, next) => {
 
   const product = await Product.findById(req.params.id);
   if (!product) {
-    return next(new ErrorHandler("Product not found", 404));
+    return next(new ErrorHandler('Product not found', 404));
   }
 
   if (req.body.flashSale && req.body.flashSale.isFlashSale) {
     if (!req.body.flashSale.flashSaleEndTime) {
-      return next(new ErrorHandler("Flash sale end time is required", 400));
+      return next(new ErrorHandler('Flash sale end time is required', 400));
     }
 
     if (new Date(req.body.flashSale.flashSaleEndTime) <= new Date()) {
       return next(
-        new ErrorHandler("Flash sale end time must be in the future", 400)
+        new ErrorHandler('Flash sale end time must be in the future', 400)
       );
     }
   }
@@ -148,7 +165,7 @@ export const updateProduct = catchAsync(async (req, res, next) => {
   );
 
   if (!updatedProduct) {
-    return next(new ErrorHandler("Product not found", 404));
+    return next(new ErrorHandler('Product not found', 404));
   }
 
   res.status(200).json({
@@ -160,11 +177,11 @@ export const updateProduct = catchAsync(async (req, res, next) => {
 export const deleteProduct = catchAsync(async (req, res, next) => {
   const product = await Product.findByIdAndDelete(req.params.id);
   if (!product) {
-    return next(new ErrorHandler("Product not found", 404));
+    return next(new ErrorHandler('Product not found', 404));
   }
   res.status(200).json({
     success: true,
-    message: "Product deleted successfully",
+    message: 'Product deleted successfully',
   });
 });
 
@@ -175,7 +192,7 @@ export const createReview = catchAsync(async (req, res, next) => {
 
   const product = await Product.findById(productId);
   if (!product) {
-    return next(new ErrorHandler("Product not found", 404));
+    return next(new ErrorHandler('Product not found', 404));
   }
 
   const existingReview = product.reviews.find(
@@ -194,11 +211,11 @@ export const createReview = catchAsync(async (req, res, next) => {
     await product.save();
 
     // Populate user details in the updated review
-    await product.populate("reviews.user", "name email avatar"); // Adjust fields as needed
+    await product.populate('reviews.user', 'name email avatar'); // Adjust fields as needed
 
     res.status(200).json({
       success: true,
-      message: "Review updated successfully",
+      message: 'Review updated successfully',
       review: existingReview,
     });
   } else {
@@ -219,11 +236,11 @@ export const createReview = catchAsync(async (req, res, next) => {
     await product.save();
 
     // Populate user details in the new review
-    await product.populate("reviews.user", "name email avatar");
+    await product.populate('reviews.user', 'name email avatar');
 
     res.status(201).json({
       success: true,
-      message: "Review added successfully",
+      message: 'Review added successfully',
       review: newReview,
     });
   }
@@ -235,16 +252,16 @@ export const deleteReview = catchAsync(async (req, res, next) => {
 
   const product = await Product.findById(productId);
   if (!product) {
-    return next(new ErrorHandler("Product not found", 404));
+    return next(new ErrorHandler('Product not found', 404));
   }
 
   const reviewIndex = product.reviews.findIndex(
     (review) =>
-      review.user.toString() === userId.toString() || req.user.role === "admin" // Allow admin to delete any review
+      review.user.toString() === userId.toString() || req.user.role === 'admin' // Allow admin to delete any review
   );
 
   if (reviewIndex === -1) {
-    return next(new ErrorHandler("Review not found", 404));
+    return next(new ErrorHandler('Review not found', 404));
   }
 
   product.reviews.splice(reviewIndex, 1);
@@ -260,7 +277,7 @@ export const deleteReview = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: "Review deleted successfully",
+    message: 'Review deleted successfully',
   });
 });
 
@@ -269,11 +286,11 @@ export const getProductReviews = catchAsync(async (req, res, next) => {
 
   const product = await Product.findById(productId);
   if (!product) {
-    return next(new ErrorHandler("Product not found", 404));
+    return next(new ErrorHandler('Product not found', 404));
   }
 
   // Populate user details in the reviews
-  await product.populate("reviews.user", "name email avatar");
+  await product.populate('reviews.user', 'name email avatar');
 
   res.status(200).json({
     success: true,
