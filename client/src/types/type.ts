@@ -139,12 +139,12 @@ export interface Order {
   shippingPrice: number;
   totalPrice: number;
   orderStatus:
-    | "Pending"
-    | "Processing"
-    | "Shipped"
-    | "Delivered"
-    | "Cancelled"
-    | "Returned";
+    | 'Pending'
+    | 'Processing'
+    | 'Shipped'
+    | 'Delivered'
+    | 'Cancelled'
+    | 'Returned';
   paymentInfo?: {
     id: string;
     status: string;

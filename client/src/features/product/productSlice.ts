@@ -1,29 +1,29 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  getAllProducts,
-  getProductById,
-  getLatestProducts,
-  createOrUpdateReview,
-  deleteReview,
-  getProductReviews,
-  getTotalProducts,
-} from "../../api/product";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
   getAllCategories,
-  getCategoryById,
-  getCategoriesWithProductCount,
   getAllSubcategories,
+  getCategoriesWithProductCount,
+  getCategoryById,
   getSubcategoriesByCategory,
   getSubcategoryById,
-} from "../../api/category";
+} from '../../api/category';
 import {
-  ProductsApiResponse,
-  Product,
-  Review,
-  QueryParams,
+  createOrUpdateReview,
+  deleteReview,
+  getAllProducts,
+  getLatestProducts,
+  getProductById,
+  getProductReviews,
+  getTotalProducts,
+} from '../../api/product';
+import {
   Category,
+  Product,
+  ProductsApiResponse,
+  QueryParams,
+  Review,
   Subcategory,
-} from "../../types/type";
+} from '../../types/type';
 
 interface ProductState {
   products: Product[];
@@ -63,7 +63,7 @@ const initialState: ProductState = {
 
 // Fetch all products
 export const fetchProducts = createAsyncThunk(
-  "products/fetchProducts",
+  'products/fetchProducts',
   async (
     params: { queryParams?: QueryParams } = { queryParams: undefined },
     { rejectWithValue }
@@ -81,7 +81,7 @@ export const fetchProducts = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -89,7 +89,7 @@ export const fetchProducts = createAsyncThunk(
 
 // Fetch product by ID
 export const fetchProductById = createAsyncThunk(
-  "products/fetchProductById",
+  'products/fetchProductById',
   async (id: string, { rejectWithValue }) => {
     try {
       const response: ProductsApiResponse<Product> = await getProductById(id);
@@ -102,7 +102,7 @@ export const fetchProductById = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -110,7 +110,7 @@ export const fetchProductById = createAsyncThunk(
 
 // fetch 10 latest products
 export const fetchLatestProducts = createAsyncThunk(
-  "products/fetchLatestProducts",
+  'products/fetchLatestProducts',
   async (_, { rejectWithValue }) => {
     try {
       const response: ProductsApiResponse<Product[]> =
@@ -124,7 +124,7 @@ export const fetchLatestProducts = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -132,7 +132,7 @@ export const fetchLatestProducts = createAsyncThunk(
 
 // Fetch product reviews
 export const fetchProductReviews = createAsyncThunk(
-  "products/fetchProductReviews",
+  'products/fetchProductReviews',
   async (productId: string, { rejectWithValue }) => {
     try {
       const response: ProductsApiResponse<Review[]> = await getProductReviews(
@@ -147,7 +147,7 @@ export const fetchProductReviews = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -155,7 +155,7 @@ export const fetchProductReviews = createAsyncThunk(
 
 // Create or update a review
 export const createReview = createAsyncThunk(
-  "products/createReview",
+  'products/createReview',
   async (
     {
       productId,
@@ -179,7 +179,7 @@ export const createReview = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -187,7 +187,7 @@ export const createReview = createAsyncThunk(
 
 // Delete a review
 export const removeReview = createAsyncThunk(
-  "products/removeReview",
+  'products/removeReview',
   async (productId: string, { rejectWithValue }) => {
     try {
       const response: ProductsApiResponse<null> = await deleteReview(productId);
@@ -200,7 +200,7 @@ export const removeReview = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -208,7 +208,7 @@ export const removeReview = createAsyncThunk(
 
 // Fetch total number of products
 export const fetchTotalProducts = createAsyncThunk(
-  "products/fetchTotalProducts",
+  'products/fetchTotalProducts',
   async (_, { rejectWithValue }) => {
     try {
       const response: ProductsApiResponse<number> = await getTotalProducts();
@@ -221,7 +221,7 @@ export const fetchTotalProducts = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -229,7 +229,7 @@ export const fetchTotalProducts = createAsyncThunk(
 
 // Fetch all categories
 export const fetchCategories = createAsyncThunk(
-  "products/fetchCategories",
+  'products/fetchCategories',
   async (_, { rejectWithValue }) => {
     try {
       const response: ProductsApiResponse<Category[]> =
@@ -244,7 +244,7 @@ export const fetchCategories = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -252,7 +252,7 @@ export const fetchCategories = createAsyncThunk(
 
 // Fetch category by ID
 export const fetchCategoryById = createAsyncThunk(
-  "products/fetchCategoryById",
+  'products/fetchCategoryById',
   async (id: string, { rejectWithValue }) => {
     try {
       const response: ProductsApiResponse<Category> = await getCategoryById(id);
@@ -265,7 +265,7 @@ export const fetchCategoryById = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -273,7 +273,7 @@ export const fetchCategoryById = createAsyncThunk(
 
 // Fetch categories with product count
 export const fetchCategoriesWithProductCount = createAsyncThunk(
-  "products/fetchCategoriesWithProductCount",
+  'products/fetchCategoriesWithProductCount',
   async (_, { rejectWithValue }) => {
     try {
       const response: ProductsApiResponse<Category[]> =
@@ -287,7 +287,7 @@ export const fetchCategoriesWithProductCount = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -295,7 +295,7 @@ export const fetchCategoriesWithProductCount = createAsyncThunk(
 
 // Fetch all subcategories
 export const fetchSubcategories = createAsyncThunk(
-  "products/fetchSubcategories",
+  'products/fetchSubcategories',
   async (_, { rejectWithValue }) => {
     try {
       const response: ProductsApiResponse<Subcategory[]> =
@@ -309,7 +309,7 @@ export const fetchSubcategories = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -317,7 +317,7 @@ export const fetchSubcategories = createAsyncThunk(
 
 // Fetch subcategories by category ID
 export const fetchSubcategoriesByCategory = createAsyncThunk(
-  "products/fetchSubcategoriesByCategory",
+  'products/fetchSubcategoriesByCategory',
   async (categoryId: string, { rejectWithValue }) => {
     try {
       const response: ProductsApiResponse<Subcategory[]> =
@@ -331,7 +331,7 @@ export const fetchSubcategoriesByCategory = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
@@ -339,7 +339,7 @@ export const fetchSubcategoriesByCategory = createAsyncThunk(
 
 // Fetch subcategory by ID
 export const fetchSubcategoryById = createAsyncThunk(
-  "products/fetchSubcategoryById",
+  'products/fetchSubcategoryById',
   async (id: string, { rejectWithValue }) => {
     try {
       const response: ProductsApiResponse<Subcategory> =
@@ -353,14 +353,14 @@ export const fetchSubcategoryById = createAsyncThunk(
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       } else {
-        return rejectWithValue("An unknown error occurred");
+        return rejectWithValue('An unknown error occurred');
       }
     }
   }
 );
 
 const productSlice = createSlice({
-  name: "products",
+  name: 'products',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
