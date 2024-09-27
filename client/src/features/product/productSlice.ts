@@ -14,6 +14,7 @@ import {
   getLatestProducts,
   getProductById,
   getProductReviews,
+  getRelatedProducts,
   getTotalProducts,
 } from '../../api/product';
 import {
@@ -21,6 +22,7 @@ import {
   Product,
   ProductsApiResponse,
   QueryParams,
+  RelatedProducts,
   Review,
   Subcategory,
 } from '../../types/type';
@@ -41,6 +43,7 @@ interface ProductState {
   reviewsError: string | null;
   reviewSubmissionLoading: boolean;
   reviewSubmissionError: string | null;
+  relatedProduct: RelatedProducts[] | null;
 }
 
 const initialState: ProductState = {
@@ -59,6 +62,7 @@ const initialState: ProductState = {
   reviewsError: null,
   reviewSubmissionLoading: false,
   reviewSubmissionError: null,
+  relatedProduct: null,
 };
 
 // Fetch all products
@@ -95,6 +99,28 @@ export const fetchProductById = createAsyncThunk(
       const response: ProductsApiResponse<Product> = await getProductById(id);
       if (response.success) {
         return response.product;
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else {
+        return rejectWithValue('An unknown error occurred');
+      }
+    }
+  }
+);
+
+// Fetch related products
+export const fetchRelatedProducts = createAsyncThunk(
+  'products/fetchRelatedProducts',
+  async (productId: string, { rejectWithValue }) => {
+    try {
+      const response: ProductsApiResponse<RelatedProducts[]> =
+        await getRelatedProducts(productId);
+      if (response.success) {
+        return response.relatedProduct;
       } else {
         throw new Error(response.message);
       }
@@ -392,7 +418,19 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-
+      // fetch related pro
+      .addCase(fetchRelatedProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchRelatedProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.relatedProduct = action.payload || [];
+      })
+      .addCase(fetchRelatedProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
       // Fetch latest products
       .addCase(fetchLatestProducts.pending, (state) => {
         state.loading = true;
