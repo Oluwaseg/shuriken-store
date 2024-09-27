@@ -1,78 +1,74 @@
-import { catchAsync } from "../utils/catchAsync.js";
-import Cart from "../models/Cart.js";
-import Product from "../models/Product.js";
-
-const TAX_RATE = 0.1;
-const SHIPPING_COST = 15;
+import Cart from '../models/Cart.js';
+import Product from '../models/Product.js';
+import { catchAsync } from '../utils/catchAsync.js';
 
 export const createOrUpdateCart = catchAsync(async (req, res, next) => {
   const { userId, productId, quantity } = req.body;
 
-  // Find the product by its ID
+  const TAX_RATE = 0.1;
+  const SHIPPING_COST = 15;
+
   const product = await Product.findById(productId);
 
-  // Check if the product exists
   if (!product) {
     return res.status(404).json({
       success: false,
-      message: "Product not found",
+      message: 'Product not found',
     });
   }
 
   const price = product.price;
-  const subtotal = price * quantity;
-  const tax = subtotal * TAX_RATE;
-  const shipping = SHIPPING_COST;
-  const total = subtotal + tax + shipping;
 
-  // Find or create the cart
   let cart = await Cart.findOne({ user: userId });
+
   if (cart) {
     const itemIndex = cart.items.findIndex(
       (item) => item.product.toString() === productId
     );
     if (itemIndex >= 0) {
-      // Update quantity and price of existing item
       cart.items[itemIndex].quantity = quantity;
       cart.items[itemIndex].price = price;
     } else {
-      // Add new item to the cart
       cart.items.push({ product: productId, quantity, price });
     }
-    cart.tax = tax;
-    cart.shipping = shipping;
-    cart.total = total;
-    await cart.save();
   } else {
-    // Create a new cart if it doesn't exist
-    cart = await Cart.create({
+    cart = new Cart({
       user: userId,
       items: [{ product: productId, quantity, price }],
-      tax,
-      shipping,
-      total,
     });
   }
 
-  // Return success response with the updated or created cart
+  cart.subtotal = cart.items.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+
+  const tax = cart.subtotal * TAX_RATE;
+  const shipping = SHIPPING_COST;
+
+  cart.total = cart.subtotal + tax + shipping;
+
+  cart.tax = tax;
+  cart.shipping = shipping;
+
+  await cart.save();
+
   res.status(200).json({
     success: true,
     cart,
   });
 });
 
-
-
-// 4. Other cart-related functionalities (Existing ones)
 export const getCartByUserId = catchAsync(async (req, res, next) => {
-  const cart = await Cart.findOne({ user: req.params.userId }).populate(
-    "items.product"
-  );
+  const cart = await Cart.findOne({ user: req.params.userId }).populate({
+    path: 'items.product',
+    select: 'name price images',
+  });
 
   if (!cart) {
     return res.status(404).json({
       success: false,
-      message: "Cart not found",
+      message: 'Cart not found',
     });
   }
 
@@ -83,19 +79,24 @@ export const getCartByUserId = catchAsync(async (req, res, next) => {
 });
 
 export const removeItemFromCart = catchAsync(async (req, res, next) => {
-  const { userId, productId } = req.body;
+  const { userId, productId } = req.body; // productId might be an object, so extract the _id
 
   const cart = await Cart.findOne({ user: userId });
 
   if (!cart) {
     return res.status(404).json({
       success: false,
-      message: "Cart not found",
+      message: 'Cart not found',
     });
   }
 
+  // Extract the product ID in case it's passed as an object
+  const productIdToRemove =
+    typeof productId === 'object' ? productId._id : productId;
+
+  // Ensure you're comparing the product's _id string
   cart.items = cart.items.filter(
-    (item) => item.product.toString() !== productId
+    (item) => item.product.toString() !== productIdToRemove
   );
 
   cart.total = cart.items.reduce(
@@ -112,19 +113,78 @@ export const removeItemFromCart = catchAsync(async (req, res, next) => {
 });
 
 export const clearCart = catchAsync(async (req, res, next) => {
-  const { userId } = req.body;
+  const { userId } = req.params;
 
   const cart = await Cart.findOneAndDelete({ user: userId });
 
   if (!cart) {
     return res.status(404).json({
       success: false,
-      message: "Cart not found",
+      message: 'Cart not found',
     });
   }
 
   res.status(200).json({
     success: true,
-    message: "Cart cleared successfully",
+    message: 'Cart cleared successfully',
   });
 });
+
+// Merge Guest Cart with Logged-in User's Cart
+export const mergeCart = async (req, res) => {
+  const { guestCart, userId } = req.body;
+
+  try {
+    // Fetch the logged-in user's cart
+    let userCart = await Cart.findOne({ user: userId });
+
+    // Create a new cart for the user if one doesn't exist
+    if (!userCart) {
+      userCart = new Cart({ user: userId, items: [] });
+    }
+
+    for (const guestItem of guestCart) {
+      const existingItem = userCart.items.find(
+        (item) => item.product.toString() === guestItem.product
+      );
+
+      // Find the product to check available stock
+      const product = await Product.findById(guestItem.product);
+
+      if (product) {
+        if (existingItem) {
+          // Check if the new quantity does not exceed available stock
+          const newQuantity = existingItem.quantity + guestItem.quantity;
+          if (newQuantity <= product.stock) {
+            existingItem.quantity = newQuantity;
+          } else {
+            // Handle the case where requested quantity exceeds stock
+            existingItem.quantity = product.stock; // or send a message back
+          }
+        } else {
+          // Check if adding the guest item does not exceed available stock
+          if (guestItem.quantity <= product.stock) {
+            userCart.items.push(guestItem);
+          } else {
+            // Handle the case where requested quantity exceeds stock
+            userCart.items.push({ ...guestItem, quantity: product.stock }); // or send a message back
+          }
+        }
+      }
+    }
+
+    // Save the updated cart
+    await userCart.save();
+
+    res.status(200).json({
+      success: true,
+      cart: userCart,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Error merging cart',
+    });
+  }
+};

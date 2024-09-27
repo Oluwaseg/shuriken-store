@@ -1,16 +1,16 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const cartSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true,
   },
   items: [
     {
       product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        ref: 'Product',
         required: true,
       },
       quantity: {
@@ -24,32 +24,6 @@ const cartSchema = new mongoose.Schema({
       },
     },
   ],
-  shippingInfo: {
-    address: {
-      type: String,
-      required: true,
-    },
-    city: {
-      type: String,
-      required: true,
-    },
-    state: {
-      type: String,
-      required: true,
-    },
-    country: {
-      type: String,
-      required: true,
-    },
-    postalCode: {
-      type: Number,
-      required: true,
-    },
-    phoneNo: {
-      type: String,
-      required: true,
-    },
-  },
   tax: {
     type: Number,
     default: 0,
@@ -68,14 +42,14 @@ const cartSchema = new mongoose.Schema({
   },
 });
 
-cartSchema.virtual("id").get(function () {
+cartSchema.virtual('id').get(function () {
   return this._id.toHexString();
 });
 
-cartSchema.set("toJSON", {
+cartSchema.set('toJSON', {
   virtuals: true,
 });
 
-const Cart = mongoose.model("Cart", cartSchema);
+const Cart = mongoose.model('Cart', cartSchema);
 
 export default Cart;
