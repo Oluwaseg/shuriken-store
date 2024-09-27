@@ -71,6 +71,33 @@ export interface Product {
   id: string;
 }
 
+export interface RelatedProducts {
+  id: string;
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  brand: string;
+  images: { url: string }[];
+  reviews: Review[];
+  ratings: number;
+  numOfReviews: number;
+  category: Category[];
+  subcategory?: string;
+  bestSeller: boolean;
+  discount: {
+    isDiscounted: boolean;
+    discountPercent: number;
+  };
+  flashSale: {
+    isFlashSale: boolean;
+    flashSalePrice: string;
+    flashSaleEndTime: string;
+  };
+  createdAt: string;
+}
+
 export interface ProductsApiResponse<T> {
   success: boolean;
   message?: string;
@@ -80,6 +107,7 @@ export interface ProductsApiResponse<T> {
   subcategories?: T;
   review?: T;
   reviews?: T;
+  relatedProduct?: T;
 }
 
 export interface Category {
@@ -107,7 +135,7 @@ export interface CartItem {
 
 export interface Cart {
   id: string;
-  user: string;
+  user: User[] | string;
   items: CartItem[];
   total: number;
   tax: number;
@@ -168,6 +196,7 @@ export interface ApiResponse<T> {
   success: boolean;
   message?: string;
   data?: T;
+  cart?: T;
 }
 
 // Paystack Payment Initialization Request type
