@@ -6,21 +6,26 @@ import {
   FaShoppingCart,
   FaStar,
   FaTrash,
+  FaUserCircle,
 } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import RatingModal from '../../components/template/RatingModal';
+import RelatedProducts from '../../components/template/RelatedProducts';
+import { addOrUpdateCart } from '../../features/cart/cartSlice';
 import {
   createReview,
   fetchProductById,
   fetchProductReviews,
+  fetchRelatedProducts,
   removeReview,
 } from '../../features/product/productSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-// d
 const Product = () => {
   const { id } = useParams();
   const dispatch = useAppDispatch();
-  const { product, loading, error } = useAppSelector((state) => state.product);
+  const { product, loading, error, relatedProduct } = useAppSelector(
+    (state) => state.product
+  );
   const { reviews, reviewsLoading, reviewsError } = useAppSelector(
     (state) => state.product
   );
@@ -34,11 +39,12 @@ const Product = () => {
   } | null>(null);
   const [showReviews, setShowReviews] = useState<boolean>(false);
   const [reviewsLimit, setReviewsLimit] = useState<number>(10);
-
+  const [quantity, setQuantity] = useState<number>(1);
   useEffect(() => {
     if (id) {
       dispatch(fetchProductById(id));
       dispatch(fetchProductReviews(id));
+      dispatch(fetchRelatedProducts(id));
     }
   }, [dispatch, id]);
 
@@ -107,7 +113,35 @@ const Product = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  const handleAddToCart = () => {
+    if (product && product._id) {
+      // Dispatch the action to add or update the cart
+      dispatch(
+        addOrUpdateCart({
+          userId: user ? user._id : undefined, // Pass user ID if logged in
+          productId: product._id, // The product ID
+          quantity, // The selected quantity
+          price: product.price, // Product price
+        })
+      )
+        .unwrap()
+        .then(() => {
+          toast.success('Product added to cart successfully!');
+        })
+        .catch((error) => {
+          toast.error(`Error adding product to cart: ${error}`);
+        });
+    } else {
+      toast.error('Product not found.');
+    }
+  };
+
+  if (loading)
+    return (
+      <div className='flex justify-center items-center'>
+        <div className='loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12'></div>{' '}
+      </div>
+    );
   if (error) return <p>Error: {error}</p>;
 
   return (
@@ -189,6 +223,8 @@ const Product = () => {
               </label>
               <select
                 id='quantity'
+                value={quantity} // Set the value from the state
+                onChange={(e) => setQuantity(Number(e.target.value))} // Update the state on change
                 className='border border-gray-300 rounded-md px-2 py-1 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200'
               >
                 {product?.stock ? (
@@ -201,6 +237,7 @@ const Product = () => {
                   <option value={0}>Out of Stock</option>
                 )}
               </select>
+
               {product?.stock !== undefined && (
                 <p className='text-gray-600 dark:text-gray-400 ml-4'>
                   Stock left: {product.stock}
@@ -210,10 +247,14 @@ const Product = () => {
 
             {/* Buttons */}
             <div className='flex space-x-4'>
-              <button className='bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition duration-300'>
+              <button
+                onClick={handleAddToCart}
+                className='bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition duration-300'
+              >
                 <FaShoppingCart />
                 Add to Cart
               </button>
+
               <button className='bg-gray-200 flex gap-2 items-center text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300 transition duration-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'>
                 <FaHeart />
                 Add to Wishlist
@@ -268,27 +309,30 @@ const Product = () => {
               <p>Error loading reviews: {reviewsError}</p>
             ) : reviews.length > 0 ? (
               <>
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-                  {reviews.slice(0, reviewsLimit).map((review, index) => (
+                <div className='space-y-8'>
+                  {reviews.slice(0, reviewsLimit).map((review) => (
                     <div
-                      key={index}
-                      className='mx-2 p-6 bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-lg dark:bg-gray-800 dark:text-gray-200'
+                      key={review._id}
+                      className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-lg'
                     >
                       <div className='flex items-start space-x-4'>
-                        <img
-                          src={
-                            review.user.avatar?.[0]?.url ||
-                            '/default-avatar.png'
-                          }
-                          alt={review.user.name}
-                          className='w-12 h-12 rounded-full border-2 border-purple-500'
-                        />
-                        <div className='flex-1'>
+                        <div className='flex-shrink-0'>
+                          {review.user.avatar?.[0]?.url ? (
+                            <img
+                              src={review.user.avatar[0].url}
+                              alt={review.user.name}
+                              className='w-12 h-12 rounded-full object-cover border-2 border-indigo-500'
+                            />
+                          ) : (
+                            <FaUserCircle className='w-12 h-12 text-gray-400 dark:text-gray-600' />
+                          )}
+                        </div>
+                        <div className='flex-grow'>
                           <div className='flex items-center justify-between'>
-                            <h3 className='text-lg font-bold text-gray-800 dark:text-gray-100'>
+                            <h3 className='text-lg font-semibold text-gray-800 dark:text-gray-100'>
                               {review.user.name}
                             </h3>
-                            <span className='text-xs text-gray-500 dark:text-gray-400'>
+                            <span className='text-sm text-gray-500 dark:text-gray-400'>
                               {new Date(review.createdAt).toLocaleDateString(
                                 'en-US',
                                 {
@@ -299,49 +343,44 @@ const Product = () => {
                               )}
                             </span>
                           </div>
-                          <p className='mt-3 text-gray-700 dark:text-gray-300 leading-relaxed'>
+                          <div className='flex items-center mt-1 mb-2'>
+                            {Array.from({ length: 5 }, (_, i) => (
+                              <span key={i}>
+                                {i < review.rating ? (
+                                  <FaStar className='w-5 h-5 text-yellow-400' />
+                                ) : (
+                                  <FaRegStar className='w-5 h-5 text-gray-300 dark:text-gray-600' />
+                                )}
+                              </span>
+                            ))}
+                          </div>
+                          <p className='text-gray-700 dark:text-gray-300 leading-relaxed'>
                             {review.comment}
                           </p>
-                          <p className='mt-3 text-gray-700 dark:text-gray-300 leading-relaxed'>
-                            {user && review.user._id === user._id && (
-                              <button
-                                className='text-red-500 mt-3 hover:text-red-700'
-                                onClick={() => handleDeleteReview()}
-                              >
-                                <FaTrash className='w-5 h-5' />
-                              </button>
-                            )}
-                          </p>
-                          <div className='flex items-center mt-1'>
-                            {Array.from({ length: 5 }, (_, i) =>
-                              i < review.rating ? (
-                                <FaStar
-                                  key={i}
-                                  className='text-yellow-400 w-5 h-5'
-                                />
-                              ) : (
-                                <FaRegStar
-                                  key={i}
-                                  className='text-gray-300 w-5 h-5 dark:text-gray-600'
-                                />
-                              )
-                            )}
-                          </div>
+                          {user && review.user._id === user._id && (
+                            <button
+                              className='mt-4 inline-flex items-center text-red-500 hover:text-red-700 transition-colors duration-200'
+                              onClick={() => handleDeleteReview()}
+                            >
+                              <FaTrash className='w-4 h-4 mr-2' />
+                              Delete Review
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
                   ))}
+                  {reviews.length > reviewsLimit && (
+                    <div className='text-center'>
+                      <button
+                        className='bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+                        onClick={handleShowMoreReviews}
+                      >
+                        Show More Reviews
+                      </button>
+                    </div>
+                  )}
                 </div>
-
-                {/* Show More Button */}
-                {reviews.length > reviewsLimit && (
-                  <button
-                    className='bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition duration-300'
-                    onClick={handleShowMoreReviews}
-                  >
-                    Show More
-                  </button>
-                )}
               </>
             ) : (
               <p>No reviews yet.</p>
@@ -349,7 +388,8 @@ const Product = () => {
           </div>
         )}
       </div>
-
+      {/* Related Products Section */}
+      <RelatedProducts products={relatedProduct || []} />
       {/* Render Modal */}
       {isModalOpen && (
         <RatingModal
