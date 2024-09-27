@@ -1,11 +1,13 @@
-import axios from "axios";
-import { Cart, ApiResponse } from "../types/type";
+import { ApiResponse, Cart } from '../types/type';
+import axiosInstance from './axiosInstance';
 
 // Get Cart by User ID
 export const getCartByUserId = async (
   userId: string
 ): Promise<ApiResponse<Cart>> => {
-  const { data } = await axios.get<ApiResponse<Cart>>(`/api/cart/${userId}`);
+  const { data } = await axiosInstance.get<ApiResponse<Cart>>(
+    `/cart/${userId}`
+  );
   return data;
 };
 
@@ -15,7 +17,7 @@ export const createOrUpdateCart = async (
   productId: string,
   quantity: number
 ): Promise<ApiResponse<Cart>> => {
-  const { data } = await axios.post<ApiResponse<Cart>>("/api/cart", {
+  const { data } = await axiosInstance.post<ApiResponse<Cart>>('/cart', {
     userId,
     productId,
     quantity,
@@ -28,7 +30,7 @@ export const removeItemFromCart = async (
   userId: string,
   productId: string
 ): Promise<ApiResponse<Cart>> => {
-  const { data } = await axios.delete<ApiResponse<Cart>>("/api/cart/item", {
+  const { data } = await axiosInstance.delete<ApiResponse<Cart>>('/cart/item', {
     data: { userId, productId },
   });
   return data;
@@ -38,8 +40,20 @@ export const removeItemFromCart = async (
 export const clearCart = async (
   userId: string
 ): Promise<ApiResponse<{ message: string }>> => {
-  const { data } = await axios.delete<ApiResponse<{ message: string }>>(
-    `/api/cart/${userId}`
+  const { data } = await axiosInstance.delete<ApiResponse<{ message: string }>>(
+    `/cart/${userId}`
   );
+  return data;
+};
+
+// Merge Cart API
+export const mergeCart = async (
+  guestCart: Cart['items'],
+  userId: string
+): Promise<ApiResponse<Cart>> => {
+  const { data } = await axiosInstance.post<ApiResponse<Cart>>('/cart/merge', {
+    guestCart,
+    userId,
+  });
   return data;
 };
