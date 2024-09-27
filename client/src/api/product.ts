@@ -1,16 +1,17 @@
-import axiosInstance from "./axiosInstance";
 import {
-  ProductsApiResponse,
   Product,
-  Review,
+  ProductsApiResponse,
   QueryParams,
-} from "../types/type";
+  RelatedProducts,
+  Review,
+} from '../types/type';
+import axiosInstance from './axiosInstance';
 
 export const getAllProducts = async (
   queryParams?: QueryParams
 ): Promise<ProductsApiResponse<Product[]>> => {
   const response = await axiosInstance.get<ProductsApiResponse<Product[]>>(
-    "/products",
+    '/products',
     { params: queryParams }
   );
   return response.data;
@@ -25,15 +26,24 @@ export const getProductById = async (
   return response.data;
 };
 
+export const getRelatedProducts = async (
+  id: string
+): Promise<ProductsApiResponse<RelatedProducts[]>> => {
+  const response = await axiosInstance.get<
+    ProductsApiResponse<RelatedProducts[]>
+  >(`/products/related/${id}`);
+  return response.data;
+};
+
 export const getLatestProducts = async (): Promise<
   ProductsApiResponse<Product[]>
 > => {
   const queryParams = {
     limit: 10,
-    sort: "-createdAt",
+    sort: '-createdAt',
   };
   const response = await axiosInstance.get<ProductsApiResponse<Product[]>>(
-    "/products",
+    '/products',
     { params: queryParams }
   );
   return response.data;
@@ -74,7 +84,7 @@ export const getTotalProducts = async (): Promise<
   ProductsApiResponse<number>
 > => {
   const response = await axiosInstance.get<ProductsApiResponse<number>>(
-    "/products/total"
+    '/products/total'
   );
   return response.data;
 };
