@@ -1,61 +1,63 @@
-import express from "express";
+import express from 'express';
 import {
   createProduct,
-  getAllProducts,
-  updateProduct,
-  deleteProduct,
-  getProductById,
   createReview,
-  getProductReviews,
+  deleteProduct,
   deleteReview,
+  getAllProducts,
+  getProductById,
+  getProductReviews,
+  getRelatedProducts,
   getTotalProducts,
-} from "../controllers/productController.js";
+  updateProduct,
+} from '../controllers/productController.js';
 import {
-  isAuthenticated,
   authorizeRoles,
-} from "../middlewares/authenticate.js";
-import { uploadProductImage } from "../middlewares/image.config.js";
+  isAuthenticated,
+} from '../middlewares/authenticate.js';
+import { uploadProductImage } from '../middlewares/image.config.js';
 
 const router = express.Router();
 
 // Product routes
 router.post(
-  "/products",
+  '/products',
   isAuthenticated,
-  authorizeRoles("admin"),
-  uploadProductImage.array("images", 8),
+  authorizeRoles('admin'),
+  uploadProductImage.array('images', 8),
   createProduct
 );
-router.get("/products", getAllProducts);
-router.get("/products/:id", getProductById);
+router.get('/products', getAllProducts);
+router.get('/products/:id', getProductById);
+router.get('/products/related/:id', getRelatedProducts);
 router.put(
-  "/products/:id",
+  '/products/:id',
   isAuthenticated,
-  uploadProductImage.array("images", 8),
-  authorizeRoles("admin"),
+  uploadProductImage.array('images', 8),
+  authorizeRoles('admin'),
   updateProduct
 );
 router.delete(
-  "/products/:id",
+  '/products/:id',
   isAuthenticated,
-  authorizeRoles("admin"),
+  authorizeRoles('admin'),
   deleteProduct
 );
 
 router.get(
-  "/admin/products/count",
+  '/admin/products/count',
   isAuthenticated,
-  authorizeRoles("admin"),
+  authorizeRoles('admin'),
   getTotalProducts
 );
 
 // Review routes
-router.get("/products/:id/reviews", getProductReviews);
-router.put("/products/:id/reviews", isAuthenticated, createReview);
+router.get('/products/:id/reviews', getProductReviews);
+router.put('/products/:id/reviews', isAuthenticated, createReview);
 router.delete(
-  "/products/:id/reviews",
+  '/products/:id/reviews',
   isAuthenticated,
-  authorizeRoles("admin", "user"),
+  authorizeRoles('admin', 'user'),
   deleteReview
 );
 
