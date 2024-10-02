@@ -160,6 +160,7 @@ export const logout = createAsyncThunk(
     try {
       await axiosInstance.post('/user/logout');
       localStorage.removeItem('token');
+      localStorage.removeItem('userInfo');
       toast.success('Logged out successfully!');
       return;
     } catch (error) {
