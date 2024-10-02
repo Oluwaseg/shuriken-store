@@ -13,6 +13,8 @@ export interface User {
   email: string;
   username: string;
   avatar?: Avatar[];
+  role: string;
+  shippingInfo: ShippingInfo;
   createdAt: string;
 }
 
@@ -146,8 +148,10 @@ export interface Cart {
 export interface ShippingInfo {
   address: string;
   city: string;
-  postalCode: string;
+  state: string;
   country: string;
+  postalCode: string;
+  phoneNo: string;
 }
 
 // Order Item type
