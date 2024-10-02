@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { IoClose, IoTrash } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { getProductById } from '../../api/product';
@@ -28,10 +29,7 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
   useEffect(() => {
     if (isOpen && isAuthenticated && userInfo?.id) {
-      console.log('Auth state:', isAuthenticated, 'User ID:', userInfo?.id);
-
       dispatch(fetchCart(userInfo.id));
-      console.log('Fetching cart for user:', userInfo.id);
     } else {
       const localCart = JSON.parse(localStorage.getItem('cart') || 'null') || {
         items: [],
@@ -64,7 +62,6 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
         }
       });
     }
-    console.log('Product details updated:', productDetails);
   }, [cart, isAuthenticated, productDetails]);
 
   const handleViewAll = () => {
@@ -72,9 +69,7 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
     onClose();
   };
 
-  useEffect(() => {
-    console.log('Cart updated:', cart);
-  }, [cart]);
+  useEffect(() => {}, [cart]);
 
   const handleQuantityChange = async (
     itemId: string | Product,
@@ -84,10 +79,8 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
     const product =
       productDetails[productId] || (typeof itemId === 'object' ? itemId : null);
 
-    console.log('Product before quantity change:', product);
-
     if (!product) {
-      console.error(`Product details for item ${itemId} not available.`);
+      toast.error(`Product details for item ${itemId} not available.`);
       return;
     }
 
@@ -120,14 +113,11 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
               ...prevState,
               [productId]: updatedProduct.product,
             }));
-            console.log(
-              'Updated product details fetched:',
-              updatedProduct.product
-            );
           }
         }
       } catch (error) {
         console.error('Error updating cart:', error);
+        toast.error('Error updating cart');
       }
     } else {
       // Handle the local cart (unauthenticated users)
@@ -166,14 +156,11 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
               ...prevState,
               [productId]: updatedProduct.product,
             }));
-            console.log(
-              'Updated product details fetched for local cart:',
-              updatedProduct.product
-            );
           }
         }
       } catch (error) {
         console.error('Error updating local cart:', error);
+        toast.error('Error updating local cart');
       }
     }
   };
@@ -201,6 +188,17 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
       dispatch(clearUserCart(userInfo.id));
     } else {
       localStorage.removeItem('cart');
+      const emptyCart = {
+        id: '',
+        user: '',
+        items: [],
+        total: 0,
+        tax: 0,
+        shipping: 0,
+      };
+
+      dispatch(setLocalCart(emptyCart));
+      toast.success('Cart cleared!');
     }
   };
 
