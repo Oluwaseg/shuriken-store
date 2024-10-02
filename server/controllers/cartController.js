@@ -130,9 +130,10 @@ export const clearCart = catchAsync(async (req, res, next) => {
   });
 });
 
-// Merge Guest Cart with Logged-in User's Cart
 export const mergeCart = async (req, res) => {
   const { guestCart, userId } = req.body;
+  const TAX_RATE = 0.1;
+  const SHIPPING_COST = 15;
 
   try {
     // Fetch the logged-in user's cart
@@ -158,20 +159,33 @@ export const mergeCart = async (req, res) => {
           if (newQuantity <= product.stock) {
             existingItem.quantity = newQuantity;
           } else {
-            // Handle the case where requested quantity exceeds stock
-            existingItem.quantity = product.stock; // or send a message back
+            existingItem.quantity = product.stock;
           }
         } else {
           // Check if adding the guest item does not exceed available stock
           if (guestItem.quantity <= product.stock) {
             userCart.items.push(guestItem);
           } else {
-            // Handle the case where requested quantity exceeds stock
-            userCart.items.push({ ...guestItem, quantity: product.stock }); // or send a message back
+            userCart.items.push({ ...guestItem, quantity: product.stock });
           }
         }
       }
     }
+
+    // Calculate the subtotal
+    userCart.subtotal = userCart.items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+
+    // Calculate tax and shipping
+    const tax = userCart.subtotal * TAX_RATE;
+    const shipping = SHIPPING_COST;
+
+    // Calculate the total and update the cart
+    userCart.total = userCart.subtotal + tax + shipping;
+    userCart.tax = tax;
+    userCart.shipping = shipping;
 
     // Save the updated cart
     await userCart.save();
