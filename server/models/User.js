@@ -1,27 +1,27 @@
-import mongoose from "mongoose";
-import crypto from "crypto";
-import validator from "validator";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
+import validator from 'validator';
 
 // Define schema
 const schema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Name is required"],
+    required: [true, 'Name is required'],
     trim: true,
   },
   email: {
     type: String,
-    required: [true, "Email is required"],
+    required: [true, 'Email is required'],
     unique: true,
     lowercase: true,
-    validate: [validator.isEmail, "Please provide a valid email"],
+    validate: [validator.isEmail, 'Please provide a valid email'],
   },
   password: {
     type: String,
     required: true,
-    minlength: [6, "Password must be at least 6 characters long"],
+    minlength: [6, 'Password must be at least 6 characters long'],
     select: false, // Prevent returning password by default in queries
   },
   image: {
@@ -33,15 +33,15 @@ const schema = new mongoose.Schema({
   },
   role: {
     type: String,
-    default: "user",
+    default: 'user',
   },
   avatar: [
     {
       public_id: {
         type: String,
-        required: [true, "Image public ID is required"],
+        required: [true, 'Image public ID is required'],
       },
-      url: { type: String, required: [true, "Image URL is required"] },
+      url: { type: String, required: [true, 'Image URL is required'] },
     },
   ],
   shippingInfo: {
@@ -70,6 +70,12 @@ const schema = new mongoose.Schema({
       required: false,
     },
   },
+  birthday: {
+    type: Date,
+  },
+  bio: {
+    type: String,
+  },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   otp: String,
@@ -85,15 +91,15 @@ const schema = new mongoose.Schema({
 });
 
 // Generate username if not provided
-schema.pre("save", async function (next) {
+schema.pre('save', async function (next) {
   // Hash password if it is new or modified
-  if (this.isModified("password")) {
+  if (this.isModified('password')) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   }
 
   // Generate username if it is a new document or name is modified
-  if (this.isModified("name") || this.isNew) {
+  if (this.isModified('name') || this.isNew) {
     const initials = this.name.substring(0, 3);
     const randomNumber = Math.floor(Math.random() * 9000) + 1000;
     const randomUsername = `${initials}-${randomNumber}`;
@@ -118,13 +124,13 @@ schema.methods.comparePassword = async function (password) {
 // Generating Passwod Reset Token
 schema.methods.getResetPasswordToken = function () {
   // Generating Token
-  const resetToken = crypto.randomBytes(20).toString("hex");
+  const resetToken = crypto.randomBytes(20).toString('hex');
 
   // Hashing and adding resetPasswordToken to userSchema
   this.resetPasswordToken = crypto
-    .createHash("sha256")
+    .createHash('sha256')
     .update(resetToken)
-    .digest("hex");
+    .digest('hex');
 
   // Expires in 10 minutes
   this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
@@ -132,16 +138,16 @@ schema.methods.getResetPasswordToken = function () {
   return resetToken;
 };
 
-schema.virtual("id").get(function () {
+schema.virtual('id').get(function () {
   return this._id.toHexString();
 });
 
 // Ensure virtual fields are serialised.
-schema.set("toJSON", {
+schema.set('toJSON', {
   virtuals: true,
 });
 
 // Define model
-const User = mongoose.model("User", schema);
+const User = mongoose.model('User', schema);
 
 export default User;

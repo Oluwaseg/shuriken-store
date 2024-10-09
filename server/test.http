@@ -1,0 +1,11 @@
+# Register user
+
+# Dummy user info
+POST http://localhost:5000/api/user/register
+Content-Type: application/json
+
+{
+    "name":"aduni",
+    "email":"sagep176@gmail.com",
+    "password":"sagemode2020"
+}

@@ -1,18 +1,18 @@
-import crypto from "crypto";
-import Order from "../models/Order.js";
-import User from "../models/User.js";
-import Cart from "../models/Cart.js";
-import { ErrorHandler } from "../utils/errorHandler.js";
-import { catchAsync } from "../utils/catchAsync.js";
-import { sendToken } from "../utils/jwtToken.js";
-import { sendEmail, sendOTP, sendWelcomeEmail } from "../utils/sendEmail.js";
+import crypto from 'crypto';
+import Cart from '../models/Cart.js';
+import Order from '../models/Order.js';
+import User from '../models/User.js';
+import { catchAsync } from '../utils/catchAsync.js';
+import { ErrorHandler } from '../utils/errorHandler.js';
+import { sendToken } from '../utils/jwtToken.js';
+import { sendEmail, sendOTP, sendWelcomeEmail } from '../utils/sendEmail.js';
 
 export const register = catchAsync(async (req, res, next) => {
   const { name, email, password } = req.body;
 
   const defaultAvatar = {
-    public_id: "default_avatar",
-    url: "https://res.cloudinary.com/djc5o8g94/image/upload/v1721652090/shop/ewzndt3avjd1fv7hwft6.jpg",
+    public_id: 'default_avatar',
+    url: 'https://res.cloudinary.com/djc5o8g94/image/upload/v1721652090/shop/ewzndt3avjd1fv7hwft6.jpg',
   };
 
   let avatar = defaultAvatar;
@@ -35,7 +35,7 @@ export const register = catchAsync(async (req, res, next) => {
   res.status(201).json({
     success: true,
     message:
-      "Registration successful! A verification email has been sent to your address with a one-time password (OTP). Please check your email and use the OTP to verify your account. The OTP will expire in 10 minutes.",
+      'Registration successful! A verification email has been sent to your address with a one-time password (OTP). Please check your email and use the OTP to verify your account. The OTP will expire in 10 minutes.',
   });
 });
 
@@ -48,7 +48,7 @@ export const verifyOTP = catchAsync(async (req, res, next) => {
   });
 
   if (!user) {
-    return next(new ErrorHandler("Invalid or expired OTP", 400));
+    return next(new ErrorHandler('Invalid or expired OTP', 400));
   }
 
   user.isVerified = true;
@@ -67,18 +67,18 @@ export const resendOTP = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    return next(new ErrorHandler("User not found", 404));
+    return next(new ErrorHandler('User not found', 404));
   }
 
   if (user.isVerified) {
-    return next(new ErrorHandler("User already verified", 400));
+    return next(new ErrorHandler('User already verified', 400));
   }
 
   await sendOTP(user);
 
   res.status(200).json({
     success: true,
-    message: "A new OTP has been sent to your email address.",
+    message: 'A new OTP has been sent to your email address.',
   });
 });
 
@@ -86,24 +86,24 @@ export const userLogin = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return next(new ErrorHandler("Please Enter Email & Password", 400));
+    return next(new ErrorHandler('Please Enter Email & Password', 400));
   }
 
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select('+password');
 
   if (!user) {
-    return next(new ErrorHandler("User not found", 404));
+    return next(new ErrorHandler('User not found', 404));
   }
   const isPasswordMatched = await user.comparePassword(password);
 
   if (!isPasswordMatched) {
-    return next(new ErrorHandler("Invalid email or password", 401));
+    return next(new ErrorHandler('Invalid email or password', 401));
   }
 
   if (!user.isVerified) {
     return next(
       new ErrorHandler(
-        "User not verified. Please verify your email address.",
+        'User not verified. Please verify your email address.',
         400
       )
     );
@@ -115,37 +115,37 @@ export const adminLogin = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return next(new ErrorHandler("Please Enter Email & Password", 400));
+    return next(new ErrorHandler('Please Enter Email & Password', 400));
   }
 
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select('+password');
 
   if (!user) {
-    return next(new ErrorHandler("User not found", 404));
+    return next(new ErrorHandler('User not found', 404));
   }
 
-  if (user.role !== "admin") {
-    return next(new ErrorHandler("Not authorized as admin", 403));
+  if (user.role !== 'admin') {
+    return next(new ErrorHandler('Not authorized as admin', 403));
   }
 
   const isPasswordMatched = await user.comparePassword(password);
 
   if (!isPasswordMatched) {
-    return next(new ErrorHandler("Invalid email or password", 401));
+    return next(new ErrorHandler('Invalid email or password', 401));
   }
 
   sendToken(user, 200, res);
 });
 
 export const logout = catchAsync(async (req, res, next) => {
-  res.cookie("token", null, {
+  res.cookie('token', null, {
     expires: new Date(Date.now()),
     httpOnly: true,
   });
 
   res.status(200).json({
     success: true,
-    message: "Logged Out",
+    message: 'Logged Out',
   });
 });
 
@@ -153,7 +153,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
 
   if (!user) {
-    return next(new ErrorHandler("User not found", 404));
+    return next(new ErrorHandler('User not found', 404));
   }
 
   const resetToken = user.getResetPasswordToken();
@@ -198,7 +198,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   try {
     await sendEmail({
       email: user.email,
-      subject: "ShopIT Password Recovery",
+      subject: 'ShopIT Password Recovery',
       html: message,
     });
     res.status(200).json({
@@ -215,9 +215,9 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
 
 export const resetPassword = catchAsync(async (req, res, next) => {
   const resetPasswordToken = crypto
-    .createHash("sha256")
+    .createHash('sha256')
     .update(req.params.token)
-    .digest("hex");
+    .digest('hex');
 
   const user = await User.findOne({
     resetPasswordToken,
@@ -227,14 +227,14 @@ export const resetPassword = catchAsync(async (req, res, next) => {
   if (!user) {
     return next(
       new ErrorHandler(
-        "Password reset token is invalid or has been expired",
+        'Password reset token is invalid or has been expired',
         400
       )
     );
   }
 
   if (req.body.password !== req.body.confirmPassword) {
-    return next(new ErrorHandler("Password does not match", 400));
+    return next(new ErrorHandler('Password does not match', 400));
   }
   user.password = req.body.password;
   user.resetPasswordToken = undefined;
@@ -252,14 +252,14 @@ export const getUserDetails = catchAsync(async (req, res, next) => {
 });
 
 export const updateUserPassword = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user.id).select("+password");
+  const user = await User.findById(req.user.id).select('+password');
 
   const isMatch = await user.comparePassword(req.body.currentPassword);
   if (!isMatch) {
-    return next(new ErrorHandler("Password is incorrect", 401));
+    return next(new ErrorHandler('Password is incorrect', 401));
   }
   if (req.body.newPassword !== req.body.confirmPassword) {
-    return next(new ErrorHandler("Passwords do not match", 401));
+    return next(new ErrorHandler('Passwords do not match', 401));
   }
 
   user.password = req.body.newPassword;
@@ -268,50 +268,122 @@ export const updateUserPassword = catchAsync(async (req, res, next) => {
 });
 
 const deleteOldAvatar = async (public_id) => {
-  if (public_id && public_id !== "default_avatar") {
+  if (public_id && public_id !== 'default_avatar') {
     await cloudinary.v2.uploader.destroy(public_id);
   }
 };
 
+// export const updateProfile = catchAsync(async (req, res, next) => {
+//   const newUserData = {};
+
+//   if (req.body.name) newUserData.name = req.body.name;
+//   if (req.body.email) newUserData.email = req.body.email;
+
+//   if (req.file) {
+//     const newAvatar = {
+//       public_id: req.file.filename,
+//       url: req.file.path,
+//     };
+
+//     const user = await User.findById(req.user.id);
+//     if (!user) {
+//       return next(new ErrorHandler('User not found', 404));
+//     }
+
+//     if (user.avatar && user.avatar.public_id !== 'default_avatar') {
+//       await deleteOldAvatar(user.avatar.public_id);
+//     }
+
+//     newUserData.avatar = newAvatar;
+//   }
+
+//   const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+//     new: true,
+//     runValidators: true,
+//     useFindAndModify: false,
+//   });
+
+//   if (!user) {
+//     return next(new ErrorHandler('User not found', 404));
+//   }
+
+//   res.status(200).json({
+//     success: true,
+//     message: 'Profile Updated Successfully',
+//     user,
+//   });
+// });
+
 export const updateProfile = catchAsync(async (req, res, next) => {
-  const newUserData = {};
+  try {
+    console.log(req.body);
+    const newUserData = {};
 
-  if (req.body.name) newUserData.name = req.body.name;
-  if (req.body.email) newUserData.email = req.body.email;
+    // Update basic fields
+    if (req.body.name) newUserData.name = req.body.name;
+    if (req.body.email) newUserData.email = req.body.email;
+    if (req.body.bio) newUserData.bio = req.body.bio;
+    if (req.body.birthday) newUserData.birthday = req.body.birthday;
+    if (req.body.username) newUserData.username = req.body.username;
 
-  if (req.file) {
-    const newAvatar = {
-      public_id: req.file.filename,
-      url: req.file.path,
-    };
+    // Shipping info update
+    if (req.body.shippingInfo) {
+      newUserData.shippingInfo = {
+        address: req.body.shippingInfo.address,
+        city: req.body.shippingInfo.city,
+        state: req.body.shippingInfo.state,
+        country: req.body.shippingInfo.country,
+        postalCode: req.body.shippingInfo.postalCode,
+        phoneNo: req.body.shippingInfo.phoneNo,
+      };
+    }
 
-    const user = await User.findById(req.user.id);
+    // Avatar update
+    if (req.file) {
+      console.log(req.file);
+      const newAvatar = {
+        public_id: req.file.filename,
+        url: req.file.path,
+      };
+
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return next(new ErrorHandler('User not found', 404));
+      }
+
+      // Delete old avatar if it's not the default
+      if (user.avatar && user.avatar.public_id !== 'default_avatar') {
+        try {
+          await deleteOldAvatar(user.avatar.public_id);
+          console.log('Old avatar deleted successfully'); // Debugging
+        } catch (error) {
+          console.error('Error deleting old avatar: ', error);
+          return next(new ErrorHandler('Failed to delete old avatar', 500));
+        }
+      }
+
+      newUserData.avatar = newAvatar;
+    }
+
+    // Update user in DB
+    const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
+
     if (!user) {
-      return next(new ErrorHandler("User not found", 404));
+      return next(new ErrorHandler('User not found', 404));
     }
 
-    if (user.avatar && user.avatar.public_id !== "default_avatar") {
-      await deleteOldAvatar(user.avatar.public_id);
-    }
-
-    newUserData.avatar = newAvatar;
+    res.status(200).json({
+      success: true,
+      message: 'Profile Updated Successfully',
+      user,
+    });
+  } catch (error) {
+    return next(new ErrorHandler('Failed to update profile', 500)); // Handle uncaught errors gracefully
   }
-
-  const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  });
-
-  if (!user) {
-    return next(new ErrorHandler("User not found", 404));
-  }
-
-  res.status(200).json({
-    success: true,
-    message: "Profile Updated Successfully",
-    user,
-  });
 });
 
 // GET all users (admin)
@@ -355,7 +427,7 @@ export const updateUserRole = catchAsync(async (req, res, next) => {
   });
   res.status(200).json({
     success: true,
-    message: "User updated successfully",
+    message: 'User updated successfully',
     newUserData,
   });
 });
@@ -398,7 +470,7 @@ export const deleteUser = catchAsync(async (req, res, next) => {
     res.status(200).json({
       success: true,
       message:
-        "User and all associated orders and cart items deleted successfully",
+        'User and all associated orders and cart items deleted successfully',
     });
   } catch (error) {
     return next(new ErrorHandler(error.message, 500));
@@ -410,7 +482,7 @@ export const updateUserShippingInfo = catchAsync(async (req, res, next) => {
 
   if (!shippingInfo || !userId) {
     return next(
-      new ErrorHandler("User ID and shipping info are required", 400)
+      new ErrorHandler('User ID and shipping info are required', 400)
     );
   }
 
@@ -421,12 +493,12 @@ export const updateUserShippingInfo = catchAsync(async (req, res, next) => {
   );
 
   if (!user) {
-    return next(new ErrorHandler("User not found", 404));
+    return next(new ErrorHandler('User not found', 404));
   }
 
   res.status(200).json({
     success: true,
-    message: "Shipping info updated successfully",
+    message: 'Shipping info updated successfully',
     user,
   });
 });

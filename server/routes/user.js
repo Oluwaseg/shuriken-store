@@ -1,73 +1,73 @@
-import express from "express";
+import express from 'express';
 import {
-  register,
-  userLogin,
   adminLogin,
-  logout,
+  deleteUser,
   forgotPassword,
-  resetPassword,
-  getUserDetails,
-  updateUserPassword,
-  updateProfile,
   getAllUsers,
   getSingleUser,
-  updateUserRole,
-  deleteUser,
-  verifyOTP,
+  getUserDetails,
+  logout,
+  register,
   resendOTP,
-} from "../controllers/userController.js";
+  resetPassword,
+  updateProfile,
+  updateUserPassword,
+  updateUserRole,
+  userLogin,
+  verifyOTP,
+} from '../controllers/userController.js';
 import {
-  isAuthenticated,
   authorizeRoles,
-} from "../middlewares/authenticate.js";
-import { uploadUserImage } from "../middlewares/image.config.js";
+  isAuthenticated,
+} from '../middlewares/authenticate.js';
+import { uploadUserImage } from '../middlewares/image.config.js';
 const router = express.Router();
 
-router.post("/user/register", uploadUserImage.single("avatar"), register);
-router.post("/user/login", userLogin);
-router.post("/user/verify-otp", verifyOTP);
-router.post("/user/resend-otp", resendOTP);
-router.post("/user/logout", logout);
-router.post("/user/forgot-password", forgotPassword);
-router.put("/user/reset-password/:token", resetPassword);
+router.post('/user/register', uploadUserImage.single('avatar'), register);
+router.post('/user/login', userLogin);
+router.post('/user/verify-otp', verifyOTP);
+router.post('/user/resend-otp', resendOTP);
+router.post('/user/logout', logout);
+router.post('/user/forgot-password', forgotPassword);
+router.put('/user/reset-password/:token', resetPassword);
 
 // User Routes
-router.get("/user/me", isAuthenticated, getUserDetails);
+router.get('/user/me', isAuthenticated, getUserDetails);
 router.put(
-  "/user/me/update",
-  uploadUserImage.single("avatar"),
+  '/user/update/me',
+  uploadUserImage.single('avatar'),
   isAuthenticated,
   updateProfile
 );
-router.put("/user/password/update", isAuthenticated, updateUserPassword);
+router.put('/user/password/update', isAuthenticated, updateUserPassword);
 
 // Admin Routes
-router.post("/admin/login", adminLogin);
+router.post('/admin/login', adminLogin);
 router.get(
-  "/admin/users",
+  '/admin/users',
   isAuthenticated,
-  authorizeRoles("admin"),
+  authorizeRoles('admin'),
   getAllUsers
 );
 
 router.get(
-  "/admin/user/:id",
+  '/admin/user/:id',
   isAuthenticated,
-  authorizeRoles("admin"),
+  authorizeRoles('admin'),
   getSingleUser
 );
 
 router.put(
-  "/admin/user/:id",
+  '/admin/user/:id',
   isAuthenticated,
-  authorizeRoles("admin"),
+  authorizeRoles('admin'),
   updateUserRole
 );
 
 router.delete(
-  "/admin/user/:id",
+  '/admin/user/:id',
   isAuthenticated,
-  authorizeRoles("admin"),
+  authorizeRoles('admin'),
   deleteUser
 );
 

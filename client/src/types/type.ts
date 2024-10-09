@@ -16,6 +16,8 @@ export interface User {
   role: string;
   shippingInfo: ShippingInfo;
   createdAt: string;
+  birthday?: Date;
+  bio?: string;
 }
 
 export interface AuthState {
