@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import {
+  FaCamera,
+  FaCloudUploadAlt,
   FaDribbble,
   FaEdit,
   FaFacebookF,
@@ -15,11 +17,11 @@ import { useAppDispatch, useAppSelector } from '../../hooks';
 const Profile = () => {
   const dispatch = useAppDispatch();
   const { isAuthenticated, userInfo } = useAppSelector((state) => state.auth);
-
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(
     userInfo?.avatar?.[0]?.url || 'https://via.placeholder.com/120'
   );
+  const [loading, setLoading] = useState(false);
 
   if (!isAuthenticated) {
     return <div>Please log in to view your profile.</div>;
@@ -43,13 +45,12 @@ const Profile = () => {
 
   const handleSaveImage = async () => {
     if (!image) return;
-
     const formData = new FormData();
     formData.append('avatar', image);
-
+    setLoading(true);
     await dispatch(fetchUpdateProfile(formData));
-
     dispatch(fetchUserDetails());
+    setLoading(false);
   };
 
   return (
@@ -72,25 +73,44 @@ const Profile = () => {
                 accept='image/*'
                 onChange={handleImageChange}
                 className='absolute inset-0 w-full h-full opacity-0 cursor-pointer'
-                id='imageUpload' // Added ID for label association
+                id='imageUpload'
               />
-              {/* Edit Text and Icon */}
               <label
                 htmlFor='imageUpload'
-                className='absolute inset-0 bottom-6 flex items-center justify-center text-white bg-black bg-opacity-50 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-300'
+                className='absolute inset-0 bottom-4 flex items-center justify-center text-white bg-black bg-opacity-50 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-300'
               >
                 <FaEdit className='mr-1' />
                 Edit
               </label>
             </div>
-            <h1 className='text-xl font-bold mb-2'>{userInfo.name}</h1>
-            <p className='mb-4'>{userInfo.username}</p>
+            <h1 className='text-xl font-bold mb-2 dark:text-white'>
+              {userInfo.name}
+            </h1>
+            <p className='mb-4 dark:text-white'>{userInfo.username}</p>
 
             <button
               onClick={handleSaveImage}
-              className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md'
+              disabled={loading || !image}
+              className={`flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-opacity duration-300 ${
+                loading || !image ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
-              Change Picture
+              {loading ? (
+                <div className='flex items-center'>
+                  <div className='submit-spinner mr-2'></div>
+                  Updating...
+                </div>
+              ) : image ? (
+                <>
+                  Upload Image
+                  <FaCloudUploadAlt className='ml-2' />
+                </>
+              ) : (
+                <>
+                  <FaCamera className='mr-2' />
+                  Change Picture
+                </>
+              )}
             </button>
           </div>
 

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Prata&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Prata&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -8,11 +8,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Outfit", sans-serif;
+  font-family: 'Outfit', sans-serif;
 }
 
 .prata {
-  font-family: "Prata", serif;
+  font-family: 'Prata', serif;
   /* font-weight: 400;
   font-style: normal; */
 }
@@ -23,7 +23,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Prata", serif;
+  font-family: 'Prata', serif;
 }
 
 body {
@@ -275,4 +275,23 @@ input:-webkit-autofill::first-line {
 
 ::-webkit-scrollbar {
   display: none;
+}
+
+/* Spinner styles for submit button */
+.submit-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.25);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

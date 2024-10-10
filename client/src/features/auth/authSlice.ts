@@ -237,6 +237,10 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
       }
     },
+    updateAuthUserInfo: (state, action) => {
+      state.userInfo = action.payload;
+      localStorage.setItem('userInfo', JSON.stringify(action.payload));
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -364,5 +368,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { resetAuthState, loadUserFromStorage } = authSlice.actions;
+export const { resetAuthState, loadUserFromStorage, updateAuthUserInfo } =
+  authSlice.actions;
 export default authSlice.reducer;

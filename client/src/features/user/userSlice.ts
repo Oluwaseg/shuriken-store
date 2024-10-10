@@ -4,8 +4,9 @@ import {
   getUserDetails,
   updateProfile,
   updateUserPassword,
-} from '../../api/user'; // Use your original API functions
+} from '../../api/user';
 import { ErrorResponse, User } from '../../types/type';
+import { updateAuthUserInfo } from '../auth/authSlice';
 
 interface UserState {
   loading: boolean;
@@ -39,10 +40,10 @@ export const fetchUserDetails = createAsyncThunk(
       return user;
     } catch (error) {
       if (error instanceof Error) {
-        toast.error(error.message); // Show toast message for error
+        toast.error(error.message);
         return rejectWithValue(error.message);
       } else {
-        toast.error('An unknown error occurred'); // Handle unknown errors
+        toast.error('An unknown error occurred');
         return rejectWithValue('An unknown error occurred');
       }
     }
@@ -52,17 +53,19 @@ export const fetchUserDetails = createAsyncThunk(
 // Update User Profile
 export const fetchUpdateProfile = createAsyncThunk(
   'user/updateProfile',
-  async (formData: FormData, { rejectWithValue }) => {
+  async (formData: FormData, { rejectWithValue, dispatch }) => {
     try {
-      const user = await updateProfile(formData); // Call your original API function
+      const user = await updateProfile(formData);
       toast.success('Profile updated successfully!');
+
+      dispatch(updateAuthUserInfo(user));
       return user;
     } catch (error) {
       if (error instanceof Error) {
-        toast.error(error.message); // Show toast message for error
+        toast.error(error.message);
         return rejectWithValue(error.message);
       } else {
-        toast.error('An unknown error occurred'); // Handle unknown errors
+        toast.error('An unknown error occurred');
         return rejectWithValue('An unknown error occurred');
       }
     }
@@ -81,15 +84,15 @@ export const fetchUpdateUserPassword = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const message = await updateUserPassword(passwordData); // Call your original API function
+      const message = await updateUserPassword(passwordData);
       toast.success(message);
       return message;
     } catch (error) {
       if (error instanceof Error) {
-        toast.error(error.message); // Show toast message for error
+        toast.error(error.message);
         return rejectWithValue(error.message);
       } else {
-        toast.error('An unknown error occurred'); // Handle unknown errors
+        toast.error('An unknown error occurred');
         return rejectWithValue('An unknown error occurred');
       }
     }
