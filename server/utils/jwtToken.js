@@ -1,4 +1,4 @@
-export const sendToken = (user, statusCode, res) => {
+export const sendToken = (user, statusCode, res, message = '') => {
   const token = user.getJWTToken();
   const options = {
     expires: new Date(
@@ -6,9 +6,10 @@ export const sendToken = (user, statusCode, res) => {
     ),
     httpOnly: true,
   };
-  res.status(statusCode).cookie("token", token, options).json({
+  res.status(statusCode).cookie('token', token, options).json({
     success: true,
     user,
     token,
+    message,
   });
 };

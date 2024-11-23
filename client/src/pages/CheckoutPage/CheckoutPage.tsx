@@ -1,179 +1,237 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { FaLock, FaShoppingCart, FaTruck } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { fetchCart } from '../../features/cart/cartSlice';
+import { initializeCheckout } from '../../features/checkout/checkoutSlice';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 
 const CheckoutPage: React.FC = () => {
+  const [shippingInfo, setShippingInfo] = useState({
+    address: '',
+    city: '',
+    postalCode: '',
+    country: '',
+    state: '',
+    phoneNo: '',
+  });
+
+  const { isAuthenticated, userInfo } = useAppSelector((state) => state.auth);
+  const { loading, error } = useAppSelector((state) => state.checkout);
+  const { cart } = useAppSelector((state) => state.cart);
+
+  const items = cart?.items || [];
+  const subtotal = items.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+  const tax = subtotal * 0.1;
+  const shipping = 15.0;
+  const total = subtotal + tax + shipping;
+
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (isAuthenticated && userInfo?.id) {
+      dispatch(fetchCart(userInfo.id));
+    }
+  }, [isAuthenticated, userInfo, dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated === false) {
+      toast.error('You must be logged in to checkout.');
+      navigate('/cart');
+      return;
+    }
+    if (cart && cart.items.length === 0) {
+      toast.error('You must have items in your cart to checkout.');
+      navigate('/cart');
+      return;
+    }
+
+    if (userInfo?.shippingInfo) {
+      setShippingInfo(userInfo.shippingInfo);
+    }
+  }, [isAuthenticated, cart, userInfo, navigate]);
+
+  const handleShippingInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setShippingInfo({
+      ...shippingInfo,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleCheckout = async () => {
+    if (!shippingInfo.address || !shippingInfo.city || !shippingInfo.country) {
+      toast.error('Please fill in all shipping details.');
+      return;
+    }
+
+    if (isAuthenticated && userInfo?.id) {
+      await dispatch(initializeCheckout({ userId: userInfo.id, shippingInfo }));
+      if (!error) {
+        navigate('/confirmation');
+      }
+    } else {
+      toast.error('You need to sign in to proceed with checkout.');
+    }
+  };
+
   return (
-    <div className='container mx-auto py-10 px-4 lg:px-8'>
-      {/* Progress Bar */}
-      <div className='flex items-center justify-between pb-6'>
-        <div className='text-gray-600 dark:text-gray-400 text-sm'>
-          <span className='font-semibold'>Cart</span> {' > '}
-          <span className='text-indigo-600 font-semibold'>Checkout</span>{' '}
-          {' > '}
-          Confirmation
-        </div>
-        <div>
-          <button
-            onClick={() => navigate('/cart')}
-            className='bg-gray-200 text-gray-800 py-2 px-4 rounded hover:bg-gray-300'
-          >
-            Back to Cart
-          </button>
-        </div>
-      </div>
-
-      <div className='grid lg:grid-cols-12 gap-8'>
-        {/* Left Section: User Info, Address, and Payment */}
-        <div className='lg:col-span-8 space-y-6'>
-          {/* Delivery Address */}
-          <div className='bg-white dark:bg-gray-800 p-6 rounded-md shadow-sm'>
-            <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>
-              Delivery Address
+    <div className='min-h-screen bg-gray-100'>
+      <div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+        <div className='grid lg:grid-cols-3 gap-8'>
+          {/* Shipping Info */}
+          <div className='lg:col-span-2 bg-white shadow-lg rounded-lg p-6'>
+            <h2 className='text-2xl font-bold text-gray-900 mb-6 flex items-center'>
+              <FaTruck className='text-indigo-600 mr-3' />
+              Shipping Information
             </h2>
-            <form className='space-y-4'>
-              <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                    First Name
-                  </label>
-                  <input
-                    type='text'
-                    className='mt-1 p-2 w-full rounded border dark:bg-gray-700 dark:text-white'
-                  />
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                    Last Name
-                  </label>
-                  <input
-                    type='text'
-                    className='mt-1 p-2 w-full rounded border dark:bg-gray-700 dark:text-white'
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                  Address
+            <form className='space-y-6'>
+              <div className='space-y-1'>
+                <label
+                  htmlFor='address'
+                  className='text-sm font-medium text-gray-700'
+                >
+                  Street Address
                 </label>
                 <input
                   type='text'
-                  className='mt-1 p-2 w-full rounded border dark:bg-gray-700 dark:text-white'
+                  id='address'
+                  name='address'
+                  placeholder='Enter your street address'
+                  value={shippingInfo.address}
+                  onChange={handleShippingInfoChange}
+                  className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                 />
               </div>
-
-              <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+              <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-1'>
+                  <label
+                    htmlFor='city'
+                    className='text-sm font-medium text-gray-700'
+                  >
                     City
                   </label>
                   <input
                     type='text'
-                    className='mt-1 p-2 w-full rounded border dark:bg-gray-700 dark:text-white'
+                    id='city'
+                    name='city'
+                    placeholder='City'
+                    value={shippingInfo.city}
+                    onChange={handleShippingInfoChange}
+                    className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                   />
                 </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+                <div className='space-y-1'>
+                  <label
+                    htmlFor='state'
+                    className='text-sm font-medium text-gray-700'
+                  >
+                    State
+                  </label>
+                  <input
+                    type='text'
+                    id='state'
+                    name='state'
+                    placeholder='State'
+                    value={shippingInfo.state}
+                    onChange={handleShippingInfoChange}
+                    className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                  />
+                </div>
+              </div>
+              <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-1'>
+                  <label
+                    htmlFor='postalCode'
+                    className='text-sm font-medium text-gray-700'
+                  >
                     Postal Code
                   </label>
                   <input
                     type='text'
-                    className='mt-1 p-2 w-full rounded border dark:bg-gray-700 dark:text-white'
+                    id='postalCode'
+                    name='postalCode'
+                    placeholder='Postal Code'
+                    value={shippingInfo.postalCode}
+                    onChange={handleShippingInfoChange}
+                    className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
                   />
                 </div>
+                <div className='space-y-1'>
+                  <label
+                    htmlFor='country'
+                    className='text-sm font-medium text-gray-700'
+                  >
+                    Country
+                  </label>
+                  <input
+                    type='text'
+                    id='country'
+                    name='country'
+                    placeholder='Country'
+                    value={shippingInfo.country}
+                    onChange={handleShippingInfoChange}
+                    className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                  />
+                </div>
+              </div>
+              <div className='space-y-1'>
+                <label
+                  htmlFor='phoneNo'
+                  className='text-sm font-medium text-gray-700'
+                >
+                  Phone Number
+                </label>
+                <input
+                  type='text'
+                  id='phoneNo'
+                  name='phoneNo'
+                  placeholder='Phone Number'
+                  value={shippingInfo.phoneNo}
+                  onChange={handleShippingInfoChange}
+                  className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                />
               </div>
             </form>
           </div>
 
-          {/* Payment Information */}
-          <div className='bg-white dark:bg-gray-800 p-6 rounded-md shadow-sm'>
-            <h2 className='text-xl font-semibold text-gray-900 dark:text-white mb-4'>
-              Payment Information
+          {/* Order Summary */}
+          <div className='bg-white shadow-lg rounded-lg p-6'>
+            <h2 className='text-2xl font-bold text-gray-900 mb-6 flex items-center'>
+              <FaShoppingCart className='text-indigo-600 mr-3' />
+              Order Summary
             </h2>
-            <form className='space-y-4'>
-              <div>
-                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                  Cardholder's Name
-                </label>
-                <input
-                  type='text'
-                  className='mt-1 p-2 w-full rounded border dark:bg-gray-700 dark:text-white'
-                />
+            <div className='space-y-4 text-gray-600'>
+              <div className='flex justify-between'>
+                <span>Subtotal</span>
+                <span>${subtotal.toFixed(2)}</span>
               </div>
-
-              <div>
-                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                  Card Number
-                </label>
-                <input
-                  type='text'
-                  className='mt-1 p-2 w-full rounded border dark:bg-gray-700 dark:text-white'
-                />
+              <div className='flex justify-between'>
+                <span>Tax</span>
+                <span>${tax.toFixed(2)}</span>
               </div>
-
-              <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                    Expiry Date
-                  </label>
-                  <input
-                    type='text'
-                    className='mt-1 p-2 w-full rounded border dark:bg-gray-700 dark:text-white'
-                  />
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-                    CVV
-                  </label>
-                  <input
-                    type='text'
-                    className='mt-1 p-2 w-full rounded border dark:bg-gray-700 dark:text-white'
-                  />
-                </div>
+              <div className='flex justify-between'>
+                <span>Shipping</span>
+                <span>${shipping.toFixed(2)}</span>
               </div>
-            </form>
-          </div>
-        </div>
-
-        {/* Right Section: Order Summary */}
-        <div className='lg:col-span-4 bg-gray-100 dark:bg-gray-800 p-6 rounded-md shadow-md'>
-          <h2 className='text-2xl font-semibold text-gray-900 dark:text-white mb-4'>
-            Order Summary
-          </h2>
-          <div className='flex justify-between text-gray-700 dark:text-gray-300 mb-2'>
-            <span>Subtotal</span>
-            <span>$120.00</span>
-          </div>
-          <div className='flex justify-between text-gray-700 dark:text-gray-300 mb-2'>
-            <span>Tax (10%)</span>
-            <span>$12.00</span>
-          </div>
-          <div className='flex justify-between text-gray-700 dark:text-gray-300 mb-4'>
-            <span>Shipping</span>
-            <span>$15.00</span>
-          </div>
-          <hr className='my-4' />
-          <div className='flex justify-between text-xl font-semibold text-gray-900 dark:text-white'>
-            <span>Total</span>
-            <span>$147.00</span>
-          </div>
-
-          {/* Checkout and Clear Cart Buttons */}
-          <div className='mt-6 space-y-4'>
+              <div className='border-t border-gray-200 pt-4 flex justify-between text-lg font-bold'>
+                <span>Total</span>
+                <span>${total.toFixed(2)}</span>
+              </div>
+            </div>
             <button
-              onClick={() => navigate('/confirmation')}
-              className='w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition-colors'
+              onClick={handleCheckout}
+              disabled={loading}
+              className='mt-6 w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition focus:outline-none focus:ring-2 focus:ring-indigo-500'
             >
-              Complete Purchase
+              {loading ? 'Processing...' : 'Confirm and Pay'}
             </button>
-            <button
-              onClick={() => navigate('/cart')}
-              className='w-full bg-gray-300 text-gray-800 py-2 rounded-md hover:bg-gray-400 transition-colors'
-            >
-              Edit Cart
-            </button>
+            <p className='mt-4 text-sm text-gray-500 flex justify-center items-center'>
+              <FaLock className='mr-2' /> Secure Checkout
+            </p>
           </div>
         </div>
       </div>

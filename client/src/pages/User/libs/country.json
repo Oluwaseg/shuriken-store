@@ -1,0 +1,22 @@
+{
+  "countries": [
+    {
+      "name": "Nigeria",
+      "code": "+234",
+      "states": ["Lagos", "Abuja", "Kano"],
+      "phonePattern": "^[0-9]{10}$"
+    },
+    {
+      "name": "United States",
+      "code": "+1",
+      "states": ["California", "Texas", "New York"],
+      "phonePattern": "^[2-9]{1}[0-9]{9}$"
+    },
+    {
+      "name": "India",
+      "code": "+91",
+      "states": ["Maharashtra", "Delhi", "Karnataka"],
+      "phonePattern": "^[6-9]{1}[0-9]{9}$"
+    }
+  ]
+}

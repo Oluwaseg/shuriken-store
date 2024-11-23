@@ -1,27 +1,118 @@
-import { useState } from 'react';
-import {
-  FaCamera,
-  FaCloudUploadAlt,
-  FaDribbble,
-  FaEdit,
-  FaFacebookF,
-  FaGithub,
-  FaTwitter,
-} from 'react-icons/fa';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FaCamera, FaCloudUploadAlt, FaEdit } from 'react-icons/fa';
+
+import SyncLoader from 'react-spinners/SyncLoader';
+import * as yup from 'yup';
 import {
   fetchUpdateProfile,
   fetchUserDetails,
 } from '../../features/user/userSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
+import countriesData from './libs/country.json';
+import { Socials } from './libs/socialInfo';
+import { UpdateUserPassword } from './libs/validate-password';
+type Country = {
+  name: string;
+  code: string;
+  states: string[];
+};
+
+const countries: Country[] = countriesData.countries;
+
+const schema = yup.object().shape({
+  name: yup.string().required('Name is required'),
+  username: yup.string().required('Username is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
+  bio: yup.string().optional(),
+  birthday: yup.string().required('Birthday is required'),
+  shippingInfo: yup.object().shape({
+    address: yup.string().required('Address is required'),
+    city: yup.string().required('City is required'),
+    state: yup.string().required('State is required'),
+    country: yup.string().required('Country is required'),
+    phoneNo: yup.string().required('Phone number is required'),
+    postalCode: yup.string().required('Postal Code is required'),
+  }),
+});
+interface FormDataValues {
+  name: string;
+  username: string;
+  email: string;
+  bio?: string;
+  birthday?: string;
+  shippingInfo: {
+    address: string;
+    city: string;
+    state: string;
+    country: string;
+    phoneNo: string;
+    postalCode: string;
+  };
+}
 
 const Profile = () => {
   const dispatch = useAppDispatch();
   const { isAuthenticated, userInfo } = useAppSelector((state) => state.auth);
+  const [selectedCountry, setSelectedCountry] = useState<string>(
+    userInfo?.shippingInfo?.country || ''
+  );
+
+  const [states, setStates] = useState<string[]>([]);
+
+  const formattedBirthday = userInfo?.birthday
+    ? new Date(userInfo?.birthday).toISOString().split('T')[0]
+    : undefined;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: userInfo?.name || '',
+      username: userInfo?.username || '',
+      email: userInfo?.email || '',
+      bio: userInfo?.bio || '',
+      birthday: formattedBirthday || '',
+
+      shippingInfo: {
+        address: userInfo?.shippingInfo?.address || '',
+        city: userInfo?.shippingInfo?.city || '',
+        state: userInfo?.shippingInfo?.state || '',
+        country: userInfo?.shippingInfo?.country || '',
+        phoneNo: userInfo?.shippingInfo?.phoneNo || '',
+        postalCode: userInfo?.shippingInfo?.postalCode || '',
+      },
+    },
+  });
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(
     userInfo?.avatar?.[0]?.url || 'https://via.placeholder.com/120'
   );
   const [loading, setLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
+  useEffect(() => {
+    if (selectedCountry) {
+      const countryData = countries.find((c) => c.name === selectedCountry);
+      setStates(countryData?.states || []);
+    }
+    setValue('shippingInfo.country', selectedCountry);
+  }, [selectedCountry, setValue]);
+
+  useEffect(() => {
+    if (userInfo?.shippingInfo?.country) {
+      setSelectedCountry(userInfo.shippingInfo.country);
+      const countryData = countries.find(
+        (c) => c.name === userInfo.shippingInfo.country
+      );
+      setStates(countryData?.states || []);
+      setValue('shippingInfo.state', userInfo.shippingInfo.state || '');
+    }
+  }, [userInfo, setValue]);
 
   if (!isAuthenticated) {
     return <div>Please log in to view your profile.</div>;
@@ -51,6 +142,47 @@ const Profile = () => {
     await dispatch(fetchUpdateProfile(formData));
     dispatch(fetchUserDetails());
     setLoading(false);
+  };
+
+  const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const country = event.target.value;
+    setSelectedCountry(country);
+    setStates(countries.find((c) => c.name === country)?.states || []);
+    setValue('shippingInfo.state', ''); // Reset state when country changes
+  };
+
+  const onSubmit = async (data: FormDataValues) => {
+    setSubmitLoading(true); // Set loading before submitting
+    setTimeout(async () => {
+      console.log('Submitted Data:', data);
+      const formData = new FormData();
+
+      Object.entries(data).forEach(([key, value]) => {
+        if (typeof value === 'string' || value instanceof Blob) {
+          formData.append(key, value);
+        } else if (value instanceof Date) {
+          formData.append(key, value.toISOString());
+        } else if (typeof value === 'object' && value !== null) {
+          // For nested objects, recursively append each sub-value
+          Object.entries(value).forEach(([subKey, subValue]) => {
+            if (typeof subValue === 'string') {
+              formData.append(`${key}[${subKey}]`, subValue);
+            } else if (subValue instanceof Date) {
+              formData.append(`${key}[${subKey}]`, subValue.toISOString());
+            } else if (subValue instanceof Blob) {
+              // Handle Blob type
+              formData.append(`${key}[${subKey}]`, subValue);
+            } else {
+              // Ensure nested values are properly serialized
+              formData.append(`${key}[${subKey}]`, String(subValue));
+            }
+          });
+        }
+      });
+
+      await dispatch(fetchUpdateProfile(formData));
+      setSubmitLoading(false); // Reset the loading state after submit
+    }, 3000); // Delay for 3 seconds before submitting the form
   };
 
   return (
@@ -97,8 +229,10 @@ const Profile = () => {
             >
               {loading ? (
                 <div className='flex items-center'>
-                  <div className='submit-spinner mr-2'></div>
                   Updating...
+                  <div className=' ml-2'>
+                    <SyncLoader size={10} color='white' />
+                  </div>
                 </div>
               ) : image ? (
                 <>
@@ -146,234 +280,196 @@ const Profile = () => {
         </div>
 
         {/* Middle Section - General Information */}
-        <div className='lg:col-span-2 bg-gray-200 dark:bg-gray-700 p-8 rounded-lg shadow-lg'>
-          <h2 className='text-2xl font-semibold mb-6'>General Information</h2>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='firstName'>
-                First Name
-              </label>
-              <input
-                type='text'
-                id='firstName'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-                placeholder='e.g., Bonnie'
-              />
+        <div className='lg:col-span-2'>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className='bg-gray-200 dark:bg-gray-700 p-8 rounded-lg shadow-lg'
+          >
+            <h2 className='text-2xl font-semibold mb-6'>General Information</h2>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div>
+                <label className='block text-sm mb-2' htmlFor='name'>
+                  Name
+                </label>
+                <input
+                  {...register('name')}
+                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                />
+                <p className='text-red-500'>{errors.name?.message}</p>
+              </div>
+
+              <div>
+                <label className='block text-sm mb-2' htmlFor='username'>
+                  Username
+                </label>
+                <input
+                  {...register('username')}
+                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                />
+                <p className='text-red-500'>{errors.username?.message}</p>
+              </div>
+
+              <div>
+                <label className='block text-sm mb-2' htmlFor='email'>
+                  Email
+                </label>
+                <input
+                  {...register('email')}
+                  type='email'
+                  disabled
+                  className='w-full p-2 rounded-md bg-gray-400 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                />
+                <p className='text-red-500'>{errors.email?.message}</p>
+              </div>
+
+              <div>
+                <label className='block text-sm mb-2' htmlFor='bio'>
+                  Bio
+                </label>
+                <textarea
+                  {...register('bio')}
+                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 resize-none'
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm mb-2' htmlFor='birthday'>
+                  Birthday
+                </label>
+                <input
+                  {...register('birthday')}
+                  type='date'
+                  defaultValue={formattedBirthday || ''}
+                  onChange={(e) => {
+                    const selectedDate = e.target.value; // This will always be in 'yyyy-mm-dd' format.
+                    console.log('Birthday Input Changed:', selectedDate);
+                    setValue('birthday', selectedDate); // Store as a string in the correct format.
+                  }}
+                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                />
+                <p className='text-red-500'>{errors.birthday?.message}</p>
+              </div>
+
+              <div>
+                <label className='block text-sm mb-2' htmlFor='address'>
+                  Address
+                </label>
+                <input
+                  {...register('shippingInfo.address')}
+                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                />
+                <p className='text-red-500'>
+                  {errors.shippingInfo?.address?.message}
+                </p>
+              </div>
+
+              <div>
+                <label className='block text-sm mb-2' htmlFor='city'>
+                  City
+                </label>
+                <input
+                  {...register('shippingInfo.city')}
+                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                />
+                <p className='text-red-500'>
+                  {errors.shippingInfo?.city?.message}
+                </p>
+              </div>
+
+              <div>
+                <label className='block text-sm mb-2' htmlFor='country'>
+                  Country
+                </label>
+                <select
+                  {...register('shippingInfo.country')}
+                  onChange={handleCountryChange}
+                  value={selectedCountry}
+                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                >
+                  <option value=''>Select a country</option>
+                  {countries.map((country) => (
+                    <option key={country.name} value={country.name}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+
+                <p className='text-red-500'>
+                  {errors.shippingInfo?.country?.message}
+                </p>
+              </div>
+
+              <div>
+                <label className='block text-sm mb-2' htmlFor='state'>
+                  State
+                </label>
+
+                <select
+                  {...register('shippingInfo.state')}
+                  disabled={!states.length}
+                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                >
+                  <option value=''>Select a state</option>
+                  {states.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
+                    </option>
+                  ))}
+                </select>
+                <p className='text-red-500'>
+                  {errors.shippingInfo?.state?.message}
+                </p>
+              </div>
+
+              <div>
+                <label className='block text-sm mb-2' htmlFor='phoneNo'>
+                  Phone Number
+                </label>
+                <input
+                  {...register('shippingInfo.phoneNo')}
+                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                />
+                <p className='text-red-500'>
+                  {errors.shippingInfo?.phoneNo?.message}
+                </p>
+              </div>
+
+              <div>
+                <label className='block text-sm mb-2' htmlFor='postalCode'>
+                  Zip/Postal Code
+                </label>
+                <input
+                  {...register('shippingInfo.postalCode')}
+                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                />
+                <p className='text-red-500'>
+                  {errors.shippingInfo?.postalCode?.message}
+                </p>
+              </div>
             </div>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='lastName'>
-                Last Name
-              </label>
-              <input
-                type='text'
-                id='lastName'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-                placeholder='e.g., Green'
-              />
-            </div>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='username'>
-                Username
-              </label>
-              <input
-                type='text'
-                id='username'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-                placeholder='Enter username'
-              />
-            </div>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='email'>
-                Email
-              </label>
-              <input
-                type='email'
-                id='email'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-                placeholder='example@company.com'
-              />
-            </div>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='bio'>
-                Bio
-              </label>
-              <textarea
-                id='bio'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-              />
-            </div>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='birthday'>
-                Birthday
-              </label>
-              <input
-                type='date'
-                id='birthday'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-              />
-            </div>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='address'>
-                Address
-              </label>
-              <input
-                type='text'
-                id='address'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-                placeholder='e.g., 123 Main St'
-              />
-            </div>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='city'>
-                City
-              </label>
-              <input
-                type='text'
-                id='city'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-                placeholder='e.g., San Francisco'
-              />
-            </div>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='state'>
-                State
-              </label>
-              <input
-                type='text'
-                id='state'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-                placeholder='e.g., California'
-              />
-            </div>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='country'>
-                Country
-              </label>
-              <input
-                type='text'
-                id='country'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-                placeholder='e.g., United States'
-              />
-            </div>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='phoneNo'>
-                Phone Number
-              </label>
-              <input
-                type='text'
-                id='phoneNo'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-                placeholder='e.g., 123-456-7890'
-              />
-            </div>
-            <div>
-              <label className='block text-sm mb-2' htmlFor='postalCode'>
-                Zip/Postal Code
-              </label>
-              <input
-                type='text'
-                id='postalCode'
-                className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-                placeholder='123456'
-              />
-            </div>
-          </div>
-          <button className='bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md mt-6'>
-            Save all
-          </button>
+
+            <button
+              type='submit'
+              disabled={submitLoading}
+              className={`w-full bg-blue-600 text-white py-2 rounded-md mt-6 flex justify-center items-center transition-opacity duration-300 ${
+                submitLoading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {submitLoading ? (
+                <>
+                  <span className='mr-2'>Saving...</span>
+                  <SyncLoader size={10} color='white' />
+                </>
+              ) : (
+                'Save Changes'
+              )}
+            </button>
+          </form>
         </div>
 
         {/* Right Section - Social & Password Info */}
-        <div className='lg:col-span-1 flex flex-col gap-6'>
-          {/* Profile Card */}
-          <div className=' items-center'>
-            <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg'>
-              <h3 className='text-lg font-semibold mb-4'>Social Accounts</h3>
-              <ul className='space-y-4'>
-                <li className='flex items-center justify-between'>
-                  <div className='flex items-center'>
-                    <FaFacebookF className='mr-2' />
-                    <span>Facebook</span>
-                  </div>
-                  <button className='text-blue-600'>Connect</button>
-                </li>
-                <li className='flex items-center justify-between'>
-                  <div className='flex items-center'>
-                    <FaTwitter className='mr-2' />
-                    <span>Twitter</span>
-                  </div>
-                  <button className='text-blue-600'>Disconnect</button>
-                </li>
-                <li className='flex items-center justify-between'>
-                  <div className='flex items-center'>
-                    <FaGithub className='mr-2' />
-                    <span>Github</span>
-                  </div>
-                  <button className='text-blue-600'>Connect</button>
-                </li>
-                <li className='flex items-center justify-between'>
-                  <div className='flex items-center'>
-                    <FaDribbble className='mr-2' />
-                    <span>Dribbble</span>
-                  </div>
-                  <button className='text-blue-600'>Connect</button>
-                </li>
-              </ul>
-              <button className='mt-6 bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md'>
-                Save all
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className='lg:col-span-2 bg-gray-200 dark:bg-gray-700 p-8 rounded-lg shadow-lg'>
-          {/* Password Information */}
-          <h3 className='text-lg font-semibold mb-4'>Password Information</h3>
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div className='mb-4'>
-              <label className='block text-sm mb-2' htmlFor='password'>
-                Current Password
-              </label>
-              <input
-                type='password'
-                placeholder='••••••••'
-                className='bg-gray-100 dark:bg-gray-700 p-2 rounded'
-              />
-            </div>
-            <div className='mb-4'>
-              <label className='block text-sm mb-2' htmlFor='password'>
-                New Password
-              </label>
-              <input
-                type='password'
-                placeholder='••••••••'
-                className='bg-gray-100 dark:bg-gray-700 p-2 rounded'
-              />
-            </div>
-            <div className='mb-4'>
-              <label className='block text-sm mb-2' htmlFor='password'>
-                Confirm Password
-              </label>
-              <input
-                type='password'
-                placeholder='••••••••'
-                className='bg-gray-100 dark:bg-gray-700 p-2 rounded'
-              />
-            </div>
-          </div>
-          <div className='mt-4 text-gray-500 dark:text-gray-400'>
-            <p>Password requirements:</p>
-            <ul className='list-disc ml-6'>
-              <li>At least 10 characters</li>
-              <li>At least one lowercase character</li>
-              <li>Inclusion of at least one special character</li>
-            </ul>
-          </div>
-          <button className='mt-6 bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md'>
-            Save all
-          </button>
-        </div>
+        <Socials />
+        <UpdateUserPassword />
       </div>
     </div>
   );

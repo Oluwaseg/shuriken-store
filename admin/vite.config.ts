@@ -1,5 +1,5 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -8,14 +8,14 @@ export default defineConfig({
     host: true,
     port: 3000,
     proxy: {
-      "/api": {
-        target: "http://localhost:5000/api",
+      '/api': {
+        target: 'http://localhost:5050/api',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },
   optimizeDeps: {
-    include: ["react-helmet-async"],
+    include: ['react-helmet-async'],
   },
 });

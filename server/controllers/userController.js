@@ -264,7 +264,7 @@ export const updateUserPassword = catchAsync(async (req, res, next) => {
 
   user.password = req.body.newPassword;
   await user.save();
-  sendToken(user, 200, res);
+  sendToken(user, 200, res, 'Password updated successfully');
 });
 
 const deleteOldAvatar = async (public_id) => {

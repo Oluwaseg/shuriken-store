@@ -71,7 +71,7 @@ const schema = new mongoose.Schema({
     },
   },
   birthday: {
-    type: Date,
+    type: String,
   },
   bio: {
     type: String,
