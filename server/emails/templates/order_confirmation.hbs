@@ -1,0 +1,45 @@
+{{> header title="Order Confirmation"}}
+
+<tr>
+    <td style="padding: 40px; font-family: 'Open Sans', Arial, sans-serif; color: #333; line-height: 1.6; background-color: #f8f9fa;">
+        <!-- Order Confirmation Title -->
+        <h2 style="font-size: 28px; font-weight: 700; color: #007bff; margin-bottom: 20px;">Order Confirmation</h2>
+
+        <!-- Greeting -->
+        <p style="font-size: 16px; margin-bottom: 20px;">Hi <strong>{{userName}},</strong></p>
+
+        <p style="font-size: 16px; margin-bottom: 20px;">Thank you for your order! We’re excited to get your items to you. Below are your order details:</p>
+
+        <!-- Order Table -->
+        <table width="100%" cellpadding="10" cellspacing="0" style="border-collapse: collapse; margin-top: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #ffffff;">
+            <thead style="background-color: #007bff; color: #ffffff;">
+                <tr>
+                    <th style="padding: 12px; text-align: left; font-size: 16px; font-weight: 600;">Item</th>
+                    <th style="padding: 12px; text-align: left; font-size: 16px; font-weight: 600;">Quantity</th>
+                    <th style="padding: 12px; text-align: left; font-size: 16px; font-weight: 600;">Price</th>
+                </tr>
+            </thead>
+            <tbody style="font-size: 16px; color: #333;">
+                {{#each orderItems}}
+                    <tr style="border-bottom: 1px solid #f1f1f1;">
+                        <td style="padding: 12px; text-align: left;">{{this.name}}</td>
+                        <td style="padding: 12px; text-align: left;">{{this.quantity}}</td>
+                        <td style="padding: 12px; text-align: left;">${{this.price}}</td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <!-- Order Summary -->
+        <div style="margin-top: 20px; font-size: 16px;">
+            <p><strong>Total: ${{totalPrice}}</strong></p>
+            <p><strong>Order Status: {{orderStatus}}</strong></p>
+            <p><strong>Order Date:</strong> {{formatDate createdAt}}</p>
+        </div>
+
+        <!-- Footer Section -->
+        <p style="font-size: 16px; margin-top: 30px; color: #868e96;">If you have any questions or need further assistance, please don’t hesitate to contact us. Thank you for shopping with us!</p>
+    </td>
+</tr>
+
+{{> footer}}

@@ -1,61 +1,24 @@
-import Product from "../models/Product.js";
-import Order from "../models/Order.js";
-import Cart from "../models/Cart.js";
-import User from "../models/User.js";
-import { ErrorHandler } from "../utils/errorHandler.js";
-import { catchAsync } from "../utils/catchAsync.js";
+import Order from '../models/Order.js';
+import Product from '../models/Product.js';
+import { catchAsync } from '../utils/catchAsync.js';
+import { ErrorHandler } from '../utils/errorHandler.js';
+import { sendOrderStatusUpdate } from '../utils/sendEmail.js';
 
-export const createOrder = catchAsync(async (req, res, next) => {
-  const { userId, shippingInfo } = req.body;
-
-  // Fetch the cart and user
-  const cart = await Cart.findOne({ user: userId });
-  const user = await User.findById(userId);
-
-  if (!cart || !user) {
-    return next(new ErrorHandler("Cart or user not found", 404));
-  }
-
-  // Use the shipping info from the user model if not provided
-  const finalShippingInfo = shippingInfo || user.shippingInfo;
-
-  // Create an order
-  const order = await Order.create({
-    user: userId,
-    orderItems: cart.items,
-    shippingInfo: finalShippingInfo,
-    itemsPrice: cart.total,
-    taxPrice: cart.tax,
-    shippingPrice: cart.shipping,
-    totalPrice: cart.total + cart.tax + cart.shipping,
-    orderStatus: "Pending",
-  });
-
-  const populatedOrder = await Order.findById(order._id)
-    .populate("user", "name email avatar")
-    .exec();
-
-  res.status(201).json({
-    success: true,
-    order: populatedOrder,
-    message: "Order created successfully. Proceed to payment.",
-  });
-});
 // Get Single Order
 export const getSingleOrder = catchAsync(async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.id).populate(
-      "user",
-      "name email avatar"
+    const orders = await Order.findById(req.params.id).populate(
+      'user',
+      'name email avatar'
     );
 
-    if (!order) {
-      return next(new ErrorHandler("Order not found with this Id", 404));
+    if (!orders) {
+      return next(new ErrorHandler('Order not found with this Id', 404));
     }
 
     res.status(200).json({
       success: true,
-      order,
+      orders,
     });
   } catch (error) {
     next(new ErrorHandler(error.message, 500));
@@ -79,7 +42,7 @@ export const myOrders = catchAsync(async (req, res, next) => {
 export const getAllOrders = catchAsync(async (req, res, next) => {
   try {
     const orders = await Order.find()
-      .populate("user", "name email avatar")
+      .populate('user', 'name email avatar')
       .exec();
 
     let totalAmount = 0;
@@ -105,22 +68,39 @@ export const updateOrder = catchAsync(async (req, res, next) => {
     const orderId = req.params.id;
     const { status } = req.body;
 
-    // Fetch the order
-    const order = await Order.findById(orderId);
+    // Fetch the order and populate the user and shipping info fields
+    const order = await Order.findById(orderId).populate(
+      'user',
+      'name email avatar'
+    );
     if (!order) {
-      return next(new ErrorHandler("Order not found with this Id", 404));
+      return next(new ErrorHandler('Order not found with this Id', 404));
+    }
+
+    // Log the current and attempted status to debug the issue
+    console.log('Current order status:', order.orderStatus);
+    console.log('Attempted transition to:', status);
+
+    // If the status is already the same, return early
+    if (order.orderStatus === status) {
+      return res.status(200).json({
+        success: true,
+        message: `Order is already in the '${status}' status.`,
+        order,
+      });
     }
 
     // Define allowed status transitions
     const allowedTransitions = {
-      Pending: ["Processing", "Cancelled"],
-      Processing: ["Shipped", "Pending"],
-      Shipped: ["Delivered", "Processing"],
-      Delivered: ["Returned"],
+      Pending: ['Processing', 'Cancelled'],
+      Processing: ['Packaging', 'Shipped', 'Pending'],
+      Packaging: ['Shipped', 'Processing'],
+      Shipped: ['Delivered', 'Processing'],
+      Delivered: ['Returned'],
       Cancelled: [],
     };
 
-    // Check if the transition is allowed
+    // Check if the attempted transition is allowed
     if (!allowedTransitions[order.orderStatus]?.includes(status)) {
       return next(
         new ErrorHandler(
@@ -130,48 +110,59 @@ export const updateOrder = catchAsync(async (req, res, next) => {
       );
     }
 
+    let customMessage = null;
+
     // Handle stock updates if transitioning to "Shipped" or reverting from "Delivered"
-    if (status === "Shipped" && order.orderStatus === "Processing") {
+    if (status === 'Shipped' && order.orderStatus === 'Processing') {
       await Promise.all(
         order.orderItems.map((item) => updateStock(item.product, item.quantity))
       );
-    } else if (status === "Processing" && order.orderStatus === "Shipped") {
-      // Optional: handle restocking if needed
+    } else if (status === 'Processing' && order.orderStatus === 'Shipped') {
       await Promise.all(
         order.orderItems.map((item) =>
           updateStock(item.product, -item.quantity)
         )
       );
+      customMessage = 'Your order has been reverted to processing.';
     }
 
     // Update order status and relevant fields
     order.orderStatus = status;
-    if (status === "Delivered") order.deliveredAt = Date.now();
-    if (status === "Shipped" && order.orderStatus === "Processing")
+    if (status === 'Delivered') order.deliveredAt = Date.now();
+    if (status === 'Shipped' && order.orderStatus === 'Processing')
       order.shippedAt = Date.now();
-    if (status === "Processing" && order.orderStatus === "Pending")
+    if (status === 'Processing' && order.orderStatus === 'Pending')
       order.processingAt = Date.now();
+    if (status === 'Packaging' && order.orderStatus === 'Processing')
+      order.packagingAt = Date.now();
 
     await order.save({ validateBeforeSave: false });
 
+    await sendOrderStatusUpdate(order.user, order, customMessage);
+
     res.status(200).json({
       success: true,
-      message: "Order updated successfully",
+      message: 'Order updated successfully',
       order,
     });
   } catch (error) {
-    console.error("Error updating order:", error);
+    console.error('Error updating order:', error);
     next(new ErrorHandler(error.message, 500));
   }
 });
 
 async function updateStock(productId, quantity) {
-  const product = await Product.findById(productId);
-  if (!product) {
-    throw new ErrorHandler("Product not found", 404);
-  }
-  product.stock -= quantity;
-  await product.save({ validateBeforeSave: false });
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new ErrorHandler('Product not found', 404);
+    }
+    product.stock -= quantity;
+    await product.save({ validateBeforeSave: false });
+    console.log(
+      `Stock updated for product ${product.name}. New stock: ${product.stock}`
+    );
+  } catch (error) {}
 }
 
 // delete order -- Admin
@@ -179,13 +170,13 @@ export const deleteOrder = catchAsync(async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);
     if (!order) {
-      return next(new ErrorHandler("Order not found with this Id", 404));
+      return next(new ErrorHandler('Order not found with this Id', 404));
     }
     await Order.findByIdAndDelete(req.params.id);
 
     res.status(200).json({
       success: true,
-      message: "Order deleted successfully",
+      message: 'Order deleted successfully',
       order,
     });
   } catch (error) {

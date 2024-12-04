@@ -1,28 +1,14 @@
-import axios from "axios";
-import {
-  InitializePaymentRequest,
-  InitializePaymentResponse,
-  ApiResponse,
-  VerifyPaymentResponse,
-} from "../types/type";
+import axiosInstance from './axiosInstance';
 
-// Initialize Payment
-export const initializePayment = async (
-  request: InitializePaymentRequest
-): Promise<ApiResponse<InitializePaymentResponse>> => {
-  const { data } = await axios.post<ApiResponse<InitializePaymentResponse>>(
-    "/api/payment/initialize",
-    request
-  );
-  return data;
+export const initializePayment = async (userId: string, email: string) => {
+  const response = await axiosInstance.post('/payment/initialize', {
+    userId,
+    email,
+  });
+  return response.data;
 };
 
-// Verify Payment
-export const verifyPayment = async (
-  reference: string
-): Promise<ApiResponse<VerifyPaymentResponse>> => {
-  const { data } = await axios.get<ApiResponse<VerifyPaymentResponse>>(
-    `/api/payment/verify/${reference}`
-  );
-  return data;
+export const verifyPayment = async (reference: string) => {
+  const response = await axiosInstance.get(`/payment/verify/${reference}`);
+  return response.data;
 };

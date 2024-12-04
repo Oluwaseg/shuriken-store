@@ -1,0 +1,68 @@
+{{> header title="Order Status Update"}}
+
+<tr>
+    <td style="padding: 40px; font-family: 'Open Sans', Arial, sans-serif; color: #333; line-height: 1.6; background-color: #f8f9fa;">
+        <!-- Order Status Title -->
+        <h2 style="font-size: 28px; font-weight: 700; color: #007bff; margin-bottom: 20px;">Order Status Update</h2>
+
+        <!-- Greeting -->
+        <p style="font-size: 16px; margin-bottom: 20px;">Hello <strong>{{userName}},</strong></p>
+
+        <!-- Custom Message Section (If exists) -->
+        {{#if customMessage}}
+            <p style="font-size: 16px; margin-bottom: 20px; color: #555;">{{customMessage}}</p>
+        {{/if}}
+
+        <!-- Order Status -->
+        <p style="font-size: 16px; margin-bottom: 20px;">
+            Your order status has been updated to: <strong style="color: #28a745;">{{orderStatus}}</strong>
+        </p>
+
+        <!-- Order Items Table -->
+        <div style="margin-top: 30px; font-size: 16px;">
+            <p><strong style="font-weight: 600;">Order Details:</strong></p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                <thead>
+                    <tr style="background-color: #f3f3f3; color: #333;">
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Item</th>
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Quantity</th>
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Price</th>
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each orderItems}}
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #ddd;">{{this.name}}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">{{this.quantity}}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${{this.price}}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">${{this.total}}</td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Order Summary -->
+         <div style="font-size: 16px; font-weight: 600; margin-top: 20px;">
+            <p><strong>Shipping:</strong> $15.00</p> <!-- Hardcoded Shipping -->
+            <p><strong>Tax:</strong> 10%</p> <!-- Hardcoded Tax -->
+            <p><strong>Total Price:</strong> ${{totalPrice}}</p>
+            <p><strong>Order placed on:</strong> {{formatDate createdAt}}</p>
+        </div>
+
+        <!-- Shipping Info Section (Only if status is 'Shipped' or 'Delivered') -->
+        {{#if shippingInfo}}
+            <div style="background-color: #f1f1f1; padding: 20px; border-radius: 8px; margin-top: 30px;">
+                <h3 style="font-size: 20px; font-weight: 600; color: #007bff;">Shipping Information</h3>
+                <p style="font-size: 16px; margin: 5px 0;"><strong>Address:</strong> {{shippingInfo.address}}, {{shippingInfo.city}}, {{shippingInfo.state}}, {{shippingInfo.country}}, {{shippingInfo.postalCode}}</p>
+                <p style="font-size: 16px; margin: 5px 0;"><strong>Phone Number:</strong> {{shippingInfo.phoneNo}}</p>
+            </div>
+        {{/if}}
+
+        <!-- Thank You Message -->
+        <p style="font-size: 16px; margin-top: 20px; color: #868e96;">Thank you for shopping with us! We appreciate your business and look forward to serving you again.</p>
+    </td>
+</tr>
+
+{{> footer}}

@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL:
+    import.meta.env.MODE === 'development'
+      ? '/api'
+      : import.meta.env.VITE_API_BASE_URL, // Use '/api' in development for Vite proxy
   headers: {
     'Content-Type': 'application/json',
   },
@@ -10,7 +13,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

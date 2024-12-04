@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { FaTrash, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import toast, { Toaster } from "react-hot-toast";
-import { Order } from "./types/type";
-import { fetchOrders, updateOrderStatus, deleteOrder } from "./apis/orders";
+import React, { useEffect, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import { FaChevronLeft, FaChevronRight, FaEye, FaTrash } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import { deleteOrder, fetchOrders, updateOrderStatus } from './apis/orders';
+import { Order } from './types/type';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -18,8 +18,8 @@ const OrderTable: React.FC = () => {
         const orders = await fetchOrders();
         setOrders(orders);
       } catch (error) {
-        console.error("Failed to fetch orders:", error);
-        toast.error("Failed to fetch orders.");
+        console.error('Failed to fetch orders:', error);
+        toast.error('Failed to fetch orders.');
       } finally {
         setLoading(false);
       }
@@ -36,21 +36,25 @@ const OrderTable: React.FC = () => {
           order._id === id ? { ...order, orderStatus: status } : order
         )
       );
-      toast.success("Order status updated successfully.");
+      toast.success('Order status updated successfully.');
     } catch (error) {
-      console.error("Failed to update order status:", error);
-      toast.error("Failed to update order status.");
+      console.error('Failed to update order status:', error);
+      toast.error('Failed to update order status.');
     }
   };
 
   const handleDelete = async (id: string) => {
-    try {
-      await deleteOrder(id);
-      setOrders((prevOrders) => prevOrders.filter((order) => order._id !== id));
-      toast.success("Order deleted successfully.");
-    } catch (error) {
-      console.error("Failed to delete order:", error);
-      toast.error("Failed to delete order.");
+    if (window.confirm('Are you sure you want to delete this order?')) {
+      try {
+        await deleteOrder(id);
+        setOrders((prevOrders) =>
+          prevOrders.filter((order) => order._id !== id)
+        );
+        toast.success('Order deleted successfully.');
+      } catch (error) {
+        console.error('Failed to delete order:', error);
+        toast.error('Failed to delete order.');
+      }
     }
   };
 
@@ -66,115 +70,154 @@ const OrderTable: React.FC = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading)
+    return (
+      <div className='flex justify-center items-center h-64'>
+        <div className='animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900 dark:border-gray-100'></div>
+      </div>
+    );
 
-  if (orders.length === 0) return <p>No orders found.</p>;
+  if (orders.length === 0)
+    return (
+      <div className='text-center py-10'>
+        <p className='text-xl text-gray-600 dark:text-gray-400'>
+          No orders found.
+        </p>
+      </div>
+    );
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'processing':
+        return 'bg-blue-100 text-blue-800';
+      case 'packaging':
+        return 'bg-purple-100 text-purple-800';
+      case 'shipped':
+        return 'bg-indigo-100 text-indigo-800';
+      case 'delivered':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
-    <div>
-      <div className="overflow-x-auto bg-transparent dark:bg-gray-800 rounded-lg shadow-lg">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-700">
+    <div className='space-y-6'>
+      <div className='overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg'>
+        <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
+          <thead className='bg-gray-50 dark:bg-gray-700'>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                #
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Client
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Order ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-pre">
-                Order Date
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
-                Order Items
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-pre">
-                Total Price
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Actions
-              </th>
+              {[
+                '#',
+                'Client',
+                'Order ID',
+                'Order Date',
+                'Order Items',
+                'Status',
+                'Total Price',
+                'Actions',
+              ].map((header) => (
+                <th
+                  key={header}
+                  className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'
+                >
+                  {header}
+                </th>
+              ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+          <tbody className='bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700'>
             {currentOrders.map((order, index) => (
-              <tr key={order._id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+              <tr
+                key={order._id}
+                className='hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150 ease-in-out'
+              >
+                <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100'>
                   {startIndex + index + 1}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100 flex items-center space-x-4">
-                  <div className="flex items-center space-x-4">
+                <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100'>
+                  <div className='flex items-center space-x-4'>
                     <img
                       src={
                         (order.user.avatar && order.user.avatar[0]?.url) ||
-                        "https://example.com/default-avatar.jpg"
+                        'https://example.com/default-avatar.jpg'
                       }
-                      alt="Client Avatar"
-                      className="w-10 h-10 rounded-full"
+                      alt='Client Avatar'
+                      className='w-10 h-10 rounded-full object-cover'
                     />
-                    <span>{order.user.name || "Client Name"}</span>
+                    <span>{order.user.name || 'Client Name'}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100'>
                   <Link
                     to={`/orders/${order._id}`}
-                    className="text-secondary hover:underline"
+                    className='text-blue-600 dark:text-blue-400 hover:underline'
                   >
                     {order._id}
                   </Link>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
                   {new Date(order.createdAt).toLocaleDateString()}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <td className='px-6 py-4 text-sm text-gray-500 dark:text-gray-400'>
                   {order.orderItems.length > 0 ? (
-                    <div>
-                      {order.orderItems.map((item) => (
-                        <div
-                          key={item._id}
-                          className="flex items-center space-x-2 mb-1"
-                        >
-                          <span>
-                            {item.name} x {item.quantity}
-                          </span>
-                        </div>
+                    <ul className='list-disc list-inside'>
+                      {order.orderItems.slice(0, 2).map((item) => (
+                        <li key={item._id} className='truncate'>
+                          {item.name} x {item.quantity}
+                        </li>
                       ))}
-                    </div>
+                      {order.orderItems.length > 2 && (
+                        <li>+{order.orderItems.length - 2} more</li>
+                      )}
+                    </ul>
                   ) : (
                     <span>No items</span>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
                   <select
                     value={order.orderStatus}
                     onChange={(e) =>
                       handleStatusChange(order._id, e.target.value)
                     }
-                    className="border border-gray-300 dark:border-gray-600 rounded-md p-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200"
+                    className={`border rounded-full px-2 py-1 text-xs font-semibold ${getStatusColor(
+                      order.orderStatus
+                    )}`}
                   >
-                    <option value="Pending">Pending</option>
-                    <option value="Processing">Processing</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="Delivered">Delivered</option>
+                    {[
+                      'Pending',
+                      'Processing',
+                      'Packaging',
+                      'Shipped',
+                      'Delivered',
+                    ].map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
                   </select>
                 </td>
-
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  {order.totalPrice}
+                <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
+                  ${order.totalPrice.toFixed(2)}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    onClick={() => handleDelete(order._id)}
-                    className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                  >
-                    <FaTrash />
-                  </button>
+                <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
+                  <div className='flex space-x-2'>
+                    <Link
+                      to={`/orders/${order._id}`}
+                      className='text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300'
+                    >
+                      <FaEye className='w-5 h-5' />
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(order._id)}
+                      className='text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300'
+                    >
+                      <FaTrash className='w-5 h-5' />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -183,52 +226,34 @@ const OrderTable: React.FC = () => {
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4">
-          <div className="text-gray-500 dark:text-gray-400">
-            Showing {startIndex + 1}-{endIndex} of {totalOrders}
+        <div className='flex items-center justify-between mt-4'>
+          <div className='text-sm text-gray-700 dark:text-gray-300'>
+            Showing <span className='font-medium'>{startIndex + 1}</span> to{' '}
+            <span className='font-medium'>{endIndex}</span> of{' '}
+            <span className='font-medium'>{totalOrders}</span> results
           </div>
-          <div className="flex items-center gap-2">
+          <div className='flex items-center space-x-2'>
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="flex items-center gap-2 px-6 py-3 font-sans text-xs font-bold text-center text-gray-900 dark:text-gray-100 uppercase align-middle transition-all rounded-lg select-none hover:bg-gray-900/10 active:bg-gray-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-              type="button"
+              className='relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
             >
-              <FaChevronLeft className="w-4 h-4" />
+              <FaChevronLeft className='w-5 h-5 mr-2' />
               Previous
             </button>
-            <div className="flex items-center gap-2">
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => handlePageChange(i + 1)}
-                  className={`relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase transition-all ${
-                    currentPage === i + 1
-                      ? "bg-gray-900 text-white border border-gray-100 shadow-md shadow-gray-900/10 hover:shadow-lg hover:shadow-gray-900/20"
-                      : "bg-gray-900 text-gray-100 hover:bg-gray-900/10"
-                  }`}
-                  type="button"
-                >
-                  <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-                    {i + 1}
-                  </span>
-                </button>
-              ))}
-            </div>
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="flex items-center gap-2 px-6 py-3 font-sans text-xs font-bold text-center text-gray-900 dark:text-gray-100 uppercase align-middle transition-all rounded-lg select-none hover:bg-gray-900/10 active:bg-gray-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-              type="button"
+              className='relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
             >
               Next
-              <FaChevronRight className="w-4 h-4" />
+              <FaChevronRight className='w-5 h-5 ml-2' />
             </button>
           </div>
         </div>
       )}
 
-      <Toaster position="top-right" />
+      <Toaster position='top-right' />
     </div>
   );
 };

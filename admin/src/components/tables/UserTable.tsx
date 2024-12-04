@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrashAlt, FaCheck, FaTimes } from "react-icons/fa";
-import axios from "axios";
-import toast from "react-hot-toast";
-import EditUserModal from "../modals/EditUser";
-import ConfirmDeleteModal from "../modals/DeleteUser";
-import PagePreloader from "../../components/PagePreloader";
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import PagePreloader from '../../components/PagePreloader';
+import ConfirmDeleteModal from '../modals/DeleteUser';
+import EditUserModal from '../modals/EditUser';
 
 interface User {
   _id: string;
@@ -37,11 +37,11 @@ const UsersTable: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get<{ users: User[] }>("/api/admin/users");
+      const response = await axios.get<{ users: User[] }>('/api/admin/users');
       setUsers(response.data.users);
     } catch (error) {
-      console.error("Error fetching users", error);
-      toast.error("Failed to fetch users.");
+      console.error('Error fetching users', error);
+      toast.error('Failed to fetch users.');
     }
   };
 
@@ -64,13 +64,13 @@ const UsersTable: React.FC = () => {
 
   const handleUserUpdated = async () => {
     await fetchUsers();
-    toast.success("User updated successfully.");
+    toast.success('User updated successfully.');
     handleModalClose();
   };
 
   const handleUserDeleted = async () => {
     await fetchUsers();
-    toast.success("User deleted successfully.");
+    toast.success('User deleted successfully.');
     handleModalClose();
   };
 
@@ -79,113 +79,112 @@ const UsersTable: React.FC = () => {
   }
 
   return (
-    <section className="container mx-auto mt-8 px-4">
-      <div className="flex justify-center">
-        <div className="w-full max-w-7xl">
-          <div className="flex flex-col">
-            <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-              <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                <div className="overflow-hidden border border-gray-200 dark:border-gray-700 md:rounded-lg">
-                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-800">
-                      <tr>
-                        <th className="py-3.5 px-4 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
-                          <div className="flex items-center gap-x-3">
-                            <span>#</span>
-                          </div>
-                        </th>
-                        <th className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
-                          Image
-                        </th>
-                        <th className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-400 ">
-                          Name
-                        </th>
-                        <th className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
-                          Email
-                        </th>
-                        <th className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
-                          Role
-                        </th>
-                        <th className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-400 whitespace-pre">
-                          Joined On
-                        </th>
-                        <th className="px-4 py-3.5 text-sm font-normal text-left text-gray-500 dark:text-gray-400">
-                          Verified
-                        </th>
-                        <th className="relative py-3.5 px-4">
-                          <span className="sr-only">Actions</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
-                      {users.map((user, index) => (
-                        <tr key={user._id}>
-                          <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-200">
-                            <div className="inline-flex items-center gap-x-3">
-                              <span>{index + 1}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-4 text-sm">
-                            <img
-                              src={
-                                user.avatar[0]?.url ||
-                                "https://via.placeholder.com/40"
-                              }
-                              alt={user.name}
-                              className="w-10 h-10 rounded-full object-cover"
-                            />
-                          </td>
-                          <td className="px-4 py-4 text-sm font-medium text-gray-900 dark:text-white whitespace-pre">
-                            {user.name}
-                          </td>
-                          <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
-                            {user.email}
-                          </td>
-                          <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
-                            {user.role}
-                          </td>
-                          <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
-                            {new Date(user.createdAt).toLocaleDateString()}
-                          </td>
-                          <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
-                            {user.isVerified ? (
-                              <div className="inline-flex items-center px-3 py-1 rounded-full gap-x-2 text-emerald-500 bg-emerald-100/60 dark:bg-gray-800">
-                                <FaCheck className="text-green-500" />
-                                <span className="text-sm font-normal">
-                                  Verified
-                                </span>
-                              </div>
-                            ) : (
-                              <div className="inline-flex items-center px-3 py-1 rounded-full gap-x-2 text-red-500 bg-red-100/60 dark:bg-gray-800">
-                                <FaTimes className="text-red-500" />
-                                <span className="text-sm font-normal">
-                                  Not Verified
-                                </span>
-                              </div>
-                            )}
-                          </td>
-                          <td className="px-4 py-4 text-sm whitespace-nowrap">
-                            <div className="flex items-center gap-x-6">
-                              <button
-                                onClick={() => handleEditClick(user)}
-                                className="text-blue-500 hover:text-blue-700 transition-colors"
-                              >
-                                <FaEdit />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteClick(user)}
-                                className="text-red-500 hover:text-red-700 transition-colors"
-                              >
-                                <FaTrashAlt />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+    <div className='container mx-auto px-6 py-8'>
+      <Toaster position='top-right' />
+      {/* Heading Section */}
+      <div className='flex justify-between items-center mb-6'>
+        <h1 className='text-2xl font-semibold text-gray-700'>User Table</h1>
+        <button
+          className='px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600'
+          onClick={() =>
+            toast('Add user functionality coming soon!', { icon: '🚧' })
+          }
+        >
+          Add User
+        </button>
+      </div>
+      <div className='mt-8'>
+        <div className='flex flex-col mt-8'>
+          <div className='-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8'>
+            <div className='align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200'>
+              <table className='min-w-full'>
+                <thead>
+                  <tr>
+                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                      #
+                    </th>
+                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                      Image
+                    </th>
+                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                      Name
+                    </th>
+                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                      Email
+                    </th>
+                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                      Role
+                    </th>
+                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                      Joined On
+                    </th>
+                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                      Verified
+                    </th>
+                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className='bg-white'>
+                  {users.map((user, index) => (
+                    <tr key={user._id}>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                        {index + 1}
+                      </td>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                        <img
+                          src={
+                            user.avatar[0]?.url ||
+                            'https://via.placeholder.com/40'
+                          }
+                          alt={user.name}
+                          className='w-10 h-10 rounded-full object-cover'
+                        />
+                      </td>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                        {user.name}
+                      </td>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                        {user.email}
+                      </td>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                        {user.role}
+                      </td>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                        {new Date(user.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                        {user.isVerified ? (
+                          <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800'>
+                            Verified
+                          </span>
+                        ) : (
+                          <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800'>
+                            Not Verified
+                          </span>
+                        )}
+                      </td>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                        <div className='flex items-center space-x-4'>
+                          <button
+                            onClick={() => handleEditClick(user)}
+                            className='text-blue-500 hover:text-blue-700'
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(user)}
+                            className='text-red-500 hover:text-red-700'
+                          >
+                            <FaTrashAlt />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -206,7 +205,7 @@ const UsersTable: React.FC = () => {
           onSuccess={handleUserDeleted}
         />
       )}
-    </section>
+    </div>
   );
 };
 

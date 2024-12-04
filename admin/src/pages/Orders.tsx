@@ -1,5 +1,5 @@
-import { Helmet, HelmetProvider } from "react-helmet-async";
-import OrderTable from "../components/tables/OrderTable";
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import OrderTable from '../components/tables/OrderTable';
 
 const Order = () => {
   return (
@@ -7,11 +7,11 @@ const Order = () => {
       <HelmetProvider>
         <Helmet>
           <title>Admin -Orders</title>
-          <meta name="description" content="Admin Order Page" />
+          <meta name='description' content='Admin Order Page' />
         </Helmet>
       </HelmetProvider>
-      <div className="p-6">
-        <h1 className="text-2xl font-semibold mb-4">Orders</h1>
+      <div className='container mx-auto px-6 py-8'>
+        <h1 className='text-2xl font-semibold mb-4'>Orders</h1>
         <OrderTable />
       </div>
     </>

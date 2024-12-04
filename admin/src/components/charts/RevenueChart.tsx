@@ -1,49 +1,34 @@
-// components/RevenueChart.tsx
-import React, { useEffect, useState } from "react";
-import { Line } from "react-chartjs-2";
+import React, { useEffect, useState } from 'react';
 import {
-  Chart as ChartJS,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  PointElement,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ReferenceLine,
+  ResponsiveContainer,
   Tooltip,
-  Filler,
-} from "chart.js";
-import { fetchRevenueData } from "../../services/dashboardService";
-
-ChartJS.register(
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  PointElement,
-  Tooltip,
-  Filler
-);
+  XAxis,
+  YAxis,
+} from 'recharts';
+import { fetchRevenueData } from '../../services/dashboardService';
 
 const RevenueChart: React.FC = () => {
-  const [chartData, setChartData] = useState<any>({ labels: [], datasets: [] });
+  const [chartData, setChartData] = useState<any>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchRevenueData(); // Adjust this to your API call
-        setChartData({
-          labels: data.labels, // Array of labels (e.g., months)
-          datasets: [
-            {
-              label: "Revenue Over Time",
-              data: data.values, // Array of values corresponding to the labels
-              borderColor: "#ff5722",
-              backgroundColor: "rgba(255, 87, 34, 0.2)",
-              fill: true,
-            },
-          ],
-        });
+        const data = await fetchRevenueData();
+        const formattedData = data.labels.map(
+          (label: string, index: number) => ({
+            name: label,
+            revenue: data.values[index],
+          })
+        );
+
+        setChartData(formattedData);
       } catch (error) {
-        console.error("Error fetching revenue data:", error);
+        console.error('Error fetching revenue data:', error);
       }
     };
 
@@ -51,9 +36,46 @@ const RevenueChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
-      <h2 className="text-lg font-semibold mb-4">Revenue Over Time</h2>
-      <Line data={chartData} />
+    <div className=''>
+      <h2 className='text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4'>
+        Revenue Over Time
+      </h2>
+      <div className='relative'>
+        <ResponsiveContainer width='100%' height={300}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray='3 3' stroke='#ccc' />
+            <XAxis dataKey='name' stroke='#6b7280' />
+            <YAxis stroke='#6b7280' />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1a202c',
+                border: 'none',
+                borderRadius: '5px',
+              }}
+              labelStyle={{ color: '#e5e7eb' }}
+              itemStyle={{ color: '#fff' }}
+            />
+            <Legend
+              verticalAlign='top'
+              align='right'
+              iconType='square'
+              iconSize={12}
+              wrapperStyle={{
+                paddingRight: 20,
+                paddingTop: 10,
+                fontSize: 12,
+              }}
+            />
+            <Bar
+              dataKey='revenue'
+              fill='#ff5722'
+              barSize={30}
+              radius={[5, 5, 0, 0]} // Rounded top corners
+            />
+            <ReferenceLine y={0} stroke='#000' strokeDasharray='3 3' />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };

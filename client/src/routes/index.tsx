@@ -14,8 +14,9 @@ import Confirmation from '../pages/Confirmation';
 import Contact from '../pages/Contact';
 import Home from '../pages/Home';
 import Root from '../pages/index';
+import OrderDetails from '../pages/OrderDetails';
 import Orders from '../pages/Orders';
-import PlaceOrder from '../pages/PlaceOrder';
+import PaymentSuccessPage from '../pages/PaymentSuccessPage';
 import Product from '../pages/Products/Product';
 import Products from '../pages/Products/Products';
 import Profile from '../pages/User/Profile';
@@ -64,24 +65,39 @@ const RoutesConfig: React.FC = () => {
         path='/orders'
         element={
           <ProtectedRoute>
-            <Orders />
+            <Layout>
+              <Orders />
+            </Layout>
           </ProtectedRoute>
         }
       />
       <Route
-        path='/place-order'
+        path='/orders/:orderId'
         element={
           <ProtectedRoute>
-            <PlaceOrder />
+            <Layout>
+              <OrderDetails />
+            </Layout>
           </ProtectedRoute>
         }
       />
+
       <Route
         path='/checkout'
         element={
           <ProtectedRoute>
             <Layout>
               <CheckoutPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/payment-success'
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <PaymentSuccessPage />
             </Layout>
           </ProtectedRoute>
         }

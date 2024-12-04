@@ -26,7 +26,6 @@ router.delete('/cart/item', isAuthenticated, removeItemFromCart);
 
 // Clear cart
 router.delete('/cart/:userId', isAuthenticated, clearCart);
-
 // checkout
 router.post('/checkout', isAuthenticated, checkout);
 
@@ -34,9 +33,9 @@ router.post('/checkout', isAuthenticated, checkout);
 router.post('/cart/merge', isAuthenticated, mergeCart);
 
 // Initialize payment
-router.post('/initialize-payment', isAuthenticated, initializePayment);
+router.post('/payment/initialize', isAuthenticated, initializePayment);
 
 // Verify payment
-router.get('/verify-payment/:reference', isAuthenticated, verifyPayment);
+router.get('/payment/verify/:reference', isAuthenticated, verifyPayment);
 
 export default router;

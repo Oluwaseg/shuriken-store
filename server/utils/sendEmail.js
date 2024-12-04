@@ -1,11 +1,24 @@
-import nodemailer from "nodemailer";
-import crypto from "crypto";
+import crypto from 'crypto';
+import fs from 'fs';
+import hbs from 'hbs';
+import nodemailer from 'nodemailer';
+import path from 'path';
+
+// Get directory name in ES module environment
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
+// Registering Handlebars partials and helpers
+hbs.registerPartials(path.join(__dirname, '../emails/partials'));
+
+// Use `import` for helpers instead of `require`
+import { formatDate } from '../emails/helpers/dateHelper.js';
+hbs.registerHelper('formatDate', formatDate);
 
 const generateOTP = () => crypto.randomInt(100000, 999999);
 
 export const sendEmail = async (options) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    service: 'gmail',
     auth: {
       user: process.env.EMAIL_USERNAME,
       pass: process.env.EMAIL_PASSWORD,
@@ -21,209 +34,230 @@ export const sendEmail = async (options) => {
 
   const info = await transporter.sendMail(message);
 
-  console.log("Message sent: %s", info.messageId);
+  console.log('Message sent: %s', info.messageId);
 };
 
 export const sendOTP = async (user) => {
   const otp = generateOTP();
-  const otpMessage = `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <style>
-          body {
-              font-family: Arial, sans-serif;
-              margin: 0;
-              padding: 0;
-              background-color: #f4f4f4;
-              color: #333;
-          }
-          .container {
-              width: 100%;
-              max-width: 600px;
-              margin: 0 auto;
-              background-color: #fff;
-              border-radius: 8px;
-              overflow: hidden;
-              box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-              margin-top: 20px;
-          }
-          .header {
-              background-color: #007bff;
-              color: #fff;
-              padding: 20px;
-              text-align: center;
-          }
-          .hero {
-              background-color: #f1f1f1;
-              padding: 30px;
-              text-align: center;
-          }
-          .hero h1 {
-              margin: 0;
-              font-size: 24px;
-              color: #333;
-          }
-          .content {
-              padding: 20px;
-              text-align: center;
-          }
-          .content p {
-              font-size: 16px;
-              line-height: 1.5;
-          }
-          .footer {
-              background-color: #007bff;
-              color: #fff;
-              text-align: center;
-              padding: 15px;
-              font-size: 14px;
-          }
-          .footer a {
-              color: #fff;
-              text-decoration: none;
-              font-weight: bold;
-          }
-      </style>
-  </head>
-  <body>
-      <div class="container">
-          <div class="header">
-              <h2>ShopIT</h2>
-          </div>
-          <div class="hero">
-              <h1>OTP Verification</h1>
-          </div>
-          <div class="content">
-              <p>Hello ${user.name},</p>
-              <p>Your OTP code is <strong>${otp}</strong>.</p>
-              <p>This code will expire in 10 minutes.</p>
-              <p>If you did not request this, please ignore this email.</p>
-          </div>
-          <div class="footer">
-              <p>&copy; ${new Date().getFullYear()} Your Company Name</p>
-              <p><a href="#">Unsubscribe</a> | <a href="#">Contact Us</a></p>
-          </div>
-      </div>
-  </body>
-  </html>
-  `;
+  const currentDate = new Date();
+  // Path to the OTP Handlebars template
+  const otpTemplatePath = path.join(__dirname, '../emails/templates/otp.hbs');
 
-  await sendEmail({
-    email: user.email,
-    subject: "OTP Verification",
-    html: otpMessage,
+  // Read the template file
+  const templateSource = fs.readFileSync(otpTemplatePath, 'utf-8');
+
+  const formattedDate = formatDate(currentDate);
+
+  // Compile the Handlebars template
+  const otpMessage = hbs.compile(templateSource)({
+    userName: user.name,
+    otp,
+    companyUrl: 'https://yourcompany.com',
+    currentDate: formattedDate,
   });
 
+  // Directly use sendEmail to send OTP
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'OTP Verification',
+      html: otpMessage,
+    });
+
+    console.log('OTP sent successfully');
+  } catch (error) {
+    console.error('Error sending OTP email:', error);
+  }
+
+  // Store OTP and its expiration time in your user model
   user.otp = otp;
-  user.otpExpire = Date.now() + 10 * 60 * 1000;
+  user.otpExpire = Date.now() + 10 * 60 * 1000; // 10 minutes expiration
   await user.save();
 };
 
-const welcomeMessage = (userName) => `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-        }
-        .header {
-            background-color: #007bff;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-        }
-        .hero {
-            background-color: #e9ecef;
-            padding: 30px;
-            text-align: center;
-        }
-        .hero h1 {
-            margin: 0;
-            font-size: 24px;
-            color: #333;
-        }
-        .content {
-            padding: 20px;
-            text-align: center;
-        }
-        .content p {
-            font-size: 16px;
-            line-height: 1.5;
-        }
-        .footer {
-            background-color: #007bff;
-            color: #fff;
-            text-align: center;
-            padding: 15px;
-            font-size: 14px;
-        }
-        .footer a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            margin-top: 20px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #28a745;
-            border-radius: 5px;
-            text-decoration: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h2>Welcome to Our Store!</h2>
-        </div>
-        <div class="hero">
-            <h1>Hello ${userName},</h1>
-        </div>
-        <div class="content">
-            <p>Congratulations on verifying your account!</p>
-            <p>We’re thrilled to have you on board. You can now enjoy a seamless shopping experience, browse through our wide range of products, and take advantage of exclusive offers.</p>
-            <p>If you need any assistance, our support team is always here to help. Feel free to reach out if you have any questions.</p>
-            <p>As a special welcome, <a href="#" class="button">Start Shopping</a></p>
-            <p>Thank you for joining us, and happy shopping!</p>
-        </div>
-        <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Our Store. All rights reserved.</p>
-            <p><a href="#">Unsubscribe</a> | <a href="#">Contact Us</a></p>
-        </div>
-    </div>
-</body>
-</html>
-`;
-
 export const sendWelcomeEmail = async (user) => {
-  const htmlContent = welcomeMessage(user.name);
+  const currentDate = new Date();
+  const formattedDate = formatDate(currentDate); // Format the current date
 
+  // Path to the welcome email Handlebars template
+  const welcomeTemplatePath = path.join(
+    __dirname,
+    '../emails/templates/welcome_email.hbs'
+  );
+
+  // Read the Handlebars template
+  const templateSource = fs.readFileSync(welcomeTemplatePath, 'utf-8');
+
+  // Compile the Handlebars template
+  const welcomeMessage = hbs.compile(templateSource);
+
+  // Generate the email content by passing dynamic data to the template
+  const htmlContent = welcomeMessage({
+    userName: user.name,
+    companyUrl: 'https://yourcompany.com',
+    currentDate: formattedDate,
+    year: new Date().getFullYear(), // Add the year for the footer
+  });
+
+  // Send the email using the sendEmail function
   await sendEmail({
     email: user.email,
-    subject: "Welcome to Our Store!",
+    subject: 'Welcome to Our Store!',
     html: htmlContent,
   });
+};
+
+export const sendPasswordReset = async (user, resetUrl) => {
+  const currentDate = new Date();
+  const formattedDate = formatDate(currentDate);
+
+  const resetTemplatePath = path.join(
+    __dirname,
+    '../emails/templates/forgot_password.hbs'
+  );
+
+  const templateSource = fs.readFileSync(resetTemplatePath, 'utf-8');
+
+  const resetMessage = hbs.compile(templateSource)({
+    userName: user.name,
+    resetUrl: resetUrl,
+  });
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Password Reset Request',
+      html: resetMessage,
+      currentDate: formattedDate,
+    });
+
+    console.log('Password reset email sent successfully');
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    throw new Error('Failed to send password reset email');
+  }
+};
+
+export const sendPasswordResetSuccess = async (user) => {
+  const currentDate = new Date();
+  const formattedDate = formatDate(currentDate);
+
+  const resetSuccessTemplatePath = path.join(
+    __dirname,
+    '../emails/templates/reset_password.hbs'
+  );
+
+  const templateSource = fs.readFileSync(resetSuccessTemplatePath, 'utf-8');
+
+  const resetSuccessMessage = hbs.compile(templateSource)({
+    userName: user.name,
+  });
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Password Reset Successful',
+      html: resetSuccessMessage,
+      currentDate: formattedDate,
+    });
+
+    console.log('Password reset success email sent successfully');
+  } catch (error) {
+    console.error('Error sending password reset success email:', error);
+    throw new Error('Failed to send password reset success email');
+  }
+};
+
+// Order Confirmation Function
+export const sendOrderConfirmation = async (user, order) => {
+  if (!user.email) {
+    console.error(
+      'User email is missing. Cannot send order confirmation email.'
+    );
+    throw new Error('User email is required to send order confirmation.');
+  }
+  const templatePath = path.join(
+    __dirname,
+    '../emails/templates/order_confirmation.hbs'
+  );
+
+  // Convert order to a plain object
+  const plainOrder = order.toObject();
+
+  // Read and compile the template source
+  const templateSource = fs.readFileSync(templatePath, 'utf-8');
+  const orderConfirmationMessage = hbs.compile(templateSource)({
+    userName: user.name,
+    orderItems: plainOrder.orderItems,
+    totalPrice: plainOrder.totalPrice,
+    orderStatus: plainOrder.orderStatus,
+    createdAt: plainOrder.createdAt,
+  });
+
+  // Send email
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Your Order Confirmation',
+      html: orderConfirmationMessage,
+    });
+
+    console.log('Order confirmation email sent successfully');
+  } catch (error) {
+    console.error('Error sending order confirmation email:', error);
+    throw new Error('Failed to send order confirmation email');
+  }
+};
+
+// Order Status Update Notification Function
+export const sendOrderStatusUpdate = async (
+  user,
+  order,
+  customMessage = ''
+) => {
+  if (!user.email) {
+    console.error(
+      'User email is missing. Cannot send order status update email.'
+    );
+    throw new Error('User email is required to send order status update.');
+  }
+
+  // Path to the status update email template
+  const statusUpdateTemplatePath = path.join(
+    __dirname,
+    '../emails/templates/order_status_update.hbs'
+  );
+
+  // Convert order to a plain object
+  const plainOrder = order.toObject();
+
+  plainOrder.orderItems.forEach((item) => {
+    item.total = item.quantity * item.price; // Directly calculate total
+  });
+
+  // Read and compile the template source
+  const templateSource = fs.readFileSync(statusUpdateTemplatePath, 'utf-8');
+  const orderStatusUpdateMessage = hbs.compile(templateSource)({
+    userName: user.name,
+    orderItems: plainOrder.orderItems,
+    totalPrice: plainOrder.totalPrice,
+    orderStatus: plainOrder.orderStatus,
+    createdAt: plainOrder.createdAt,
+    shippingInfo: plainOrder.shippingInfo,
+    customMessage,
+  });
+
+  // Send email
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: `Your Order Status Update: ${order.orderStatus}`,
+      html: orderStatusUpdateMessage,
+    });
+
+    console.log('Order status update email sent successfully');
+  } catch (error) {
+    console.error('Error sending order status update email:', error);
+    throw new Error('Failed to send order status update email');
+  }
 };

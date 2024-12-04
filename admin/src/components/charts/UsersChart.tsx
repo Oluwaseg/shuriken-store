@@ -1,52 +1,35 @@
-// components/UsersChart.tsx
-import React, { useEffect, useState } from "react";
-import { Line } from "react-chartjs-2";
+import React, { useEffect, useState } from 'react';
 import {
-  Chart as ChartJS,
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  PointElement,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
   Tooltip,
-  Filler,
-} from "chart.js";
-import { fetchUserData } from "../../services/dashboardService";
-
-ChartJS.register(
-  LineElement,
-  CategoryScale,
-  LinearScale,
-  Title,
-  PointElement,
-  Tooltip,
-  Filler
-);
+  XAxis,
+  YAxis,
+} from 'recharts';
+import { fetchUserData } from '../../services/dashboardService';
 
 const UsersChart: React.FC = () => {
-  const [chartData, setChartData] = useState<any>({
-    labels: [],
-    datasets: [],
-  });
+  const [chartData, setChartData] = useState<any>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await fetchUserData();
-        setChartData({
-          labels: data.labels,
-          datasets: [
-            {
-              label: "Users Over Time",
-              data: data.values,
-              borderColor: "#4caf50",
-              backgroundColor: "rgba(76, 175, 80, 0.2)",
-              fill: true,
-            },
-          ],
-        });
+        // Preparing data to be used in the LineChart
+        const formattedData = data.labels.map(
+          (label: string, index: number) => ({
+            name: label,
+            users: data.values[index],
+          })
+        );
+
+        setChartData(formattedData);
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error('Error fetching user data:', error);
       }
     };
 
@@ -54,44 +37,48 @@ const UsersChart: React.FC = () => {
   }, []);
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
-      <h2 className="text-lg font-semibold mb-4">Users Over Time</h2>
-      <div className="relative">
-        <Line
-          data={chartData}
-          options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: true,
-                position: "top",
-              },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    let label = context.dataset.label || "";
-                    if (label) {
-                      label += ": ";
-                    }
-                    if (context.parsed.y !== null) {
-                      label += context.parsed.y;
-                    }
-                    return label;
-                  },
-                },
-              },
-            },
-            scales: {
-              x: {
-                ticks: {
-                  autoSkip: true,
-                  maxTicksLimit: 12,
-                },
-              },
-            },
-          }}
-        />
+    <div className=''>
+      <h2 className='text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4'>
+        Users Over Time
+      </h2>
+      <div className='relative'>
+        <ResponsiveContainer width='100%' height={300}>
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray='3 3' stroke='#ccc' />
+            <XAxis dataKey='name' stroke='#6b7280' />
+            <YAxis stroke='#6b7280' />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1a202c',
+                border: 'none',
+                borderRadius: '5px',
+              }}
+              labelStyle={{ color: '#e5e7eb' }}
+              itemStyle={{ color: '#fff' }}
+            />
+            <Legend
+              verticalAlign='top'
+              align='right'
+              iconType='circle'
+              iconSize={10}
+              wrapperStyle={{
+                paddingRight: 20,
+                paddingTop: 10,
+                fontSize: 12,
+              }}
+            />
+            <Line
+              type='monotone'
+              dataKey='users'
+              stroke='#4caf50'
+              strokeWidth={3}
+              dot={{ stroke: '#4caf50', strokeWidth: 2 }}
+              activeDot={{ r: 8, stroke: '#fff', strokeWidth: 2 }}
+              fill='rgba(76, 175, 80, 0.2)'
+            />
+            <ReferenceLine y={0} stroke='#000' strokeDasharray='3 3' />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
   shippingInfo: {
@@ -49,14 +49,14 @@ const orderSchema = new mongoose.Schema({
       },
       product: {
         type: mongoose.Schema.ObjectId,
-        ref: "Product",
+        ref: 'Product',
         required: true,
       },
     },
   ],
   user: {
     type: mongoose.Schema.ObjectId,
-    ref: "User",
+    ref: 'User',
     required: true,
   },
   paymentInfo: {
@@ -96,7 +96,7 @@ const orderSchema = new mongoose.Schema({
   orderStatus: {
     type: String,
     required: true,
-    default: "Processing",
+    default: 'Processing',
   },
   deliveredAt: Date,
   createdAt: {
@@ -105,14 +105,14 @@ const orderSchema = new mongoose.Schema({
   },
 });
 
-orderSchema.virtual("id").get(function () {
+orderSchema.virtual('id').get(function () {
   return this._id.toHexString();
 });
 
 // Ensure virtual fields are serialised.
-orderSchema.set("toJSON", {
+orderSchema.set('toJSON', {
   virtuals: true,
 });
 
-const Order = mongoose.model("Order", orderSchema);
+const Order = mongoose.model('Order', orderSchema);
 export default Order;

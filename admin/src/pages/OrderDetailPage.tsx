@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
-import { fetchOrderById } from "../components/tables/apis/orders";
-import { Order } from "../components/tables/types/type";
-import { Helmet, HelmetProvider } from "react-helmet-async";
+import React, { useEffect, useState } from 'react';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import { FaArrowLeft, FaPrint } from 'react-icons/fa';
+import { Link, useParams } from 'react-router-dom';
+import { fetchOrderById } from '../components/tables/apis/orders';
+import { Order } from '../components/tables/types/type';
+
 const OrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const [order, setOrder] = useState<Order | null>(null);
@@ -13,7 +14,7 @@ const OrderDetailPage: React.FC = () => {
   useEffect(() => {
     const loadOrderDetails = async () => {
       if (!orderId) {
-        setError("Order ID is missing.");
+        setError('Order ID is missing.');
         setLoading(false);
         return;
       }
@@ -23,10 +24,10 @@ const OrderDetailPage: React.FC = () => {
         if (response && response.order) {
           setOrder(response.order);
         } else {
-          setError("Order details are not available.");
+          setError('Order details are not available.');
         }
       } catch {
-        setError("Failed to fetch order details.");
+        setError('Failed to fetch order details.');
       } finally {
         setLoading(false);
       }
@@ -35,22 +36,59 @@ const OrderDetailPage: React.FC = () => {
     loadOrderDetails();
   }, [orderId]);
 
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'processing':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'shipped':
+        return 'bg-blue-100 text-blue-800';
+      case 'delivered':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   if (loading)
     return (
-      <div className="text-center py-12">
-        <p className="text-lg font-semibold">Loading...</p>
+      <div className='flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900'>
+        <div className='animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500'></div>
       </div>
     );
+
   if (error)
     return (
-      <div className="text-center py-12">
-        <p className="text-lg text-red-600 font-semibold">{error}</p>
+      <div className='flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900'>
+        <div className='text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl'>
+          <p className='text-xl text-red-600 font-semibold mb-4'>{error}</p>
+          <Link
+            to='/orders'
+            className='inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300'
+          >
+            <FaArrowLeft className='mr-2' />
+            Back to Orders
+          </Link>
+        </div>
       </div>
     );
+
   if (!order)
     return (
-      <div className="text-center py-12">
-        <p className="text-lg font-semibold">No order found.</p>
+      <div className='flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900'>
+        <div className='text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl'>
+          <p className='text-xl font-semibold mb-4'>No order found.</p>
+          <Link
+            to='/orders'
+            className='inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300'
+          >
+            <FaArrowLeft className='mr-2' />
+            Back to Orders
+          </Link>
+        </div>
       </div>
     );
 
@@ -58,127 +96,210 @@ const OrderDetailPage: React.FC = () => {
     <>
       <HelmetProvider>
         <Helmet>
-          <title>Admin Order Details</title>
-          <meta name="description" content="Admin Order Details Page" />
+          <title>Order Details - #{order._id}</title>
+          <meta
+            name='description'
+            content={`Order details for order #${order._id}`}
+          />
         </Helmet>
       </HelmetProvider>
-      <div className="container mx-auto p-6 md:p-12 bg-gray-100 dark:bg-gray-900 min-h-screen">
-        <Link
-          to="/orders"
-          className="flex items-center space-x-2 mb-8 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-300"
-        >
-          <FaArrowLeft className="text-xl" />
-          <span className="text-lg font-medium">Back to Orders</span>
-        </Link>
-
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-              Shipping Information
-            </h2>
-            {order.shippingInfo ? (
-              <div className="space-y-2 text-gray-600 dark:text-gray-400">
-                <p>
-                  <strong>Address:</strong> {order.shippingInfo.address}
-                </p>
-                <p>
-                  <strong>City:</strong> {order.shippingInfo.city}
-                </p>
-                <p>
-                  <strong>State:</strong> {order.shippingInfo.state}
-                </p>
-                <p>
-                  <strong>Country:</strong> {order.shippingInfo.country}
-                </p>
-                <p>
-                  <strong>Postal Code:</strong> {order.shippingInfo.postalCode}
-                </p>
-                <p>
-                  <strong>Phone No:</strong> {order.shippingInfo.phoneNo}
-                </p>
-              </div>
-            ) : (
-              <p>No shipping information available.</p>
-            )}
+      <div className='min-h-screen bg-gray-100 dark:bg-gray-900 py-8'>
+        <div className='container mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='mb-8 flex justify-between items-center'>
+            <Link
+              to='/orders'
+              className='inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300 shadow-sm'
+            >
+              <FaArrowLeft className='mr-2' />
+              Back to Orders
+            </Link>
+            <button
+              onClick={handlePrint}
+              className='inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300 shadow-sm'
+            >
+              <FaPrint className='mr-2' />
+              Print Order
+            </button>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-              Payment Information
-            </h2>
-            {order.paymentInfo ? (
-              <div className="space-y-2 text-gray-600 dark:text-gray-400">
-                <p>
-                  <strong>ID:</strong> {order.paymentInfo.id}
-                </p>
-                <p>
-                  <strong>Status:</strong> {order.paymentInfo.status}
-                </p>
+          <div className='bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden'>
+            <div className='p-6 sm:p-8'>
+              <div className='flex justify-between items-center mb-6'>
+                <h1 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
+                  Order #{order._id}
+                </h1>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
+                    order.orderStatus
+                  )}`}
+                >
+                  {order.orderStatus}
+                </span>
               </div>
-            ) : (
-              <p>No payment information available.</p>
-            )}
-          </div>
 
-          <div className="col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-              Order Items
-            </h2>
-            {order.orderItems && order.orderItems.length > 0 ? (
-              <div className="space-y-4">
-                {order.orderItems.map((item) => (
-                  <div
-                    key={item._id}
-                    className="flex items-start space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
-                  >
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-24 h-24 object-cover rounded-lg border border-gray-300 dark:border-gray-600"
-                    />
-                    <div className="space-y-1">
-                      <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                        {item.name}
+              <div className='grid gap-8 md:grid-cols-2'>
+                <div>
+                  <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>
+                    Shipping Information
+                  </h2>
+                  {order.shippingInfo ? (
+                    <div className='space-y-2 text-gray-600 dark:text-gray-400'>
+                      <p>
+                        <strong>Address:</strong> {order.shippingInfo.address}
                       </p>
                       <p>
-                        <strong>Price:</strong> ${item.price}
+                        <strong>City:</strong> {order.shippingInfo.city}
                       </p>
                       <p>
-                        <strong>Quantity:</strong> {item.quantity}
+                        <strong>State:</strong> {order.shippingInfo.state}
+                      </p>
+                      <p>
+                        <strong>Country:</strong> {order.shippingInfo.country}
+                      </p>
+                      <p>
+                        <strong>Postal Code:</strong>{' '}
+                        {order.shippingInfo.postalCode}
+                      </p>
+                      <p>
+                        <strong>Phone:</strong> {order.shippingInfo.phoneNo}
                       </p>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p>No items in this order.</p>
-            )}
-          </div>
+                  ) : (
+                    <p className='text-gray-500 dark:text-gray-400'>
+                      No shipping information available.
+                    </p>
+                  )}
+                </div>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-              Order Summary
-            </h2>
-            <div className="space-y-2 text-gray-600 dark:text-gray-400">
-              <p>
-                <strong>Items Price:</strong> ${order.itemsPrice}
-              </p>
-              <p>
-                <strong>Tax Price:</strong> ${order.taxPrice}
-              </p>
-              <p>
-                <strong>Shipping Price:</strong> ${order.shippingPrice}
-              </p>
-              <p>
-                <strong>Total Price:</strong> ${order.totalPrice}
-              </p>
-              <p>
-                <strong>Status:</strong> {order.orderStatus}
-              </p>
-              <p>
-                <strong>Order Date:</strong>{" "}
-                {new Date(order.createdAt).toLocaleDateString()}
-              </p>
+                <div>
+                  <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>
+                    Payment Information
+                  </h2>
+                  {order.paymentInfo ? (
+                    <div className='space-y-2 text-gray-600 dark:text-gray-400'>
+                      <p>
+                        <strong>ID:</strong> {order.paymentInfo.id}
+                      </p>
+                      <p>
+                        <strong>Status:</strong> {order.paymentInfo.status}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className='text-gray-500 dark:text-gray-400'>
+                      No payment information available.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className='mt-8'>
+                <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>
+                  Order Items
+                </h2>
+                {order.orderItems && order.orderItems.length > 0 ? (
+                  <div className='overflow-x-auto'>
+                    <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
+                      <thead className='bg-gray-50 dark:bg-gray-700'>
+                        <tr>
+                          <th
+                            scope='col'
+                            className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
+                          >
+                            Product
+                          </th>
+                          <th
+                            scope='col'
+                            className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
+                          >
+                            Price
+                          </th>
+                          <th
+                            scope='col'
+                            className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
+                          >
+                            Quantity
+                          </th>
+                          <th
+                            scope='col'
+                            className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
+                          >
+                            Total
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className='bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700'>
+                        {order.orderItems.map((item) => (
+                          <tr key={item._id}>
+                            <td className='px-6 py-4 whitespace-nowrap'>
+                              <div className='flex items-center'>
+                                <img
+                                  className='h-10 w-10 rounded-full object-cover'
+                                  src={item.image}
+                                  alt={item.name}
+                                />
+                                <div className='ml-4'>
+                                  <div className='text-sm font-medium text-gray-900 dark:text-gray-100'>
+                                    {item.name}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className='px-6 py-4 whitespace-nowrap'>
+                              <div className='text-sm text-gray-500 dark:text-gray-400'>
+                                ${item.price.toFixed(2)}
+                              </div>
+                            </td>
+                            <td className='px-6 py-4 whitespace-nowrap'>
+                              <div className='text-sm text-gray-500 dark:text-gray-400'>
+                                {item.quantity}
+                              </div>
+                            </td>
+                            <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
+                              ${(item.price * item.quantity).toFixed(2)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className='text-gray-500 dark:text-gray-400'>
+                    No items in this order.
+                  </p>
+                )}
+              </div>
+
+              <div className='mt-8 bg-gray-50 dark:bg-gray-700 p-6 rounded-lg'>
+                <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>
+                  Order Summary
+                </h2>
+                <div className='space-y-2 text-gray-600 dark:text-gray-400'>
+                  <p className='flex justify-between'>
+                    <span>Items Price:</span>
+                    <span>${order.itemsPrice.toFixed(2)}</span>
+                  </p>
+                  <p className='flex justify-between'>
+                    <span>Tax:</span>
+                    <span>${order.taxPrice.toFixed(2)}</span>
+                  </p>
+                  <p className='flex justify-between'>
+                    <span>Shipping:</span>
+                    <span>${order.shippingPrice.toFixed(2)}</span>
+                  </p>
+                  <div className='border-t border-gray-200 dark:border-gray-600 my-2 pt-2'>
+                    <p className='flex justify-between font-semibold text-lg'>
+                      <span>Total:</span>
+                      <span>${order.totalPrice.toFixed(2)}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className='mt-8 text-sm text-gray-500 dark:text-gray-400'>
+                <p>
+                  Order placed on: {new Date(order.createdAt).toLocaleString()}
+                </p>
+              </div>
             </div>
           </div>
         </div>

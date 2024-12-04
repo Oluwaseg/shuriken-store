@@ -14,11 +14,18 @@ import product from './routes/product.js';
 import user from './routes/user.js';
 const app = express();
 
-// Middleware
+//! Middleware
 
 const corsOptions = {
-  origin: process.env.CLIENT_URL,
+  origin: [
+    process.env.ADMIN_URL,
+    process.env.CLIENT_URL,
+    'https://b3tfhzw5-3000.uks1.devtunnels.ms',
+    'https://b3tfhzw5-3050.uks1.devtunnels.ms',
+  ],
   credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
 };
 
 app.use(cors(corsOptions));
@@ -36,7 +43,9 @@ app.use(
     },
   })
 );
-// Setup Morgan to use Winston for logging
+
+//! Setup Morgan to use Winston for logging
+
 app.use(
   morgan('combined', {
     stream: { write: (message) => logger.info(message.trim()) },
@@ -46,7 +55,6 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(errorMiddleware);
 
 // routes
 app.use('/api', user);
@@ -55,9 +63,8 @@ app.use('/api', order);
 app.use('/api', category);
 app.use('/api', cart);
 
-app.use((err, req, res, next) => {
-  logger.error(err.stack);
-  res.status(500).send('Something broke!');
-});
+//! error middleware
+
+app.use(errorMiddleware);
 
 export default app;

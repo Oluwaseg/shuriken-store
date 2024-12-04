@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { FaLock, FaShoppingCart, FaTruck } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { initializePayment } from '../../api/payment';
 import { fetchCart } from '../../features/cart/cartSlice';
 import { initializeCheckout } from '../../features/checkout/checkoutSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
@@ -69,9 +70,30 @@ const CheckoutPage: React.FC = () => {
     }
 
     if (isAuthenticated && userInfo?.id) {
+      // Initialize checkout
       await dispatch(initializeCheckout({ userId: userInfo.id, shippingInfo }));
+
       if (!error) {
-        navigate('/confirmation');
+        try {
+          // Call the backend to initialize payment
+          const paymentResponse = await initializePayment(
+            userInfo.id,
+            userInfo.email
+          );
+
+          if (
+            paymentResponse.success &&
+            paymentResponse.data.authorization_url
+          ) {
+            // Redirect to Paystack authorization URL
+            window.location.href = paymentResponse.data.authorization_url;
+          } else {
+            toast.error('Payment initialization failed. Please try again.');
+          }
+        } catch (err) {
+          toast.error('An error occurred while initializing payment.');
+          console.error(err);
+        }
       }
     } else {
       toast.error('You need to sign in to proceed with checkout.');

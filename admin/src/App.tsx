@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
-import RootLayout from "./layouts/RootLayout";
-import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
-import Orders from "./pages/Orders";
-import Settings from "./pages/Settings";
-import Products from "./pages/Products";
-import Category from "./pages/Category";
-import Login from "./pages/Login";
-import OrderDetailPage from "./pages/OrderDetailPage";
-import ProtectedRoute from "./services/ProtectedRoutes";
-import Preloader from "./components/Preloader";
-import { RootState } from "./redux/store";
-import SubCategory from "./pages/SubCategory";
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Route, Routes } from 'react-router-dom';
+import Preloader from './components/Preloader';
+import Layout from './layouts/Layout';
+import Analytics from './pages/Analytics';
+import Category from './pages/Category';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+import OrderDetailPage from './pages/OrderDetailPage';
+import Orders from './pages/Orders';
+import Products from './pages/Products';
+import Settings from './pages/Settings';
+import SubCategory from './pages/SubCategory';
+import Users from './pages/Users';
+import { RootState } from './redux/store';
+import ProtectedRoute from './services/ProtectedRoutes';
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -30,9 +31,9 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (isDarkMode) {
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.remove('dark');
     }
   }, [isDarkMode]);
 
@@ -42,84 +43,94 @@ const App: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path='/login' element={<Login />} />
       <Route
-        path="/"
+        path='/'
         element={
           <ProtectedRoute>
-            <RootLayout>
+            <Layout>
               <Dashboard />
-            </RootLayout>
+            </Layout>
           </ProtectedRoute>
         }
       />
       <Route
-        path="/users"
+        path='/analytics'
         element={
           <ProtectedRoute>
-            <RootLayout>
+            <Layout>
+              <Analytics />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/users'
+        element={
+          <ProtectedRoute>
+            <Layout>
               <Users />
-            </RootLayout>
+            </Layout>
           </ProtectedRoute>
         }
       />
       <Route
-        path="/orders"
+        path='/orders'
         element={
           <ProtectedRoute>
-            <RootLayout>
+            <Layout>
               <Orders />
-            </RootLayout>
+            </Layout>
           </ProtectedRoute>
         }
       />
       <Route
-        path="/orders/:orderId"
+        path='/orders/:orderId'
         element={
           <ProtectedRoute>
-            <RootLayout>
+            <Layout>
               <OrderDetailPage />
-            </RootLayout>
+            </Layout>
           </ProtectedRoute>
         }
       />
       <Route
-        path="/settings"
+        path='/settings'
         element={
           <ProtectedRoute>
-            <RootLayout>
+            <Layout>
               <Settings />
-            </RootLayout>
+            </Layout>
           </ProtectedRoute>
         }
       />
       <Route
-        path="/products"
+        path='/products'
         element={
           <ProtectedRoute>
-            <RootLayout>
+            <Layout>
               <Products />
-            </RootLayout>
+            </Layout>
           </ProtectedRoute>
         }
       />
       <Route
-        path="/subcategories"
+        path='/subcategories'
         element={
           <ProtectedRoute>
-            <RootLayout>
+            <Layout>
               <SubCategory />
-            </RootLayout>
+            </Layout>
           </ProtectedRoute>
         }
       />
       <Route
-        path="/categories"
+        path='/categories'
         element={
           <ProtectedRoute>
-            <RootLayout>
+            <Layout>
               <Category />
-            </RootLayout>
+            </Layout>
           </ProtectedRoute>
         }
       />

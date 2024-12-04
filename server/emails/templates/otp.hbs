@@ -1,0 +1,21 @@
+{{> header title="OTP Verification"}}
+
+<tr>
+    <td style="padding: 40px; text-align: center; font-family: 'Open Sans', Arial, sans-serif; color: #333;">
+        <h2 style="color: #007bff; font-size: 24px; font-weight: 700; margin-bottom: 20px;">OTP Verification</h2>
+        <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px; color: #555;">Hello <strong>{{userName}}</strong>,</p>
+        <p style="font-size: 16px; line-height: 1.5; margin-bottom: 20px; color: #555;">Your One-Time Password (OTP) code is:</p>
+        
+        <div style="display: inline-block; padding: 15px 30px; background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 30px; font-size: 20px; font-weight: 700; color: #333;">
+            {{otp}}
+        </div>
+
+        <p style="font-size: 14px; line-height: 1.5; margin-bottom: 20px; color: #868e96;">
+            This code will expire in <strong>10 minutes</strong>. If you didn’t request this, please ignore this email.
+        </p>
+
+        <p style="font-size: 14px; color: #868e96;">Sent on: {{currentDate}}</p>
+    </td>
+</tr>
+
+{{> footer}}

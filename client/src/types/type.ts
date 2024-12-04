@@ -158,16 +158,27 @@ export interface ShippingInfo {
   phoneNo: string;
 }
 
+// Payment Information type
+export interface PaymentInfo {
+  id: string;
+  status: string;
+}
+
 // Order Item type
 export interface OrderItem {
   product: Product | string;
+  name: string; // Product name
+  price: number; // Price per item
   quantity: number;
+  image: string;
+  id: string;
 }
 
 // Order type
 export interface Order {
   id: string;
-  userId: string; // Reference to User ID
+  _id: string;
+  user: User | string;
   orderItems: OrderItem[];
   shippingInfo: ShippingInfo;
   itemsPrice: number;
@@ -175,19 +186,19 @@ export interface Order {
   shippingPrice: number;
   totalPrice: number;
   orderStatus:
+    | 'Pending Verification'
     | 'Pending'
     | 'Processing'
+    | 'Packaging'
     | 'Shipped'
     | 'Delivered'
     | 'Cancelled'
     | 'Returned';
-  paymentInfo?: {
-    id: string;
-    status: string;
-  };
-  paidAt?: Date;
-  shippedAt?: Date;
-  deliveredAt?: Date;
+  paymentInfo?: PaymentInfo;
+  paidAt?: string;
+  shippedAt?: string;
+  deliveredAt?: string;
+  createdAt: string;
 }
 
 // Checkout data response type
@@ -205,6 +216,7 @@ export interface ApiResponse<T> {
   message?: string;
   data?: T;
   cart?: T;
+  orders?: T;
 }
 
 // Paystack Payment Initialization Request type
