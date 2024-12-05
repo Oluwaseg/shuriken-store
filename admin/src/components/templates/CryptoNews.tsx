@@ -17,9 +17,10 @@ const CryptoNews: React.FC = () => {
     const fetchCryptoNews = async () => {
       try {
         const response = await fetch(
-          `https://finnhub.io/api/v1/news?category=crypto&token=ct6d061r01qmbqorn8l0ct6d061r01qmbqorn8lg`
+          `https://finnhub.io/api/v1/news?category=crypto&token=${
+            import.meta.env.VITE_FINNHUB_API_KEY
+          }`
         );
-
         if (!response.ok) {
           throw new Error(`HTTP Error! Status: ${response.status}`);
         }

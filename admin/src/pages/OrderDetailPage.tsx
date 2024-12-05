@@ -7,7 +7,7 @@ import { Order } from '../components/tables/types/type';
 
 const OrderDetailPage: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();
-  const [order, setOrder] = useState<Order | null>(null);
+  const [orders, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,8 +21,8 @@ const OrderDetailPage: React.FC = () => {
 
       try {
         const response = await fetchOrderById(orderId);
-        if (response && response.order) {
-          setOrder(response.order);
+        if (response && response.orders) {
+          setOrder(response.orders);
         } else {
           setError('Order details are not available.');
         }
@@ -38,12 +38,18 @@ const OrderDetailPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
+      case 'pending':
+        return 'bg-red-100 text-red-800';
       case 'processing':
         return 'bg-yellow-100 text-yellow-800';
+      case 'packaging':
+        return 'bg-purple-100 text-purple-800';
       case 'shipped':
         return 'bg-blue-100 text-blue-800';
       case 'delivered':
         return 'bg-green-100 text-green-800';
+      case 'cancelled':
+        return 'bg-red-300 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -76,7 +82,7 @@ const OrderDetailPage: React.FC = () => {
       </div>
     );
 
-  if (!order)
+  if (!orders)
     return (
       <div className='flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900'>
         <div className='text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl'>
@@ -96,10 +102,10 @@ const OrderDetailPage: React.FC = () => {
     <>
       <HelmetProvider>
         <Helmet>
-          <title>Order Details - #{order._id}</title>
+          <title>Order Details - #{orders._id}</title>
           <meta
             name='description'
-            content={`Order details for order #${order._id}`}
+            content={`Order details for order #${orders._id}`}
           />
         </Helmet>
       </HelmetProvider>
@@ -126,14 +132,14 @@ const OrderDetailPage: React.FC = () => {
             <div className='p-6 sm:p-8'>
               <div className='flex justify-between items-center mb-6'>
                 <h1 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
-                  Order #{order._id}
+                  Order #{orders._id}
                 </h1>
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
-                    order.orderStatus
+                    orders.orderStatus
                   )}`}
                 >
-                  {order.orderStatus}
+                  {orders.orderStatus}
                 </span>
               </div>
 
@@ -142,26 +148,26 @@ const OrderDetailPage: React.FC = () => {
                   <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>
                     Shipping Information
                   </h2>
-                  {order.shippingInfo ? (
+                  {orders.shippingInfo ? (
                     <div className='space-y-2 text-gray-600 dark:text-gray-400'>
                       <p>
-                        <strong>Address:</strong> {order.shippingInfo.address}
+                        <strong>Address:</strong> {orders.shippingInfo.address}
                       </p>
                       <p>
-                        <strong>City:</strong> {order.shippingInfo.city}
+                        <strong>City:</strong> {orders.shippingInfo.city}
                       </p>
                       <p>
-                        <strong>State:</strong> {order.shippingInfo.state}
+                        <strong>State:</strong> {orders.shippingInfo.state}
                       </p>
                       <p>
-                        <strong>Country:</strong> {order.shippingInfo.country}
+                        <strong>Country:</strong> {orders.shippingInfo.country}
                       </p>
                       <p>
                         <strong>Postal Code:</strong>{' '}
-                        {order.shippingInfo.postalCode}
+                        {orders.shippingInfo.postalCode}
                       </p>
                       <p>
-                        <strong>Phone:</strong> {order.shippingInfo.phoneNo}
+                        <strong>Phone:</strong> {orders.shippingInfo.phoneNo}
                       </p>
                     </div>
                   ) : (
@@ -175,13 +181,13 @@ const OrderDetailPage: React.FC = () => {
                   <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>
                     Payment Information
                   </h2>
-                  {order.paymentInfo ? (
+                  {orders.paymentInfo ? (
                     <div className='space-y-2 text-gray-600 dark:text-gray-400'>
                       <p>
-                        <strong>ID:</strong> {order.paymentInfo.id}
+                        <strong>ID:</strong> {orders.paymentInfo.id}
                       </p>
                       <p>
-                        <strong>Status:</strong> {order.paymentInfo.status}
+                        <strong>Status:</strong> {orders.paymentInfo.status}
                       </p>
                     </div>
                   ) : (
@@ -196,7 +202,7 @@ const OrderDetailPage: React.FC = () => {
                 <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>
                   Order Items
                 </h2>
-                {order.orderItems && order.orderItems.length > 0 ? (
+                {orders.orderItems && orders.orderItems.length > 0 ? (
                   <div className='overflow-x-auto'>
                     <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
                       <thead className='bg-gray-50 dark:bg-gray-700'>
@@ -228,7 +234,7 @@ const OrderDetailPage: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody className='bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700'>
-                        {order.orderItems.map((item) => (
+                        {orders.orderItems.map((item) => (
                           <tr key={item._id}>
                             <td className='px-6 py-4 whitespace-nowrap'>
                               <div className='flex items-center'>
@@ -276,20 +282,20 @@ const OrderDetailPage: React.FC = () => {
                 <div className='space-y-2 text-gray-600 dark:text-gray-400'>
                   <p className='flex justify-between'>
                     <span>Items Price:</span>
-                    <span>${order.itemsPrice.toFixed(2)}</span>
+                    <span>${orders.itemsPrice.toFixed(2)}</span>
                   </p>
                   <p className='flex justify-between'>
                     <span>Tax:</span>
-                    <span>${order.taxPrice.toFixed(2)}</span>
+                    <span>${orders.taxPrice.toFixed(2)}</span>
                   </p>
                   <p className='flex justify-between'>
                     <span>Shipping:</span>
-                    <span>${order.shippingPrice.toFixed(2)}</span>
+                    <span>${orders.shippingPrice.toFixed(2)}</span>
                   </p>
                   <div className='border-t border-gray-200 dark:border-gray-600 my-2 pt-2'>
                     <p className='flex justify-between font-semibold text-lg'>
                       <span>Total:</span>
-                      <span>${order.totalPrice.toFixed(2)}</span>
+                      <span>${orders.totalPrice.toFixed(2)}</span>
                     </p>
                   </div>
                 </div>
@@ -297,7 +303,7 @@ const OrderDetailPage: React.FC = () => {
 
               <div className='mt-8 text-sm text-gray-500 dark:text-gray-400'>
                 <p>
-                  Order placed on: {new Date(order.createdAt).toLocaleString()}
+                  Order placed on: {new Date(orders.createdAt).toLocaleString()}
                 </p>
               </div>
             </div>

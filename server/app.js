@@ -1,3 +1,4 @@
+import MongoStore from 'connect-mongo';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
@@ -20,8 +21,8 @@ const corsOptions = {
   origin: [
     process.env.ADMIN_URL,
     process.env.CLIENT_URL,
-    'https://b3tfhzw5-3000.uks1.devtunnels.ms',
-    'https://b3tfhzw5-3050.uks1.devtunnels.ms',
+    process.env.ADMIN_DEVELOPMENT_URL,
+    process.env.CLIENT_DEVELOPMENT_URL,
   ],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -35,6 +36,10 @@ app.use(
     secret: process.env.SESSION_SECRET || 'your-session-secret',
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URL,
+      ttl: 30 * 60,
+    }),
     cookie: {
       maxAge: 30 * 60 * 1000,
       httpOnly: true,
@@ -62,6 +67,10 @@ app.use('/api/', product);
 app.use('/api', order);
 app.use('/api', category);
 app.use('/api', cart);
+
+app.get('/', (req, res) => {
+  res.send('Welcome to the homepage!');
+});
 
 //! error middleware
 

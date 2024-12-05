@@ -217,6 +217,7 @@ export interface ApiResponse<T> {
   data?: T;
   cart?: T;
   orders?: T;
+  order?: T;
 }
 
 // Paystack Payment Initialization Request type

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getMyOrders, getSingleOrder } from '../../api/order';
+import { cancelOrder, getMyOrders, getSingleOrder } from '../../api/order';
 import { Order } from '../../types/type';
 
 interface OrderState {
@@ -75,6 +75,32 @@ export const fetchMyOrders = createAsyncThunk(
   }
 );
 
+// Cancel Order Thunk
+export const cancelSingleOrder = createAsyncThunk(
+  'orders/cancelOrder',
+  async (orderId: string, { rejectWithValue }) => {
+    try {
+      const response = await cancelOrder(orderId);
+      return response.order;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      } else if (
+        typeof error === 'object' &&
+        error !== null &&
+        'response' in error
+      ) {
+        const err = error as { response?: { data?: { message: string } } };
+        return rejectWithValue(
+          err.response?.data?.message || 'An unknown error occurred'
+        );
+      } else {
+        return rejectWithValue('An unknown error occurred');
+      }
+    }
+  }
+);
+
 // Slice
 const orderSlice = createSlice({
   name: 'orders',
@@ -112,6 +138,20 @@ const orderSlice = createSlice({
         state.orders = action.payload ?? null;
       })
       .addCase(fetchMyOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+    // Cancel Order
+    builder
+      .addCase(cancelSingleOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(cancelSingleOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.singleOrder = action.payload ?? null;
+      })
+      .addCase(cancelSingleOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

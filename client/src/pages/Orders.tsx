@@ -12,11 +12,15 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch, RootState } from '../app/store';
-import { fetchMyOrders } from '../features/orders/orderSlice';
+import {
+  cancelSingleOrder,
+  fetchMyOrders,
+} from '../features/orders/orderSlice';
 
 const statusIcons: Record<string, React.ReactNode> = {
   Pending: <FiAlertCircle className='text-yellow-500' />,
   Processing: <FiPackage className='text-blue-500' />,
+  Packing: <FiPackage className='text-blue-500' />,
   Shipped: <FiTruck className='text-purple-500' />,
   Delivered: <FiCheck className='text-green-500' />,
   Cancelled: <FiX className='text-red-500' />,
@@ -69,6 +73,10 @@ const OrderPage: React.FC = () => {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+  };
+
+  const handleCancelOrder = (orderId: string) => {
+    dispatch(cancelSingleOrder(orderId)); // Dispatch cancel thunk
   };
 
   return (
@@ -127,6 +135,14 @@ const OrderPage: React.FC = () => {
           </div>
         ) : error ? (
           <div className='text-center text-red-500'>{error}</div>
+        ) : filteredOrders.length === 0 ? (
+          <div className='flex justify-center items-center h-64'>
+            <div className='text-center text-gray-500 dark:text-gray-400'>
+              {statusFilter === 'All' && searchTerm === ''
+                ? 'No orders found.'
+                : `No orders found matching the ${statusFilter} status or your search term.`}
+            </div>
+          </div>
         ) : (
           <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
             {filteredOrders.map((order) => (
@@ -168,6 +184,14 @@ const OrderPage: React.FC = () => {
                   >
                     View Details
                   </button>
+                  {['Pending', 'Processing'].includes(order.orderStatus) && (
+                    <button
+                      onClick={() => handleCancelOrder(order.id)}
+                      className='w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition duration-200'
+                    >
+                      Cancel Order
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

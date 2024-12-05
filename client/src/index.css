@@ -26,10 +26,6 @@ h6 {
   font-family: 'Prata', serif;
 }
 
-body {
-  @apply bg-primary text-gray-800;
-}
-
 @layer components {
   .circle-svg {
     @apply text-secondary;
@@ -293,5 +289,50 @@ input:-webkit-autofill::first-line {
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+/* Define reusable input styles */
+.input-base {
+  @apply w-full p-3 border rounded-md text-text-light bg-input-light dark:bg-input-dark dark:text-text-dark focus:outline-none focus:ring-1 focus:ring-accent-light  dark:focus:ring-accent-dark transition;
+}
+
+.input-error {
+  @apply border-red-500 text-red-500;
+}
+
+/* Define reusable textarea styles */
+.textarea-base {
+  @apply w-full p-3 border rounded-md text-text-light bg-input-light dark:bg-input-dark dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark transition resize-none;
+}
+
+.textarea-error {
+  @apply border-red-500 text-red-500;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: theme('colors.text-light');
+  -webkit-box-shadow: 0 0 0px 1000px theme('colors.white') inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill,
+.dark textarea:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: theme('colors.text-dark');
+  -webkit-box-shadow: 0 0 0px 1000px theme('colors.input-dark') inset;
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto;
   }
 }

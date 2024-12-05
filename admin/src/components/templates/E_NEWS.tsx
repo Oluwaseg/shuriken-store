@@ -17,7 +17,9 @@ const E_NEWS: React.FC = () => {
     const fetchNews = async () => {
       try {
         const response = await fetch(
-          'https://finnhub.io/api/v1/news?category=ecommerce&token=ct6d061r01qmbqorn8l0ct6d061r01qmbqorn8lg'
+          `https://finnhub.io/api/v1/news?category=ecommerce&token=${
+            import.meta.env.VITE_FINNHUB_API_KEY
+          }`
         );
 
         if (!response.ok) {

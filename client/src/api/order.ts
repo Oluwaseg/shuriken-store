@@ -16,3 +16,13 @@ export const getMyOrders = async (): Promise<ApiResponse<Order[]>> => {
   const { data } = await axiosInstance.get<ApiResponse<Order[]>>(`/orders/me`);
   return data;
 };
+
+// Cancel Order
+export const cancelOrder = async (
+  orderId: string
+): Promise<ApiResponse<Order>> => {
+  const { data } = await axiosInstance.put<ApiResponse<Order>>(
+    `/orders/${orderId}/cancel`
+  );
+  return data;
+};

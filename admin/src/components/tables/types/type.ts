@@ -87,5 +87,5 @@ export interface Order {
 }
 export type OrderResponse = {
   success: boolean;
-  order: Order;
+  orders: Order;
 };

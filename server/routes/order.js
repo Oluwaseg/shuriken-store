@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  cancelOrder,
   deleteOrder,
   getAllOrders,
   getSingleOrder,
@@ -17,6 +18,9 @@ router.get('/orders/me', isAuthenticated, myOrders);
 
 // Get Single Order
 router.get('/orders/:id', isAuthenticated, getSingleOrder);
+
+// Cancel Order -- Admin/User
+router.put('/orders/:id/cancel', isAuthenticated, cancelOrder);
 
 // Get All Orders -- Admin
 router.get(
