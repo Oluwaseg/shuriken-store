@@ -1,6 +1,8 @@
 import express from 'express';
 import {
   adminLogin,
+  createAdmin,
+  createUser,
   deleteUser,
   forgotPassword,
   getAllUsers,
@@ -23,6 +25,17 @@ import {
 import { uploadUserImage } from '../middlewares/image.config.js';
 const router = express.Router();
 
+// Admin Routes -- Yet to be implemented
+router.post(
+  '/user/register-admin',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  createAdmin
+);
+
+// User Routes
+
+router.post('/user/create-user', createUser);
 router.post('/user/register', uploadUserImage.single('avatar'), register);
 router.post('/user/login', userLogin);
 router.post('/user/verify-otp', verifyOTP);

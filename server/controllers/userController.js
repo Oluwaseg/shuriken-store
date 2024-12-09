@@ -12,6 +12,89 @@ import {
   sendWelcomeEmail,
 } from '../utils/sendEmail.js';
 
+export const createUser = catchAsync(async (req, res, next) => {
+  console.log(req.body);
+  const { name, email, password, role } = req.body;
+
+  // Validate inputs
+  if (!name || !email || !password) {
+    return next(
+      new ErrorHandler('Name, email, and password are required', 400)
+    );
+  }
+
+  // Check for password requirements (6+ chars, at least one number and letter)
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+  if (!passwordRegex.test(password)) {
+    return next(
+      new ErrorHandler(
+        'Password must be at least 6 characters long and include at least one letter and one number',
+        400
+      )
+    );
+  }
+
+  // Default user role to 'user' if not provided
+  const userRole = role || 'user';
+
+  // Check if the user already exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return next(new ErrorHandler('User with this email already exists', 400));
+  }
+
+  // Create the user
+  const user = await User.create({
+    name,
+    email,
+    password,
+    role: userRole,
+  });
+
+  try {
+    await sendWelcomeEmail(user);
+  } catch (error) {
+    return next(
+      new ErrorHandler(
+        "User created successfully, but email couldn't be sent",
+        500
+      )
+    );
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'User created successfully, email sent successfully',
+    user,
+  });
+});
+
+export const createAdmin = catchAsync(async (req, res, next) => {
+  const { name, email, password } = req.body;
+
+  if (req.user.role !== 'admin') {
+    return next(new ErrorHandler('Unauthorized to perform this action', 403));
+  }
+
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return next(new ErrorHandler('User with this email already exists', 400));
+  }
+
+  const admin = await User.create({
+    name,
+    email,
+    password,
+    role: 'admin',
+  });
+
+  res.status(201).json({
+    success: true,
+    message: 'Admin created successfully',
+    admin,
+  });
+});
+
 export const register = catchAsync(async (req, res, next) => {
   try {
     const { name, email, password } = req.body;

@@ -1,10 +1,14 @@
 // controllers/subcategoryController.js
-import Subcategory from "../models/SubCategory.js";
-import { ErrorHandler } from "../utils/errorHandler.js";
-import { catchAsync } from "../utils/catchAsync.js";
+import Subcategory from '../models/SubCategory.js';
+import { catchAsync } from '../utils/catchAsync.js';
+import { ErrorHandler } from '../utils/errorHandler.js';
 
 export const createSubcategory = catchAsync(async (req, res, next) => {
   const { name, category, description } = req.body;
+
+  if (!category) {
+    return next(new ErrorHandler('Category is required', 400));
+  }
 
   const subcategory = await Subcategory.create({ name, category, description });
 
@@ -15,7 +19,7 @@ export const createSubcategory = catchAsync(async (req, res, next) => {
 });
 
 export const getAllSubcategories = catchAsync(async (req, res, next) => {
-  const subcategories = await Subcategory.find().populate("category");
+  const subcategories = await Subcategory.find().populate('category');
 
   res.status(200).json({
     success: true,
@@ -27,6 +31,10 @@ export const getAllSubcategories = catchAsync(async (req, res, next) => {
 export const getSubcategoriesByCategory = catchAsync(async (req, res, next) => {
   const { categoryId } = req.params;
 
+  if (!categoryId) {
+    return next(new ErrorHandler('Category ID is required', 400));
+  }
+
   const subcategories = await Subcategory.find({ category: categoryId });
 
   res.status(200).json({
@@ -37,11 +45,10 @@ export const getSubcategoriesByCategory = catchAsync(async (req, res, next) => {
 
 export const getSubcategoryById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  console.log(id);
 
-  const subcategory = await Subcategory.findById(id).populate("category");
+  const subcategory = await Subcategory.findById(id).populate('category');
   if (!subcategory) {
-    return next(new ErrorHandler("Subcategory not found", 404));
+    return next(new ErrorHandler('Subcategory not found', 404));
   }
 
   res.status(200).json({
@@ -54,6 +61,10 @@ export const updateSubcategory = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { name, category, description } = req.body;
 
+  if (!category) {
+    return next(new ErrorHandler('Category is required', 400));
+  }
+
   const subcategory = await Subcategory.findByIdAndUpdate(
     id,
     { name, category, description },
@@ -61,7 +72,7 @@ export const updateSubcategory = catchAsync(async (req, res, next) => {
   );
 
   if (!subcategory) {
-    return next(new ErrorHandler("Subcategory not found", 404));
+    return next(new ErrorHandler('Subcategory not found', 404));
   }
 
   res.status(200).json({
@@ -77,11 +88,11 @@ export const deleteSubcategory = catchAsync(async (req, res, next) => {
   const subcategory = await Subcategory.findByIdAndDelete(id);
 
   if (!subcategory) {
-    return next(new ErrorHandler("Subcategory not found", 404));
+    return next(new ErrorHandler('Subcategory not found', 404));
   }
 
   res.status(200).json({
     success: true,
-    message: "Subcategory deleted successfully",
+    message: 'Subcategory deleted successfully',
   });
 });

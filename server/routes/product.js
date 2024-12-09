@@ -7,6 +7,7 @@ import {
   getAllProducts,
   getProductById,
   getProductReviews,
+  getRecentActivities,
   getRelatedProducts,
   getTotalProducts,
   updateProduct,
@@ -16,6 +17,7 @@ import {
   isAuthenticated,
 } from '../middlewares/authenticate.js';
 import { uploadProductImage } from '../middlewares/image.config.js';
+import { validateCreateProduct } from '../middlewares/validateProduct.js';
 
 const router = express.Router();
 
@@ -25,8 +27,10 @@ router.post(
   isAuthenticated,
   authorizeRoles('admin'),
   uploadProductImage.array('images', 8),
+  validateCreateProduct,
   createProduct
 );
+router.get('/products/activities', getRecentActivities);
 router.get('/products', getAllProducts);
 router.get('/products/:id', getProductById);
 router.get('/products/related/:id', getRelatedProducts);
@@ -35,6 +39,7 @@ router.put(
   isAuthenticated,
   uploadProductImage.array('images', 8),
   authorizeRoles('admin'),
+  validateCreateProduct,
   updateProduct
 );
 router.delete(

@@ -1,41 +1,111 @@
 import cloudinary from 'cloudinary';
+import Activity from '../models/Activity.js';
+import Category from '../models/Category.js';
 import Product from '../models/Product.js';
+import Subcategory from '../models/SubCategory.js';
 import APIFeatures from '../utils/apiFeatures.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { ErrorHandler } from '../utils/errorHandler.js';
 
 export const createProduct = catchAsync(async (req, res, next) => {
   try {
-    console.log(req.body);
+    const {
+      name,
+      description,
+      price,
+      stock,
+      category,
+      subcategory,
+      brand,
+      discount,
+      flashSale,
+    } = req.body;
 
-    const productData = { ...req.body };
+    // Validate category
+    const validCategory = await Category.findById(category);
+    if (!validCategory) {
+      return next(new ErrorHandler('Invalid category selected', 400));
+    }
 
-    if (productData.flashSale && productData.flashSale.isFlashSale) {
-      if (!productData.flashSale.flashSaleEndTime) {
+    // Validate subcategory if provided
+    if (subcategory) {
+      const validSubcategory = await Subcategory.findById(subcategory);
+      if (
+        !validSubcategory ||
+        validSubcategory.category.toString() !== category
+      ) {
+        return next(
+          new ErrorHandler('Invalid or mismatched subcategory selected', 400)
+        );
+      }
+    }
+
+    // Validate flash sale
+    if (flashSale?.isFlashSale) {
+      if (!flashSale.flashSaleEndTime) {
         return next(new ErrorHandler('Flash sale end time is required', 400));
       }
-
-      if (new Date(productData.flashSale.flashSaleEndTime) <= new Date()) {
+      if (new Date(flashSale.flashSaleEndTime) <= new Date()) {
         return next(
           new ErrorHandler('Flash sale end time must be in the future', 400)
         );
       }
     }
 
-    if (req.files && req.files.length > 0) {
-      productData.images = req.files.map((file) => ({
+    // Prepare images if provided
+    const images =
+      req.files?.map((file) => ({
         url: file.path,
         public_id: file.filename,
-      }));
-    }
+      })) || [];
 
-    productData.user = req.user.id;
+    // Construct product data
+    const productData = {
+      name,
+      description,
+      price,
+      stock,
+      category,
+      subcategory,
+      brand,
+      discount: discount || { isDiscounted: false, discountPercent: 0 },
+      flashSale: flashSale || { isFlashSale: false },
+      images,
+      user: req.user.id,
+    };
 
+    // Create product
     const product = await Product.create(productData);
+
+    // Log activity
+    await Activity.create({
+      action: 'create',
+      product: product._id,
+      user: req.user.id,
+      activity: `Created a new product: ${product.name}`,
+    });
 
     res.status(201).json({
       success: true,
       product,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+export const getRecentActivities = catchAsync(async (req, res, next) => {
+  try {
+    const activities = await Activity.find()
+      .sort({ timestamp: -1 })
+      .limit(10)
+      .populate('product', 'name images price')
+      .populate('user', 'name email avatar');
+
+    res.status(200).json({
+      success: true,
+      count: activities.length,
+      activities,
     });
   } catch (error) {
     next(error);
@@ -86,53 +156,95 @@ export const getRelatedProducts = catchAsync(async (req, res, next) => {
 });
 
 export const updateProduct = catchAsync(async (req, res, next) => {
-  console.log(req.body);
+  try {
+    // Destructure request body
+    const {
+      name,
+      description,
+      price,
+      stock,
+      category,
+      subcategory,
+      brand,
+      discount,
+      flashSale,
+      remove_images = [],
+    } = req.body;
 
-  const remove_images = req.body.remove_images || [];
-
-  if (remove_images.length > 0) {
-    await Promise.all(
-      remove_images.map(async (imageUrl) => {
-        const public_id = imageUrl.split('/').pop().split('.')[0];
-        await cloudinary.v2.uploader.destroy(public_id);
-      })
-    );
-  }
-
-  let newImages = [];
-  if (req.files && req.files.length > 0) {
-    newImages = req.files.map((file) => ({
-      url: file.path,
-      public_id: file.filename,
-    }));
-  }
-
-  const product = await Product.findById(req.params.id);
-  if (!product) {
-    return next(new ErrorHandler('Product not found', 404));
-  }
-
-  if (req.body.flashSale && req.body.flashSale.isFlashSale) {
-    if (!req.body.flashSale.flashSaleEndTime) {
-      return next(new ErrorHandler('Flash sale end time is required', 400));
+    // Validate category
+    const validCategory = await Category.findById(category);
+    if (!validCategory) {
+      return next(new ErrorHandler('Invalid category selected', 400));
     }
 
-    if (new Date(req.body.flashSale.flashSaleEndTime) <= new Date()) {
-      return next(
-        new ErrorHandler('Flash sale end time must be in the future', 400)
+    // Validate subcategory if provided
+    if (subcategory) {
+      const validSubcategory = await Subcategory.findById(subcategory);
+      if (
+        !validSubcategory ||
+        validSubcategory.category.toString() !== category
+      ) {
+        return next(
+          new ErrorHandler('Invalid or mismatched subcategory selected', 400)
+        );
+      }
+    }
+
+    // Validate flash sale
+    if (flashSale?.isFlashSale) {
+      if (!flashSale.flashSaleEndTime) {
+        return next(new ErrorHandler('Flash sale end time is required', 400));
+      }
+      if (new Date(flashSale.flashSaleEndTime) <= new Date()) {
+        return next(
+          new ErrorHandler('Flash sale end time must be in the future', 400)
+        );
+      }
+    }
+
+    // Fetch product
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return next(new ErrorHandler('Product not found', 404));
+    }
+
+    // Handle image removal
+    if (remove_images.length > 0) {
+      await Promise.all(
+        remove_images.map(async (imageUrl) => {
+          const public_id = imageUrl.split('/').pop().split('.')[0];
+          await cloudinary.v2.uploader.destroy(public_id);
+        })
       );
     }
-  }
 
-  const updatedData = {
-    ...req.body,
-    images: [
-      ...product.images.filter((img) => !remove_images.includes(img.url)),
-      ...newImages,
-    ],
-  };
+    // Handle new images
+    let newImages = [];
+    if (req.files && req.files.length > 0) {
+      newImages = req.files.map((file) => ({
+        url: file.path,
+        public_id: file.filename,
+      }));
+    }
 
-  if (updatedData.discount) {
+    // Prepare updated data
+    const updatedData = {
+      name,
+      description,
+      price,
+      stock,
+      category,
+      subcategory,
+      brand,
+      discount: discount || product.discount,
+      flashSale: flashSale || product.flashSale,
+      images: [
+        ...product.images.filter((img) => !remove_images.includes(img.url)),
+        ...newImages,
+      ],
+    };
+
+    // Recalculate discount price if applicable
     if (
       updatedData.discount.isDiscounted &&
       updatedData.discount.discountPercent
@@ -142,9 +254,8 @@ export const updateProduct = catchAsync(async (req, res, next) => {
     } else {
       updatedData.discount.discountedPrice = updatedData.price;
     }
-  }
 
-  if (updatedData.flashSale) {
+    // Handle flash sale price if applicable
     if (
       updatedData.flashSale.isFlashSale &&
       updatedData.flashSale.flashSalePrice
@@ -152,26 +263,37 @@ export const updateProduct = catchAsync(async (req, res, next) => {
       updatedData.flashSale.flashSalePrice =
         updatedData.flashSale.flashSalePrice;
     }
-  }
 
-  const updatedProduct = await Product.findByIdAndUpdate(
-    req.params.id,
-    updatedData,
-    {
-      new: true,
-      runValidators: true,
-      useFindAndModify: false,
+    // Update product in database
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      updatedData,
+      {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      }
+    );
+
+    if (!updatedProduct) {
+      return next(new ErrorHandler('Product not found', 404));
     }
-  );
 
-  if (!updatedProduct) {
-    return next(new ErrorHandler('Product not found', 404));
+    // Log activity
+    await Activity.create({
+      action: 'update',
+      product: updatedProduct._id,
+      user: req.user.id,
+      activity: `Updated product: ${updatedProduct.name}`,
+    });
+
+    res.status(200).json({
+      success: true,
+      product: updatedProduct,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  res.status(200).json({
-    success: true,
-    product: updatedProduct,
-  });
 });
 
 export const deleteProduct = catchAsync(async (req, res, next) => {
@@ -179,6 +301,14 @@ export const deleteProduct = catchAsync(async (req, res, next) => {
   if (!product) {
     return next(new ErrorHandler('Product not found', 404));
   }
+
+  await Activity.create({
+    action: 'delete',
+    product: product._id,
+    user: req.user.id,
+    activity: `Deleted product: ${product.name}`,
+  });
+
   res.status(200).json({
     success: true,
     message: 'Product deleted successfully',
@@ -211,7 +341,14 @@ export const createReview = catchAsync(async (req, res, next) => {
     await product.save();
 
     // Populate user details in the updated review
-    await product.populate('reviews.user', 'name email avatar'); // Adjust fields as needed
+    await product.populate('reviews.user', 'name email avatar');
+
+    await Activity.create({
+      action: 'update',
+      product: product._id,
+      user: userId,
+      activity: `Updated review for product: ${product.name}`,
+    });
 
     res.status(200).json({
       success: true,
@@ -234,6 +371,13 @@ export const createReview = catchAsync(async (req, res, next) => {
       product.numOfReviews;
 
     await product.save();
+
+    await Activity.create({
+      action: 'create',
+      product: product._id,
+      user: userId,
+      activity: `Added a review for product: ${product.name}`,
+    });
 
     // Populate user details in the new review
     await product.populate('reviews.user', 'name email avatar');
@@ -275,6 +419,13 @@ export const deleteReview = catchAsync(async (req, res, next) => {
 
   await product.save();
 
+  await Activity.create({
+    action: 'delete',
+    product: product._id,
+    user: userId,
+    activity: `Deleted a review for product: ${product.name}`,
+  });
+
   res.status(200).json({
     success: true,
     message: 'Review deleted successfully',
@@ -291,6 +442,13 @@ export const getProductReviews = catchAsync(async (req, res, next) => {
 
   // Populate user details in the reviews
   await product.populate('reviews.user', 'name email avatar');
+
+  await Activity.create({
+    action: 'view',
+    product: product._id,
+    user: req.user.id,
+    activity: `Viewed reviews for product: ${product.name}`,
+  });
 
   res.status(200).json({
     success: true,
