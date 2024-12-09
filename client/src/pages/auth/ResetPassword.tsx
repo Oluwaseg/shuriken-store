@@ -1,16 +1,17 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { resetPassword } from "../../features/auth/authSlice";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
+import { FiCheck, FiLock } from 'react-icons/fi';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { resetPassword } from '../../features/auth/authSlice';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 
 type FormData = {
   password: string;
   confirmPassword: string;
 };
 
-const ResetPassword: React.FC = () => {
+const ResetPasswordPage: React.FC = () => {
   const { token } = useParams<{ token: string }>();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const ResetPassword: React.FC = () => {
 
   const onSubmit = (data: FormData) => {
     if (data.password !== data.confirmPassword) {
-      toast.error("Passwords do not match.");
+      toast.error('Passwords do not match.');
       return;
     }
 
@@ -37,75 +38,84 @@ const ResetPassword: React.FC = () => {
       )
         .unwrap()
         .then(() => {
-          navigate("/login");
+          navigate('/login');
         })
         .catch(() => {
-          toast.error("Failed to reset password.");
+          toast.error('Failed to reset password.');
         });
     }
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100 justify-center items-center">
-      <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
-        <h2 className="text-3xl font-bold mb-6 text-center">Reset Password</h2>
+    <div className='min-h-screen flex items-center justify-center bg-body-light dark:bg-body-dark'>
+      <div className='bg-white dark:bg-dark-light p-8 rounded-xl shadow-2xl w-full max-w-md'>
+        <h2 className='text-3xl font-bold text-center mb-8 text-text-primary-light dark:text-text-primary-dark'>
+          Reset Password
+        </h2>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label htmlFor="password" className="block text-gray-700">
-              New Password
-            </label>
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          <div className='relative'>
+            <FiLock className='absolute top-3 left-3 text-text-secondary-light dark:text-text-secondary-dark' />
             <input
-              id="password"
-              type="password"
-              {...formRegister("password", {
-                required: "Password is required",
+              type='password'
+              placeholder='New Password'
+              {...formRegister('password', {
+                required: 'Password is required',
               })}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+              className='w-full pl-10 pr-3 py-2 rounded-lg border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
             />
             {errors.password && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className='text-red-500 text-xs mt-1'>
                 {errors.password.message}
               </p>
             )}
           </div>
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-gray-700">
-              Confirm Password
-            </label>
+          <div className='relative'>
+            <FiLock className='absolute top-3 left-3 text-text-secondary-light dark:text-text-secondary-dark' />
             <input
-              id="confirmPassword"
-              type="password"
-              {...formRegister("confirmPassword", {
-                required: "Confirm password is required",
+              type='password'
+              placeholder='Confirm New Password'
+              {...formRegister('confirmPassword', {
+                required: 'Confirm password is required',
               })}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+              className='w-full pl-10 pr-3 py-2 rounded-lg border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
             />
             {errors.confirmPassword && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className='text-red-500 text-xs mt-1'>
                 {errors.confirmPassword.message}
               </p>
             )}
           </div>
 
           <button
-            type="submit"
+            type='submit'
             disabled={loading}
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 disabled:bg-blue-300"
+            className='w-full bg-button-primary-light dark:bg-button-primary-dark text-white py-2 rounded-lg hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition duration-300 transform hover:scale-105 flex items-center justify-center'
           >
-            {loading ? "Resetting..." : "Reset Password"}
+            {loading ? 'Resetting...' : 'Reset Password'}
+            <FiCheck className='ml-2' />
           </button>
 
           {error && (
-            <div className="mt-2 text-red-500 text-xs">
+            <div className='mt-2 text-red-500 text-xs'>
               <p>{error}</p>
             </div>
           )}
         </form>
+
+        <p className='mt-6 text-center text-text-secondary-light dark:text-text-secondary-dark'>
+          Remember your password?{' '}
+          <Link
+            to='/login'
+            className='text-accent-light dark:text-accent-dark hover:underline'
+          >
+            Back to Login
+          </Link>
+        </p>
       </div>
     </div>
   );
 };
 
-export default ResetPassword;
+export default ResetPasswordPage;

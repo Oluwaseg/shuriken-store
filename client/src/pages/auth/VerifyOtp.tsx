@@ -1,15 +1,16 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { verifyOTP } from "../../features/auth/authSlice";
-import { useNavigate } from "react-router-dom"; // Use useNavigate hook
-import { toast } from "react-hot-toast";
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
+import { FiCheck } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { verifyOTP } from '../../features/auth/authSlice';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 
 type FormData = {
   otp: string;
 };
 
-const VerifyOTP: React.FC = () => {
+const VerifyOTPPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.auth);
   const {
@@ -17,79 +18,83 @@ const VerifyOTP: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isVerifying, setIsVerifying] = useState(false);
   const navigate = useNavigate();
 
+  const handleChange = (element: HTMLInputElement, index: number) => {
+    if (isNaN(parseInt(element.value))) return false;
+
+    setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
+
+    if (element.nextSibling && element.value !== '') {
+      (element.nextSibling as HTMLInputElement).focus();
+    }
+  };
+
   const onSubmit = (data: FormData) => {
     setIsVerifying(true);
-    dispatch(verifyOTP(data))
+    dispatch(verifyOTP({ otp: data.otp }))
       .unwrap()
       .then(() => {
         setTimeout(() => {
-          navigate("/login");
+          navigate('/login');
         }, 3000);
       })
       .catch(() => {
-        toast.error("OTP verification failed.");
+        toast.error('OTP verification failed.');
         setIsVerifying(false);
       });
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100 justify-center items-center">
-      <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold mb-6 text-center">Verify Your OTP</h2>
-        <p className="text-gray-600 mb-4 text-center">
-          Enter the OTP sent to your email to verify your account.
+    <div className='min-h-screen flex items-center justify-center bg-body-light dark:bg-body-dark'>
+      <div className='bg-white dark:bg-dark-light p-8 rounded-xl shadow-2xl w-full max-w-md'>
+        <h2 className='text-3xl font-bold text-center mb-8 text-text-primary-light dark:text-text-primary-dark'>
+          Verify OTP
+        </h2>
+        <p className='text-center text-text-secondary-light dark:text-text-secondary-dark mb-6'>
+          We've sent a code to your email. Please enter it below.
         </p>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label htmlFor="otp" className="block text-gray-700">
-              OTP
-            </label>
-            <input
-              id="otp"
-              type="text"
-              {...formRegister("otp", { required: "OTP is required" })}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-              maxLength={6}
-            />
-            {errors.otp && (
-              <p className="text-red-500 text-xs mt-1">{errors.otp.message}</p>
-            )}
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          <div className='flex justify-center space-x-2'>
+            {otp.map((data, index) => (
+              <input
+                key={index}
+                type='text'
+                maxLength={1}
+                value={data}
+                {...formRegister('otp', { required: 'OTP is required' })}
+                onChange={(e) => handleChange(e.target, index)}
+                className='w-12 h-12 text-center text-text-primary-light dark:text-text-primary-light text-2xl rounded-lg border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
+              />
+            ))}
           </div>
-
+          {errors.otp && (
+            <p className='text-red-500 text-xs mt-1'>{errors.otp.message}</p>
+          )}
           <button
-            type="submit"
+            type='submit'
             disabled={loading || isVerifying}
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 disabled:bg-blue-300"
+            className='w-full bg-button-primary-light dark:bg-button-primary-dark text-white py-2 rounded-lg hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition duration-300 transform hover:scale-105 flex items-center justify-center'
           >
-            {isVerifying
-              ? "Verifying..."
-              : loading
-              ? "Processing..."
-              : "Verify OTP"}
+            {isVerifying ? (
+              'Verifying...'
+            ) : loading ? (
+              'Processing...'
+            ) : (
+              <>
+                <FiCheck className='mr-2' />
+                Verify OTP
+              </>
+            )}
           </button>
-
-          {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Didn't receive the OTP?{" "}
-            <button
-              onClick={() =>
-                toast.success("Resend OTP functionality not implemented yet")
-              }
-              className="text-blue-500 hover:underline"
-            >
-              Resend OTP
-            </button>
-          </p>
-        </div>
+        {error && <p className='text-red-500 text-xs mt-2'>{error}</p>}
       </div>
     </div>
   );
 };
 
-export default VerifyOTP;
+export default VerifyOTPPage;

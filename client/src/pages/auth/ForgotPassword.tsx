@@ -1,14 +1,15 @@
-import React from "react";
-import { useForm } from "react-hook-form";
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { forgotPassword, resetAuthState } from "../../features/auth/authSlice";
-import { useEffect } from "react";
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiArrowRight, FiMail } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { forgotPassword, resetAuthState } from '../../features/auth/authSlice';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 
 type FormData = {
   email: string;
 };
 
-const ForgotPassword: React.FC = () => {
+const ForgotPasswordPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.auth);
   const {
@@ -35,45 +36,60 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100 justify-center items-center">
-      <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
-        <h2 className="text-3xl font-bold mb-6 text-center">Forgot Password</h2>
+    <div className='min-h-screen flex items-center justify-center bg-body-light dark:bg-body-dark'>
+      <div className='bg-white dark:bg-dark-light p-8 rounded-xl shadow-2xl w-full max-w-md'>
+        <h2 className='text-3xl font-bold text-center mb-8 text-text-primary-light dark:text-text-primary-dark'>
+          Forgot Password
+        </h2>
+        <p className='text-center text-text-secondary-light dark:text-text-secondary-dark mb-6'>
+          Enter your email address and we'll send you a link to reset your
+          password.
+        </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-gray-700">
-              Email
-            </label>
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          <div className='relative'>
+            <FiMail className='absolute top-3 left-3 text-text-secondary-light dark:text-text-secondary-dark' />
             <input
-              id="email"
-              type="email"
-              {...formRegister("email", { required: "Email is required" })}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
+              type='email'
+              placeholder='Email Address'
+              {...formRegister('email', { required: 'Email is required' })}
+              className='w-full pl-10 pr-3 py-2 rounded-lg border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
             />
             {errors.email && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className='text-red-500 text-xs mt-1'>
                 {errors.email.message}
               </p>
             )}
           </div>
 
           <button
-            type="submit"
+            type='submit'
             disabled={loading}
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 disabled:bg-blue-300"
+            className='w-full bg-button-primary-light dark:bg-button-primary-dark text-white py-2 rounded-lg hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition duration-300 transform hover:scale-105 flex items-center justify-center'
           >
-            {loading ? "Sending..." : "Send Reset Link"}
+            {loading ? 'Sending...' : 'Send Reset Link'}
+            <FiArrowRight className='ml-2' />
           </button>
 
           {error && (
-            <div className="mt-2 text-red-500 text-xs">
+            <div className='mt-2 text-red-500 text-xs'>
               <p>{error}</p>
             </div>
           )}
         </form>
+
+        <p className='mt-6 text-center text-text-secondary-light dark:text-text-secondary-dark'>
+          Remember your password?{' '}
+          <Link
+            to='/login'
+            className='text-accent-light dark:text-accent-dark hover:underline'
+          >
+            Back to Login
+          </Link>
+        </p>
       </div>
     </div>
   );
 };
 
-export default ForgotPassword;
+export default ForgotPasswordPage;

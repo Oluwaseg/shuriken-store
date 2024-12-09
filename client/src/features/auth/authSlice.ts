@@ -253,6 +253,7 @@ const authSlice = createSlice({
         state.userInfo = action.payload.user;
         state.token = action.payload.token;
         state.isAuthenticated = false;
+        state.error = null;
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
@@ -266,6 +267,7 @@ const authSlice = createSlice({
       .addCase(verifyOTP.fulfilled, (state) => {
         state.loading = false;
         state.isAuthenticated = false;
+        state.error = null;
       })
       .addCase(verifyOTP.rejected, (state, action) => {
         state.loading = false;
@@ -278,6 +280,7 @@ const authSlice = createSlice({
       })
       .addCase(resendOTP.fulfilled, (state) => {
         state.loading = false;
+        state.error = null;
       })
       .addCase(resendOTP.rejected, (state, action) => {
         state.loading = false;
@@ -306,6 +309,7 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         localStorage.setItem('token', action.payload.token);
         localStorage.setItem('userInfo', JSON.stringify(action.payload.user));
+        state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -335,6 +339,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         localStorage.removeItem('token');
         localStorage.removeItem('userInfo');
+        state.error = null;
       })
       .addCase(logout.rejected, (state, action) => {
         state.loading = false;
@@ -347,6 +352,7 @@ const authSlice = createSlice({
       })
       .addCase(forgotPassword.fulfilled, (state) => {
         state.loading = false;
+        state.error = null;
       })
       .addCase(forgotPassword.rejected, (state, action) => {
         state.loading = false;
@@ -359,6 +365,7 @@ const authSlice = createSlice({
       })
       .addCase(resetPassword.fulfilled, (state) => {
         state.loading = false;
+        state.error = null;
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.loading = false;

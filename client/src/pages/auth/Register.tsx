@@ -2,17 +2,14 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import {
-  FaApple,
-  FaEnvelope,
-  FaEye,
-  FaEyeSlash,
-  FaFacebook,
-  FaGoogle,
-  FaImage,
-  FaLock,
-  FaUser,
-} from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+  FiEye,
+  FiEyeOff,
+  FiImage,
+  FiLock,
+  FiMail,
+  FiUser,
+} from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../../features/auth/authSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 
@@ -23,22 +20,26 @@ type FormData = {
   avatar?: File;
 };
 
-const Register: React.FC = () => {
+const RegisterPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
   const {
     register: formRegister,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormData>();
-  const [showPassword, setShowPassword] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
-  const navigate = useNavigate();
 
   const onSubmit = (data: FormData) => {
     dispatch(register(data))
       .unwrap()
       .then(() => {
+        reset();
         setIsRedirecting(true);
         setTimeout(() => {
           navigate('/verify-otp');
@@ -48,38 +49,34 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center p-4'>
-      <div className='bg-white rounded-3xl shadow-2xl overflow-hidden max-w-md w-full p-8'>
-        <h2 className='text-4xl font-bold mb-6 text-center text-gray-800'>
-          Join Us
+    <div className='min-h-screen flex items-center justify-center bg-body-light dark:bg-body-dark'>
+      <div className='bg-white dark:bg-dark-light p-8 rounded-xl shadow-2xl w-full max-w-md border border-border-light dark:border-border-dark'>
+        <h2 className='text-3xl font-bold text-center mb-8 text-text-primary-light dark:text-text-primary-dark'>
+          Create Account
         </h2>
-        <p className='text-center text-gray-600 mb-8'>
-          Create your account and start your journey
-        </p>
-
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          {/* Name Field */}
           <div className='relative'>
-            <FaUser className='absolute top-3 left-3 text-gray-400' />
+            <FiUser className='absolute top-3 left-3 text-placeholder-light dark:text-placeholder-dark' />
             <input
-              id='name'
               type='text'
-              {...formRegister('name', { required: 'Name is required' })}
-              className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition'
               placeholder='Full Name'
+              {...formRegister('name', { required: 'Name is required' })}
+              className='w-full pl-10 pr-3 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-light dark:bg-input-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
             />
             {errors.name && (
               <p className='text-red-500 text-xs mt-1'>{errors.name.message}</p>
             )}
           </div>
 
+          {/* Email Field */}
           <div className='relative'>
-            <FaEnvelope className='absolute top-3 left-3 text-gray-400' />
+            <FiMail className='absolute top-3 left-3 text-placeholder-light dark:text-placeholder-dark' />
             <input
-              id='email'
               type='email'
-              {...formRegister('email', { required: 'Email is required' })}
-              className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition'
               placeholder='Email Address'
+              {...formRegister('email', { required: 'Email is required' })}
+              className='w-full pl-10 pr-3 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-light dark:bg-input-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
             />
             {errors.email && (
               <p className='text-red-500 text-xs mt-1'>
@@ -88,23 +85,23 @@ const Register: React.FC = () => {
             )}
           </div>
 
+          {/* Password Field */}
           <div className='relative'>
-            <FaLock className='absolute top-3 left-3 text-gray-400' />
+            <FiLock className='absolute top-3 left-3 text-placeholder-light dark:text-placeholder-dark' />
             <input
-              id='password'
               type={showPassword ? 'text' : 'password'}
+              placeholder='Password'
               {...formRegister('password', {
                 required: 'Password is required',
               })}
-              className='w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition'
-              placeholder='Password'
+              className='w-full pl-10 pr-10 py-2 rounded-lg border border-border-light dark:border-border-dark bg-input-light dark:bg-input-dark text-text-light dark:text-text-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
             />
             <button
               type='button'
               onClick={() => setShowPassword((prev) => !prev)}
-              className='absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600'
+              className='absolute inset-y-0 right-0 pr-3 flex items-center text-placeholder-light dark:text-placeholder-dark hover:text-text-primary-light dark:hover:text-text-primary-dark'
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {showPassword ? <FiEyeOff /> : <FiEye />}
             </button>
             {errors.password && (
               <p className='text-red-500 text-xs mt-1'>
@@ -114,19 +111,43 @@ const Register: React.FC = () => {
           </div>
 
           <div className='relative'>
-            <FaImage className='absolute top-3 left-3 text-gray-400' />
+            <label
+              htmlFor='avatar'
+              className='flex items-center cursor-pointer justify-center border border-dashed border-border-light dark:border-border-dark bg-input-light dark:bg-input-dark text-text-secondary-light dark:text-text-secondary-dark rounded-lg py-2 px-3 focus:outline-none'
+            >
+              <FiImage className='mr-2 text-placeholder-light dark:text-placeholder-dark' />
+              {preview || 'Upload Avatar'}
+            </label>
             <input
               id='avatar'
               type='file'
+              accept='image/*'
               {...formRegister('avatar')}
-              className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition'
+              className='hidden'
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setPreview(file.name);
+                  setPreview(URL.createObjectURL(file));
+                } else {
+                  setPreview(null);
+                }
+              }}
             />
+            {preview && (
+              <img
+                src={preview}
+                alt='Avatar Preview'
+                className='mt-3 w-20 h-20 rounded-full object-cover border border-border-light dark:border-border-dark'
+              />
+            )}
           </div>
 
+          {/* Submit Button */}
           <button
             type='submit'
             disabled={loading || isRedirecting}
-            className='w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-lg font-semibold text-lg hover:from-purple-700 hover:to-blue-600 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed'
+            className='w-full bg-button-primary-light dark:bg-button-primary-dark text-white py-3 rounded-lg font-semibold text-lg hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed'
           >
             {isRedirecting
               ? 'Redirecting...'
@@ -140,54 +161,18 @@ const Register: React.FC = () => {
           )}
         </form>
 
-        <div className='mt-8'>
-          <div className='relative'>
-            <div className='absolute inset-0 flex items-center'>
-              <div className='w-full border-t border-gray-300'></div>
-            </div>
-            <div className='relative flex justify-center text-sm'>
-              <span className='px-2 bg-white text-gray-500'>
-                Or continue with
-              </span>
-            </div>
-          </div>
-
-          <div className='mt-6 flex justify-center gap-4'>
-            <a
-              href='/google'
-              className='flex items-center justify-center w-12 h-12 rounded-full border border-gray-300 hover:bg-gray-50 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md'
-            >
-              <FaGoogle className='text-red-500 w-5 h-5' />
-            </a>
-            <a
-              href='/facebook'
-              className='flex items-center justify-center w-12 h-12 rounded-full border border-gray-300 hover:bg-gray-50 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md'
-            >
-              <FaFacebook className='text-blue-600 w-5 h-5' />
-            </a>
-            <a
-              href='/apple'
-              className='flex items-center justify-center w-12 h-12 rounded-full border border-gray-300 hover:bg-gray-50 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md'
-            >
-              <FaApple className='text-gray-800 w-5 h-5' />
-            </a>
-          </div>
-        </div>
-
-        <div className='mt-8 text-center'>
-          <p className='text-gray-600'>
-            Already have an account?{' '}
-            <a
-              href='/login'
-              className='text-purple-600 hover:underline font-medium'
-            >
-              Log In
-            </a>
-          </p>
-        </div>
+        <p className='mt-6 text-center text-text-secondary-light dark:text-text-secondary-dark'>
+          Already have an account?{' '}
+          <Link
+            to='/login'
+            className='text-accent-light dark:text-accent-dark hover:underline'
+          >
+            Login here
+          </Link>
+        </p>
       </div>
     </div>
   );
 };
 
-export default Register;
+export default RegisterPage;

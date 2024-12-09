@@ -1,15 +1,9 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { login } from "../../features/auth/authSlice";
-import {
-  FaEye,
-  FaEyeSlash,
-  FaGoogle,
-  FaFacebook,
-  FaApple,
-} from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { login } from '../../features/auth/authSlice';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 
 type FormData = {
   email: string;
@@ -27,143 +21,125 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
+
   const onSubmit = (data: FormData) => {
     dispatch(login(data))
       .unwrap()
       .then(() => {
-        navigate("/home");
+        navigate(from, { replace: true });
       })
       .catch(() => {});
   };
 
   return (
-    <div className="flex min-h-screen bg-primary justify-center items-center">
-      <div className="w-full max-w-4xl flex flex-col md:flex-row bg-transparent shadow-lg rounded-lg overflow-hidden">
-        <div className="w-full md:w-1/2 p-8">
-          <h2 className="text-3xl font-bold mb-6 text-center">Login</h2>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-accent">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                {...formRegister("email", { required: "Email is required" })}
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-              />
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-
-            <div className="relative">
-              <label htmlFor="password" className="block text-accent">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  {...formRegister("password", {
-                    required: "Password is required",
-                  })}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center h-full"
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 disabled:bg-blue-300"
+    <div className='min-h-screen flex items-center justify-center bg-body-light dark:bg-body-dark transition-all'>
+      <div className='bg-white dark:bg-dark-light p-8 rounded-lg shadow-lg w-full max-w-md'>
+        <h2 className='text-3xl font-bold mb-6 text-center text-text-primary-light dark:text-text-primary-dark'>
+          Login
+        </h2>
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+          {/* Email Input */}
+          <div>
+            <label
+              htmlFor='email'
+              className='block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark'
             >
-              {loading ? "Logging in..." : "Login"}
-            </button>
-
-            {error && (
-              <div className="mt-2 text-red-500 text-xs">
-                {error ===
-                "User not verified. Please verify your email address." ? (
-                  <p>
-                    {error}{" "}
-                    <a
-                      href="/resend-otp"
-                      className="text-blue-500 hover:underline"
-                    >
-                      Resend OTP
-                    </a>
-                  </p>
-                ) : null}
-              </div>
-            )}
-            {/* Forgot Password Link */}
-            <div className="mt-4 text-center">
-              <p className="text-gray-600">
-                <a
-                  href="/forgot-password"
-                  className="text-blue-500 hover:underline"
-                >
-                  Forgot Password?
-                </a>
+              Email
+            </label>
+            <input
+              id='email'
+              type='email'
+              {...formRegister('email', { required: 'Email is required' })}
+              className='mt-1 w-full px-4 py-2 bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark placeholder-text-secondary-light dark:placeholder-placeholder-dark'
+            />
+            {errors.email && (
+              <p className='text-sm text-red-500 mt-1'>
+                {errors.email.message}
               </p>
+            )}
+          </div>
+
+          {/* Password Input */}
+          <div>
+            <label
+              htmlFor='password'
+              className='block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark'
+            >
+              Password
+            </label>
+            <div className='relative mt-1'>
+              <input
+                id='password'
+                type={showPassword ? 'text' : 'password'}
+                {...formRegister('password', {
+                  required: 'Password is required',
+                })}
+                className='w-full px-4 py-2 bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark placeholder-text-secondary-light dark:placeholder-placeholder-dark'
+              />
+              <button
+                type='button'
+                onClick={() => setShowPassword((prev) => !prev)}
+                className='absolute inset-y-0 right-3 flex items-center text-text-secondary-light dark:text-placeholder-dark'
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </div>
-          </form>
-
-          <div className="mt-6 flex justify-center gap-4">
-            <a
-              href="/google"
-              className="p-2 border rounded-full hover:bg-gray-100"
-            >
-              <FaGoogle className="text-red-500 w-5 h-5" />
-            </a>
-            <a
-              href="/facebook"
-              className="p-2 border rounded-full hover:bg-gray-100"
-            >
-              <FaFacebook className="text-blue-600 w-5 h-5" />
-            </a>
-            <a
-              href="/apple"
-              className="p-2 border rounded-full hover:bg-gray-100"
-            >
-              <FaApple className="text-gray-800 w-5 h-5" />
-            </a>
+            {errors.password && (
+              <p className='text-sm text-red-500 mt-1'>
+                {errors.password.message}
+              </p>
+            )}
           </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-gray-600">
-              Don't have an account?{" "}
-              <a href="/register" className="text-blue-500 hover:underline">
-                Register
-              </a>
-            </p>
-          </div>
+          {/* Submit Button */}
+          <button
+            type='submit'
+            disabled={loading}
+            className='w-full py-2 rounded-lg text-white bg-button-primary-light dark:bg-button-primary-dark hover:bg-button-hover-light dark:hover:bg-button-hover-dark disabled:bg-gray-400 transition-all'
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+
+        {/* Error Display */}
+        {error && (
+          <p className='text-center text-sm text-red-500 mt-4'>
+            {error ===
+            'User not verified. Please verify your email address.' ? (
+              <>
+                {error}{' '}
+                <Link
+                  to='/resend-otp'
+                  className='text-accent-light dark:text-accent-dark hover:underline'
+                >
+                  Resend OTP
+                </Link>
+              </>
+            ) : (
+              error
+            )}
+          </p>
+        )}
+
+        {/* Additional Links */}
+        <div className='mt-6 text-center'>
+          <Link
+            to='/forgot-password'
+            className='text-sm text-accent-light dark:text-accent-dark hover:underline'
+          >
+            Forgot Password?
+          </Link>
         </div>
-
-        {/* Image Side */}
-        <div
-          className="hidden md:block w-1/2 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('/assets/split-image-2.png')",
-          }}
-        >
-          {/* You can place text or additional content here if needed */}
+        <div className='mt-4 text-center text-sm text-text-secondary-light dark:text-text-secondary-dark'>
+          Don't have an account?{' '}
+          <Link
+            to='/register'
+            className='text-accent-light dark:text-accent-dark hover:underline'
+          >
+            Register here
+          </Link>
         </div>
       </div>
     </div>
