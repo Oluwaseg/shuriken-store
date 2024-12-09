@@ -9,7 +9,7 @@ export default defineConfig({
     port: 3050,
     proxy: {
       '/api': {
-        target: 'http://localhost:5050/api',
+        target: 'https://shuriken-store.onrender.com/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
