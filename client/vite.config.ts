@@ -7,12 +7,5 @@ export default defineConfig({
   server: {
     host: true,
     port: 3050,
-    proxy: {
-      '/api': {
-        target: 'https://shuriken-store.onrender.com/api',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
   },
 });
