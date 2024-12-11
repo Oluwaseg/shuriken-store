@@ -9,8 +9,7 @@ import { ErrorHandler } from '../utils/errorHandler.js';
 
 export const createProduct = catchAsync(async (req, res, next) => {
   try {
-    console.log("Incoming Request",req.body)
-    const {
+     const {
       name,
       description,
       price,
@@ -21,6 +20,8 @@ export const createProduct = catchAsync(async (req, res, next) => {
       discount,
       flashSale,
     } = req.body;
+
+    console.log("Incoming Request",req.body)
 
     // Validate category
     const validCategory = await Category.findById(category);
