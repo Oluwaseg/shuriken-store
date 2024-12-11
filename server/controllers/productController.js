@@ -9,6 +9,7 @@ import { ErrorHandler } from '../utils/errorHandler.js';
 
 export const createProduct = catchAsync(async (req, res, next) => {
   try {
+    console.log("Incoming Request",req.body)
     const {
       name,
       description,
