@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import apiClient from '../services/apiClient';
 
 // Define TypeScript interfaces for the state and payload
 interface User {
@@ -29,23 +29,23 @@ export const loginUser = createAsyncThunk<
   AuthResponse,
   LoginPayload,
   { rejectValue: { message: string } }
->("auth/loginUser", async ({ email, password }, { rejectWithValue }) => {
+>('auth/loginUser', async ({ email, password }, { rejectWithValue }) => {
   try {
-    const response = await axios.post<AuthResponse>("/api/admin/login", {
+    const response = await apiClient.post<AuthResponse>('/admin/login', {
       email,
       password,
     });
     return response.data;
   } catch (error: any) {
     const status = error.response?.status;
-    let message = "Login failed. Please try again.";
+    let message = 'Login failed. Please try again.';
 
     if (status === 400) {
-      message = "Please enter a valid email and password.";
+      message = 'Please enter a valid email and password.';
     } else if (status === 401) {
-      message = "Invalid email or password.";
+      message = 'Invalid email or password.';
     } else if (status === 404) {
-      message = "User not found.";
+      message = 'User not found.';
     }
 
     return rejectWithValue({ message });
@@ -57,37 +57,37 @@ export const logoutUser = createAsyncThunk<
   void,
   void,
   { rejectValue: { message: string } }
->("auth/logoutUser", async (_, { rejectWithValue }) => {
+>('auth/logoutUser', async (_, { rejectWithValue }) => {
   try {
-    await axios.post("/api/user/logout", {}, { withCredentials: true });
+    await apiClient.post('/user/logout', {}, { withCredentials: true });
   } catch (error: any) {
     return rejectWithValue({
       message:
-        error.response?.data.message || "Logout failed. Please try again.",
+        error.response?.data.message || 'Logout failed. Please try again.',
     });
   }
 });
 
 // Auth slice
 const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState: {
-    user: JSON.parse(localStorage.getItem("user") || "null") as User | null,
-    token: localStorage.getItem("token") || null,
+    user: JSON.parse(localStorage.getItem('user') || 'null') as User | null,
+    token: localStorage.getItem('token') || null,
     loading: false,
   } as AuthState,
   reducers: {
     logout: (state) => {
       state.user = null;
       state.token = null;
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     },
     setAuth: (state, action: PayloadAction<AuthResponse>) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
-      localStorage.setItem("token", action.payload.token);
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      localStorage.setItem('token', action.payload.token);
+      localStorage.setItem('user', JSON.stringify(action.payload.user));
     },
   },
   extraReducers: (builder) => {
@@ -101,8 +101,8 @@ const authSlice = createSlice({
           state.user = action.payload.user;
           state.token = action.payload.token;
           state.loading = false;
-          localStorage.setItem("token", action.payload.token);
-          localStorage.setItem("user", JSON.stringify(action.payload.user));
+          localStorage.setItem('token', action.payload.token);
+          localStorage.setItem('user', JSON.stringify(action.payload.user));
         }
       )
       .addCase(loginUser.rejected, (state, action) => {
@@ -115,8 +115,8 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.loading = false;
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       })
       .addCase(logoutUser.rejected, (state) => {
         state.loading = false;

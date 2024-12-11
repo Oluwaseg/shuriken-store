@@ -1,15 +1,15 @@
-import axios from 'axios';
+import apiClient from '../../../services/apiClient';
 import { Order, OrderResponse } from '../types/type';
 
 // Fetch all orders
 export const fetchOrders = async (): Promise<Order[]> => {
-  const { data } = await axios.get('/api/admin/orders');
+  const { data } = await apiClient.get('/admin/orders');
   return data.orders;
 };
 
 // Fetch a single order by ID
 export const fetchOrderById = async (id: string): Promise<OrderResponse> => {
-  const { data } = await axios.get(`/api/orders/${id}`);
+  const { data } = await apiClient.get(`/orders/${id}`);
   return data;
 };
 
@@ -26,10 +26,10 @@ export const updateOrderStatus = async (id: string, status: string) => {
     throw new Error('Invalid status value');
   }
 
-  await axios.put(`/api/admin/orders/${id}`, { status });
+  await apiClient.put(`/admin/orders/${id}`, { status });
 };
 
 // Delete an order
 export const deleteOrder = async (id: string) => {
-  await axios.delete(`/api/admin/orders/${id}`);
+  await apiClient.delete(`/admin/orders/${id}`);
 };

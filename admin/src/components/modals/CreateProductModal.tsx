@@ -1,9 +1,9 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
-import ImageCarousel from "../previews/ImageCarousel";
-import { MdClose } from "react-icons/md";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import { MdClose } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
+import apiClient from '../../services/apiClient';
+import ImageCarousel from '../previews/ImageCarousel';
 
 interface Category {
   id: string;
@@ -44,22 +44,22 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
   onSuccess,
 }) => {
   const [productData, setProductData] = useState<ProductData>({
-    name: "",
-    description: "",
-    price: "",
-    stock: "",
-    category: "",
-    subcategory: "",
-    brand: "",
+    name: '',
+    description: '',
+    price: '',
+    stock: '',
+    category: '',
+    subcategory: '',
+    brand: '',
     bestSeller: false,
     discount: {
       isDiscounted: false,
-      discountPercent: "0",
+      discountPercent: '0',
     },
     flashSale: {
       isFlashSale: false,
-      flashSalePrice: "0.00",
-      flashSaleEndTime: "",
+      flashSalePrice: '0.00',
+      flashSaleEndTime: '',
     },
   });
   const [images, setImages] = useState<File[]>([]);
@@ -72,12 +72,12 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get<{ categories: Category[] }>(
-          "/api/category"
+        const response = await apiClient.get<{ categories: Category[] }>(
+          '/category'
         );
         setCategories(response.data.categories);
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error('Error fetching categories:', error);
       }
     };
 
@@ -88,12 +88,12 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
     if (productData.category) {
       const fetchSubcategories = async () => {
         try {
-          const response = await axios.get<{ subcategories: Subcategory[] }>(
-            `/api/subcategories/${productData.category}`
-          );
+          const response = await apiClient.get<{
+            subcategories: Subcategory[];
+          }>(`/subcategories/${productData.category}`);
           setSubcategories(response.data.subcategories);
         } catch (error) {
-          console.error("Error fetching subcategories:", error);
+          console.error('Error fetching subcategories:', error);
         }
       };
 
@@ -122,7 +122,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
 
   const handleCheckboxChange = (
     e: ChangeEvent<HTMLInputElement>,
-    field: "discount" | "flashSale"
+    field: 'discount' | 'flashSale'
   ) => {
     const { checked, name } = e.target;
     setProductData((prevState) => ({
@@ -147,162 +147,162 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
 
     try {
       const formData = new FormData();
-      formData.append("name", productData.name);
-      formData.append("description", productData.description);
-      formData.append("price", productData.price);
-      formData.append("stock", productData.stock);
-      formData.append("category", productData.category);
+      formData.append('name', productData.name);
+      formData.append('description', productData.description);
+      formData.append('price', productData.price);
+      formData.append('stock', productData.stock);
+      formData.append('category', productData.category);
       if (productData.subcategory)
-        formData.append("subcategory", productData.subcategory);
-      formData.append("brand", productData.brand);
-      formData.append("bestSeller", String(productData.bestSeller));
+        formData.append('subcategory', productData.subcategory);
+      formData.append('brand', productData.brand);
+      formData.append('bestSeller', String(productData.bestSeller));
 
       formData.append(
-        "discount.isDiscounted",
+        'discount.isDiscounted',
         String(productData.discount.isDiscounted)
       );
       formData.append(
-        "discount.discountPercent",
+        'discount.discountPercent',
         productData.discount.discountPercent
       );
 
       formData.append(
-        "flashSale.isFlashSale",
+        'flashSale.isFlashSale',
         String(productData.flashSale.isFlashSale)
       );
       formData.append(
-        "flashSale.flashSalePrice",
+        'flashSale.flashSalePrice',
         productData.flashSale.flashSalePrice
       );
       formData.append(
-        "flashSale.flashSaleEndTime",
+        'flashSale.flashSaleEndTime',
         productData.flashSale.flashSaleEndTime
       );
 
-      images.forEach((img) => formData.append("images", img));
+      images.forEach((img) => formData.append('images', img));
 
-      const response = await axios.post("/api/products", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const response = await apiClient.post('/products', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       if (response.data.success) {
-        toast.success("Product created successfully");
+        toast.success('Product created successfully');
         closeModal();
         onSuccess();
       } else {
-        toast.error("Error creating product");
+        toast.error('Error creating product');
       }
     } catch (error) {
-      console.error("Error creating product:", error);
-      toast.error("Error creating product");
+      console.error('Error creating product:', error);
+      toast.error('Error creating product');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75'>
+      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto'>
         <div
-          className="bg-gray-950 bg-opacity-75 fixed inset-0"
+          className='bg-gray-950 bg-opacity-75 fixed inset-0'
           onClick={closeModal}
         ></div>
-        <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-4xl w-full z-10">
+        <div className='relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-4xl w-full z-10'>
           <button
             onClick={closeModal}
-            className="absolute top-4 right-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300"
+            className='absolute top-4 right-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
           >
             <MdClose size={24} />
           </button>
-          <Toaster position="top-right" />
+          <Toaster position='top-right' />
           <form
             onSubmit={handleSubmit}
-            encType="multipart/form-data"
-            className="space-y-4 bg-white dark:bg-gray-800"
+            encType='multipart/form-data'
+            className='space-y-4 bg-white dark:bg-gray-800'
           >
-            <h2 className="text-3xl font-semibold text-gray-900 dark:text-white mb-6">
+            <h2 className='text-3xl font-semibold text-gray-900 dark:text-white mb-6'>
               Create Product
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-              <div className="col-span-full">
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4'>
+              <div className='col-span-full'>
                 <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor='name'
+                  className='block text-sm font-medium text-gray-900 dark:text-white'
                 >
                   Product Name
                 </label>
                 <input
-                  type="text"
-                  name="name"
-                  id="name"
+                  type='text'
+                  name='name'
+                  id='name'
                   value={productData.name}
                   onChange={handleChange}
                   required
-                  placeholder="Enter product name"
-                  className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none"
+                  placeholder='Enter product name'
+                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
                 />
               </div>
 
-              <div className="col-span-full">
+              <div className='col-span-full'>
                 <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor='description'
+                  className='block text-sm font-medium text-gray-900 dark:text-white'
                 >
                   Description
                 </label>
                 <textarea
-                  id="description"
-                  name="description"
+                  id='description'
+                  name='description'
                   rows={3}
                   value={productData.description}
                   onChange={handleChange}
                   required
-                  placeholder="Enter product description"
-                  className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none"
+                  placeholder='Enter product description'
+                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
                 />
               </div>
 
               <div>
                 <label
-                  htmlFor="price"
-                  className="block text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor='price'
+                  className='block text-sm font-medium text-gray-900 dark:text-white'
                 >
                   Price
                 </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-sm">
+                <div className='relative'>
+                  <span className='absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-sm'>
                     $
                   </span>
                   <input
-                    type="number"
-                    name="price"
-                    id="price"
+                    type='number'
+                    name='price'
+                    id='price'
                     value={productData.price}
                     onChange={handleChange}
                     required
-                    className="mt-2 block w-full rounded-md border border-gray-300 pl-8 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none"
-                    placeholder="0.00"
+                    className='mt-2 block w-full rounded-md border border-gray-300 pl-8 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                    placeholder='0.00'
                   />
                 </div>
               </div>
 
               <div>
                 <label
-                  htmlFor="stock"
-                  className="block text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor='stock'
+                  className='block text-sm font-medium text-gray-900 dark:text-white'
                 >
                   Stock
                 </label>
                 <select
-                  name="stock"
-                  id="stock"
+                  name='stock'
+                  id='stock'
                   value={productData.stock}
                   onChange={handleChange}
                   required
-                  className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none"
+                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
                 >
-                  <option value="">Select stock quantity</option>
+                  <option value=''>Select stock quantity</option>
                   {[...Array(200).keys()].map((num) => (
                     <option key={num + 1} value={num + 1}>
                       {num + 1}
@@ -313,20 +313,20 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
 
               <div>
                 <label
-                  htmlFor="category"
-                  className="block text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor='category'
+                  className='block text-sm font-medium text-gray-900 dark:text-white'
                 >
                   Category
                 </label>
                 <select
-                  name="category"
-                  id="category"
+                  name='category'
+                  id='category'
                   value={productData.category}
                   onChange={handleChange}
                   required
-                  className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none"
+                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
                 >
-                  <option value="">Select a category</option>
+                  <option value=''>Select a category</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
@@ -337,19 +337,19 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
 
               <div>
                 <label
-                  htmlFor="subcategory"
-                  className="block text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor='subcategory'
+                  className='block text-sm font-medium text-gray-900 dark:text-white'
                 >
                   Subcategory
                 </label>
                 <select
-                  name="subcategory"
-                  id="subcategory"
-                  value={productData.subcategory || ""}
+                  name='subcategory'
+                  id='subcategory'
+                  value={productData.subcategory || ''}
                   onChange={handleChange}
-                  className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none"
+                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
                 >
-                  <option value="">Select a subcategory</option>
+                  <option value=''>Select a subcategory</option>
                   {subcategories.map((sub) => (
                     <option key={sub.id} value={sub.id}>
                       {sub.name}
@@ -360,80 +360,80 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
 
               <div>
                 <label
-                  htmlFor="brand"
-                  className="block text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor='brand'
+                  className='block text-sm font-medium text-gray-900 dark:text-white'
                 >
                   Brand
                 </label>
                 <input
-                  type="text"
-                  name="brand"
-                  id="brand"
+                  type='text'
+                  name='brand'
+                  id='brand'
                   value={productData.brand}
                   onChange={handleChange}
                   required
-                  placeholder="Enter product brand"
-                  className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none"
+                  placeholder='Enter product brand'
+                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
                 />
               </div>
 
               <div>
                 <label
-                  htmlFor="bestSeller"
-                  className="block text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor='bestSeller'
+                  className='block text-sm font-medium text-gray-900 dark:text-white'
                 >
                   Best Seller
                 </label>
                 <select
-                  name="bestSeller"
-                  id="bestSeller"
-                  value={productData.bestSeller ? "true" : "false"}
+                  name='bestSeller'
+                  id='bestSeller'
+                  value={productData.bestSeller ? 'true' : 'false'}
                   onChange={handleChange}
                   required
-                  className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none"
+                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
                 >
-                  <option value="false">No</option>
-                  <option value="true">Yes</option>
+                  <option value='false'>No</option>
+                  <option value='true'>Yes</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                <label className='block text-sm font-medium text-gray-900 dark:text-white'>
                   Discount
                 </label>
-                <div className="flex items-center mt-2">
+                <div className='flex items-center mt-2'>
                   <input
-                    type="checkbox"
-                    id="isDiscounted"
-                    name="isDiscounted"
+                    type='checkbox'
+                    id='isDiscounted'
+                    name='isDiscounted'
                     checked={productData.discount.isDiscounted}
-                    onChange={(e) => handleCheckboxChange(e, "discount")}
-                    className="h-4 w-4 text-indigo-600 focus:ring-secondary border-gray-300 rounded"
+                    onChange={(e) => handleCheckboxChange(e, 'discount')}
+                    className='h-4 w-4 text-indigo-600 focus:ring-secondary border-gray-300 rounded'
                   />
                   <label
-                    htmlFor="isDiscounted"
-                    className="ml-2 text-sm font-medium text-gray-900 dark:text-white"
+                    htmlFor='isDiscounted'
+                    className='ml-2 text-sm font-medium text-gray-900 dark:text-white'
                   >
                     Is Discounted
                   </label>
                 </div>
                 {productData.discount.isDiscounted && (
-                  <div className="mt-4 space-y-4">
+                  <div className='mt-4 space-y-4'>
                     <div>
                       <label
-                        htmlFor="discountPercent"
-                        className="block text-sm font-medium text-gray-900 dark:text-white"
+                        htmlFor='discountPercent'
+                        className='block text-sm font-medium text-gray-900 dark:text-white'
                       >
                         Discount Percent
                       </label>
                       <input
-                        type="number"
-                        id="discountPercent"
-                        name="discountPercent"
+                        type='number'
+                        id='discountPercent'
+                        name='discountPercent'
                         value={productData.discount.discountPercent}
                         onChange={handleChange}
-                        className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none"
-                        placeholder="0"
+                        className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                        placeholder='0'
                       />
                     </div>
                   </div>
@@ -441,106 +441,106 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white">
+                <label className='block text-sm font-medium text-gray-900 dark:text-white'>
                   Flash Sale
                 </label>
-                <div className="flex items-center mt-2">
+                <div className='flex items-center mt-2'>
                   <input
-                    type="checkbox"
-                    id="isFlashSale"
-                    name="isFlashSale"
+                    type='checkbox'
+                    id='isFlashSale'
+                    name='isFlashSale'
                     checked={productData.flashSale.isFlashSale}
-                    onChange={(e) => handleCheckboxChange(e, "flashSale")}
-                    className="h-4 w-4 text-indigo-600 focus:ring-secondary border-gray-300 rounded"
+                    onChange={(e) => handleCheckboxChange(e, 'flashSale')}
+                    className='h-4 w-4 text-indigo-600 focus:ring-secondary border-gray-300 rounded'
                   />
                   <label
-                    htmlFor="isFlashSale"
-                    className="ml-2 text-sm font-medium text-gray-900 dark:text-white"
+                    htmlFor='isFlashSale'
+                    className='ml-2 text-sm font-medium text-gray-900 dark:text-white'
                   >
                     Is Flash Sale
                   </label>
                 </div>
                 {productData.flashSale.isFlashSale && (
-                  <div className="mt-4 space-y-4">
+                  <div className='mt-4 space-y-4'>
                     <div>
                       <label
-                        htmlFor="flashSalePrice"
-                        className="block text-sm font-medium text-gray-900 dark:text-white"
+                        htmlFor='flashSalePrice'
+                        className='block text-sm font-medium text-gray-900 dark:text-white'
                       >
                         Flash Sale Price
                       </label>
                       <input
-                        type="number"
-                        id="flashSalePrice"
-                        name="flashSalePrice"
+                        type='number'
+                        id='flashSalePrice'
+                        name='flashSalePrice'
                         value={productData.flashSale.flashSalePrice}
                         onChange={handleChange}
-                        className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none"
-                        placeholder="0.00"
+                        className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                        placeholder='0.00'
                       />
                     </div>
                     <div>
                       <label
-                        htmlFor="flashSaleEndTime"
-                        className="block text-sm font-medium text-gray-900 dark:text-white"
+                        htmlFor='flashSaleEndTime'
+                        className='block text-sm font-medium text-gray-900 dark:text-white'
                       >
                         Flash Sale End Time
                       </label>
                       <input
-                        type="datetime-local"
-                        id="flashSaleEndTime"
-                        name="flashSaleEndTime"
+                        type='datetime-local'
+                        id='flashSaleEndTime'
+                        name='flashSaleEndTime'
                         value={productData.flashSale.flashSaleEndTime}
                         onChange={handleChange}
-                        className="mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none"
+                        className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
                       />
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="col-span-full">
+              <div className='col-span-full'>
                 <label
-                  htmlFor="images"
-                  className="block text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor='images'
+                  className='block text-sm font-medium text-gray-900 dark:text-white'
                 >
                   Images
                 </label>
                 <input
-                  type="file"
-                  id="images"
-                  name="images"
+                  type='file'
+                  id='images'
+                  name='images'
                   multiple
                   key={fileInputKey}
                   onChange={handleFileChange}
-                  className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-gray-100 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200 "
+                  className='mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-gray-100 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200 '
                 />
                 {images.length > 0 && (
-                  <div className="mt-4">
+                  <div className='mt-4'>
                     <ImageCarousel images={images} />
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-x-6">
+            <div className='flex items-center justify-end gap-x-6'>
               <button
-                type="button"
-                className="text-sm font-semibold text-gray-900 dark:text-white"
-                onClick={() => navigate("/products")}
+                type='button'
+                className='text-sm font-semibold text-gray-900 dark:text-white'
+                onClick={() => navigate('/products')}
               >
                 Cancel
               </button>
               <button
-                type="submit"
+                type='submit'
                 disabled={loading}
                 className={`rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-gray-300 ${
                   loading
-                    ? "bg-green-400 cursor-not-allowed"
-                    : "bg-secondary hover:bg-secondary hover:bg-opacity-75 duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-none ring-0"
+                    ? 'bg-green-400 cursor-not-allowed'
+                    : 'bg-secondary hover:bg-secondary hover:bg-opacity-75 duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-none ring-0'
                 }`}
               >
-                {loading ? "Submitting..." : "Create Product"}
+                {loading ? 'Submitting...' : 'Create Product'}
               </button>
             </div>
           </form>

@@ -6,6 +6,7 @@
 import debugModule from 'debug';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
+import { Server } from 'socket.io';
 import app from '../app.js';
 import connectDB from '../config/db.js';
 
@@ -26,7 +27,36 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-var server = createServer(app);
+const server = createServer(app);
+
+// Initialize Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: [
+      process.env.ADMIN_URL,
+      process.env.CLIENT_URL,
+      process.env.ADMIN_DEVELOPMENT_URL,
+      process.env.CLIENT_DEVELOPMENT_URL,
+    ],
+    credentials: true,
+  },
+});
+
+console.log('Socket.IO initialized');
+
+// Socket.IO Logic
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected:', socket.id);
+  });
+
+  socket.on('order-update', (data) => {
+    console.log('Order Update:', data);
+    io.emit('order-update', data); // Broadcast to all clients
+  });
+});
 
 /**
  * Listen on provided port, on all network interfaces.

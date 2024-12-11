@@ -1,8 +1,8 @@
-import axios from 'axios';
+import apiClient from '../../services/apiClient';
 import { UpdatePasswordValues, UpdateProfileValues } from './types';
 
 export const getUserDetails = async () => {
-  const response = await axios.get('/api/user/me');
+  const response = await apiClient.get('/user/me');
   return response.data.user;
 };
 
@@ -13,7 +13,7 @@ export const updateUserProfile = async (data: UpdateProfileValues) => {
   if (data.avatar) {
     formData.append('avatar', data.avatar);
   }
-  const response = await axios.put('/api/user/update/me', formData, {
+  const response = await apiClient.put('/user/update/me', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -22,6 +22,6 @@ export const updateUserProfile = async (data: UpdateProfileValues) => {
 };
 
 export const updateUserPassword = async (data: UpdatePasswordValues) => {
-  const response = await axios.put('/api/user/password/update', data);
+  const response = await apiClient.put('/user/password/update', data);
   return response.data;
 };

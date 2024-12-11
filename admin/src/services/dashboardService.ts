@@ -1,12 +1,12 @@
-import axios from "axios";
-import { User, Order } from "../components/tables/types/type";
+import { Order, User } from '../components/tables/types/type';
+import apiClient from './apiClient';
 
 export const fetchTotalCustomers = async (): Promise<number> => {
   try {
-    const response = await axios.get("api/admin/users");
+    const response = await apiClient.get('/admin/users');
     return response.data.count;
   } catch (error) {
-    console.error("Error fetching total customers:", error);
+    console.error('Error fetching total customers:', error);
     throw error;
   }
 };
@@ -16,23 +16,23 @@ export const fetchOrderMetrics = async (): Promise<{
   totalIncome: number;
 }> => {
   try {
-    const response = await axios.get("api/admin/orders");
+    const response = await apiClient.get('/admin/orders');
     return {
       totalOrders: response.data.orderCount,
       totalIncome: response.data.totalAmount,
     };
   } catch (error) {
-    console.error("Error fetching order metrics:", error);
+    console.error('Error fetching order metrics:', error);
     throw error;
   }
 };
 
 export const fetchTotalProducts = async (): Promise<number> => {
   try {
-    const response = await axios.get("api/admin/products/count");
+    const response = await apiClient.get('/admin/products/count');
     return response.data.count;
   } catch (error) {
-    console.error("Error fetching total products:", error);
+    console.error('Error fetching total products:', error);
     throw error;
   }
 };
@@ -42,22 +42,22 @@ export const fetchUserData = async (): Promise<{
   values: number[];
 }> => {
   try {
-    const response = await axios.get(`/api/admin/users`);
+    const response = await apiClient.get(`/admin/users`);
     const users: User[] = response.data.users;
 
     const labels = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     const values = new Array(12).fill(0);
 
@@ -68,21 +68,21 @@ export const fetchUserData = async (): Promise<{
 
     return { labels, values };
   } catch (error) {
-    console.error("Error fetching user data:", error);
+    console.error('Error fetching user data:', error);
     throw error;
   }
 };
 
 export const fetchCategoriesWithProductCount = async () => {
   try {
-    const response = await fetch("/api/categories");
+    const response = await fetch('/categories');
     if (!response.ok) {
-      throw new Error("Failed to fetch categories");
+      throw new Error('Failed to fetch categories');
     }
     const data = await response.json();
     return data.categories;
   } catch (error) {
-    console.error("Error fetching categories with product count:", error);
+    console.error('Error fetching categories with product count:', error);
     throw error;
   }
 };
@@ -92,22 +92,22 @@ export const fetchOrdersData = async (): Promise<{
   values: number[];
 }> => {
   try {
-    const response = await axios.get(`/api/admin/orders`);
+    const response = await apiClient.get(`/admin/orders`);
     const orders: Order[] = response.data.orders;
 
     const labels = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     const values = new Array(12).fill(0);
 
@@ -118,7 +118,7 @@ export const fetchOrdersData = async (): Promise<{
 
     return { labels, values };
   } catch (error) {
-    console.error("Error fetching orders data:", error);
+    console.error('Error fetching orders data:', error);
     throw error;
   }
 };
@@ -128,22 +128,22 @@ export const fetchRevenueData = async (): Promise<{
   values: number[];
 }> => {
   try {
-    const response = await axios.get(`/api/admin/orders`);
+    const response = await apiClient.get(`/admin/orders`);
     const orders: Order[] = response.data.orders;
 
     const labels = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     const values = new Array(12).fill(0);
 
@@ -154,7 +154,7 @@ export const fetchRevenueData = async (): Promise<{
 
     return { labels, values };
   } catch (error) {
-    console.error("Error fetching revenue data:", error);
+    console.error('Error fetching revenue data:', error);
     throw error;
   }
 };

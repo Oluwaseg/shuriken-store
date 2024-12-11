@@ -1,8 +1,8 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import PagePreloader from '../../components/PagePreloader';
+import apiClient from '../../services/apiClient';
 import ConfirmDeleteModal from '../modals/DeleteUser';
 import EditUserModal from '../modals/EditUser';
 
@@ -37,7 +37,7 @@ const UsersTable: React.FC = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get<{ users: User[] }>('/api/admin/users');
+      const response = await apiClient.get<{ users: User[] }>('/admin/users');
       setUsers(response.data.users);
     } catch (error) {
       console.error('Error fetching users', error);
