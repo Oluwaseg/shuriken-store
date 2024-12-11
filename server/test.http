@@ -9,3 +9,13 @@ Content-Type: application/json
     "email":"oluwasegunsam56@gmail.com",
     "password":"sagemode2020"
 }
+
+
+### Login user
+POST http://localhost:5050/api/admin/login
+Content-Type: application/json
+
+{
+    "email":"samueloluwasegun999@gmail.com",
+    "password":"samuel1"
+}

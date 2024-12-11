@@ -1,13 +1,13 @@
-import { catchAsync } from "../utils/catchAsync.js";
-import { ErrorHandler } from "../utils/errorHandler.js";
-import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import { catchAsync } from '../utils/catchAsync.js';
+import { ErrorHandler } from '../utils/errorHandler.js';
 
 export const isAuthenticated = catchAsync(async (req, res, next) => {
-  const { token } = req.cookies;
+  let token = req.cookies.token || req.headers['authorization']?.split(' ')[1]; // Get token from cookie or header
 
   if (!token) {
-    return next(new ErrorHandler("Login first to access this resource", 401));
+    return next(new ErrorHandler('Login first to access this resource', 401));
   }
 
   try {
@@ -15,12 +15,12 @@ export const isAuthenticated = catchAsync(async (req, res, next) => {
     req.user = await User.findById(decoded.id);
 
     if (!req.user) {
-      return next(new ErrorHandler("User not found", 401));
+      return next(new ErrorHandler('User not found', 401));
     }
 
     next();
   } catch (err) {
-    return next(new ErrorHandler("Invalid or expired token", 401));
+    return next(new ErrorHandler('Invalid or expired token', 401));
   }
 });
 
