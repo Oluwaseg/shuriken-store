@@ -7,9 +7,11 @@ export const createProductSchema = Joi.object({
   description: Joi.string().required(),
   price: Joi.number().positive().required(),
   stock: Joi.number().integer().min(0).required(),
+  images: Joi.array().min(1).required(),
   category: Joi.string().required(),
   subcategory: Joi.string().optional(),
   brand: Joi.string().optional(),
+  bestSeller: Joi.boolean().optional(),
   discount: Joi.object({
     isDiscounted: Joi.boolean(),
     discountPercent: Joi.number().min(0).max(100),
@@ -19,7 +21,7 @@ export const createProductSchema = Joi.object({
     flashSalePrice: Joi.number().positive(),
     flashSaleEndTime: Joi.date(),
   }).optional(),
-});
+}).prefs({ convert: true });
 
 export const validateCreateProduct = (req, res, next) => {
   const { error } = createProductSchema.validate(req.body, {

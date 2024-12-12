@@ -27,7 +27,7 @@ router.post(
   isAuthenticated,
   authorizeRoles('admin'),
   uploadProductImage.array('images', 8),
-  validateCreateProduct,
+
   createProduct
 );
 router.get('/products/activities', getRecentActivities);
