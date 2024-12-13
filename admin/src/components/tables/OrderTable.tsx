@@ -201,7 +201,7 @@ const OrderTable: React.FC = () => {
                   </select>
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
-                  ${order.totalPrice.toFixed(2)}
+                  ₦{order.totalPrice.toFixed(2)}
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
                   <div className='flex space-x-2'>

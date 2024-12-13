@@ -17,7 +17,10 @@ import {
   isAuthenticated,
 } from '../middlewares/authenticate.js';
 import { uploadProductImage } from '../middlewares/image.config.js';
-import { validateCreateProduct } from '../middlewares/validateProduct.js';
+import {
+  validateCreateProduct,
+  validateUpdateProduct,
+} from '../middlewares/validateProduct.js';
 
 const router = express.Router();
 
@@ -27,7 +30,7 @@ router.post(
   isAuthenticated,
   authorizeRoles('admin'),
   uploadProductImage.array('images', 8),
-
+  validateCreateProduct,
   createProduct
 );
 router.get('/products/activities', getRecentActivities);
@@ -39,7 +42,7 @@ router.put(
   isAuthenticated,
   uploadProductImage.array('images', 8),
   authorizeRoles('admin'),
-  validateCreateProduct,
+  validateUpdateProduct,
   updateProduct
 );
 router.delete(

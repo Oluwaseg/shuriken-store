@@ -105,7 +105,7 @@ const OrderDetailPage: React.FC = () => {
           <title>Order Details - #{orders._id}</title>
           <meta
             name='description'
-            content={`Order details for order #${orders._id}`}
+            content={`Order details for order #₦{orders._id}`}
           />
         </Helmet>
       </HelmetProvider>
@@ -135,7 +135,7 @@ const OrderDetailPage: React.FC = () => {
                   Order #{orders._id}
                 </h1>
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
+                  className={`px-3 py-1 rounded-full text-sm font-semibold ₦{getStatusColor(
                     orders.orderStatus
                   )}`}
                 >
@@ -252,7 +252,7 @@ const OrderDetailPage: React.FC = () => {
                             </td>
                             <td className='px-6 py-4 whitespace-nowrap'>
                               <div className='text-sm text-gray-500 dark:text-gray-400'>
-                                ${item.price.toFixed(2)}
+                                ₦{item.price.toFixed(2)}
                               </div>
                             </td>
                             <td className='px-6 py-4 whitespace-nowrap'>
@@ -261,7 +261,7 @@ const OrderDetailPage: React.FC = () => {
                               </div>
                             </td>
                             <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
-                              ${(item.price * item.quantity).toFixed(2)}
+                              ₦{(item.price * item.quantity).toFixed(2)}
                             </td>
                           </tr>
                         ))}
@@ -282,20 +282,20 @@ const OrderDetailPage: React.FC = () => {
                 <div className='space-y-2 text-gray-600 dark:text-gray-400'>
                   <p className='flex justify-between'>
                     <span>Items Price:</span>
-                    <span>${orders.itemsPrice.toFixed(2)}</span>
+                    <span>₦{orders.itemsPrice.toFixed(2)}</span>
                   </p>
                   <p className='flex justify-between'>
                     <span>Tax:</span>
-                    <span>${orders.taxPrice.toFixed(2)}</span>
+                    <span>₦{orders.taxPrice.toFixed(2)}</span>
                   </p>
                   <p className='flex justify-between'>
                     <span>Shipping:</span>
-                    <span>${orders.shippingPrice.toFixed(2)}</span>
+                    <span>₦{orders.shippingPrice.toFixed(2)}</span>
                   </p>
                   <div className='border-t border-gray-200 dark:border-gray-600 my-2 pt-2'>
                     <p className='flex justify-between font-semibold text-lg'>
                       <span>Total:</span>
-                      <span>${orders.totalPrice.toFixed(2)}</span>
+                      <span>₦{orders.totalPrice.toFixed(2)}</span>
                     </p>
                   </div>
                 </div>

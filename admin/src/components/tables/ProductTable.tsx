@@ -10,7 +10,7 @@ import apiClient from '../../services/apiClient';
 import EditProductModal from '../modals/EditProduct';
 import { Category, Product } from './types/type';
 
-const ProductsTable: React.FC<{ key: number }> = ({ key }) => {
+const ProductsTable: React.FC<{ tableKey: number }> = ({ tableKey }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -44,7 +44,7 @@ const ProductsTable: React.FC<{ key: number }> = ({ key }) => {
 
     fetchProducts();
     fetchCategories();
-  }, [key]);
+  }, [tableKey]);
 
   const handleEdit = (product: Product) => {
     setSelectedProduct(product);
@@ -163,7 +163,7 @@ const ProductsTable: React.FC<{ key: number }> = ({ key }) => {
                           {truncateText(product.name, 10)}
                         </td>
                         <td className='px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap'>
-                          ${product.price}
+                          ₦{product.price}
                         </td>
                         <td className='px-4 py-4 text-sm text-gray-500 dark:text-gray-300 whitespace-nowrap hidden md:table-cell'>
                           {product.stock}

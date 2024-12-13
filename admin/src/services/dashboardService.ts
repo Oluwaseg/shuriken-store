@@ -75,12 +75,11 @@ export const fetchUserData = async (): Promise<{
 
 export const fetchCategoriesWithProductCount = async () => {
   try {
-    const response = await fetch('/categories');
-    if (!response.ok) {
+    const response = await apiClient.get('/categories');
+    if (!response) {
       throw new Error('Failed to fetch categories');
     }
-    const data = await response.json();
-    return data.categories;
+    return response.data.categories;
   } catch (error) {
     console.error('Error fetching categories with product count:', error);
     throw error;

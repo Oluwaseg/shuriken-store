@@ -35,8 +35,8 @@
                         <tr>
                             <td style="padding: 10px; border: 1px solid #ddd;">{{this.name}}</td>
                             <td style="padding: 10px; border: 1px solid #ddd;">{{this.quantity}}</td>
-                            <td style="padding: 10px; border: 1px solid #ddd;">${{this.price}}</td>
-                            <td style="padding: 10px; border: 1px solid #ddd;">${{this.total}}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">₦{{this.price}}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">₦{{this.total}}</td>
                         </tr>
                     {{/each}}
                 </tbody>
@@ -45,9 +45,9 @@
 
         <!-- Order Summary -->
          <div style="font-size: 16px; font-weight: 600; margin-top: 20px;">
-            <p><strong>Shipping:</strong> $15.00</p> <!-- Hardcoded Shipping -->
+            <p><strong>Shipping:</strong> ₦8500</p> <!-- Hardcoded Shipping -->
             <p><strong>Tax:</strong> 10%</p> <!-- Hardcoded Tax -->
-            <p><strong>Total Price:</strong> ${{totalPrice}}</p>
+            <p><strong>Total Price:</strong> ₦{{totalPrice}}</p>
             <p><strong>Order placed on:</strong> {{formatDate createdAt}}</p>
         </div>
 

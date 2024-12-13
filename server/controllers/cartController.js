@@ -24,7 +24,7 @@ export const createOrUpdateCart = catchAsync(async (req, res, next) => {
     }
 
     const TAX_RATE = 0.1;
-    const SHIPPING_COST = 15;
+    const SHIPPING_COST = 8500;
 
     const product = await Product.findById(productId);
     if (!product) {

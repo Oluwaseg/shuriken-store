@@ -24,7 +24,7 @@
                     <tr style="border-bottom: 1px solid #f1f1f1;">
                         <td style="padding: 12px; text-align: left;">{{this.name}}</td>
                         <td style="padding: 12px; text-align: left;">{{this.quantity}}</td>
-                        <td style="padding: 12px; text-align: left;">${{this.price}}</td>
+                        <td style="padding: 12px; text-align: left;">₦{{this.price}}</td>
                     </tr>
                 {{/each}}
             </tbody>
@@ -32,7 +32,7 @@
 
         <!-- Order Summary -->
         <div style="margin-top: 20px; font-size: 16px;">
-            <p><strong>Total: ${{totalPrice}}</strong></p>
+            <p><strong>Total: ₦{{totalPrice}}</strong></p>
             <p><strong>Order Status: {{orderStatus}}</strong></p>
             <p><strong>Order Date:</strong> {{formatDate createdAt}}</p>
         </div>

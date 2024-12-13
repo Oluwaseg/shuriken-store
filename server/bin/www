@@ -48,15 +48,19 @@ console.log('Socket.IO initialized');
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  socket.on('disconnect', () => {
-    console.log('A user disconnected:', socket.id);
-  });
+  // socket.on('order-update', (data) => {
+  //   console.log('Order Update:', data);
+  //   io.emit('order-update', data); // Broadcast to all clients
+  // });
 
-  socket.on('order-update', (data) => {
-    console.log('Order Update:', data);
-    io.emit('order-update', data); // Broadcast to all clients
+  socket.emit('message', 'Welcome to the Socket.IO server!');
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
   });
 });
+
+export { io };
 
 /**
  * Listen on provided port, on all network interfaces.

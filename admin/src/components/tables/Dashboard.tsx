@@ -109,7 +109,7 @@ const Dashboard: React.FC = () => {
               <div className='mx-4'>
                 <h4 className='text-2xl font-semibold text-gray-700 dark:text-white'>
                   {totalIncome !== null
-                    ? `$${totalIncome.toLocaleString()}`
+                    ? `₦${totalIncome.toLocaleString()}`
                     : 'Loading...'}
                 </h4>
                 <div className='text-gray-500 dark:text-white'>

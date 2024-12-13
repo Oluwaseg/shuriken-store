@@ -174,6 +174,16 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     }
   };
 
+  const formatDate = (date: string | Date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
   return (
     <div className='fixed inset-0 bg-gray-500  bg-opacity-75 flex items-center justify-center z-[10] overflow-y-auto'>
       <Toaster position='top-right' />
@@ -207,9 +217,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     type='text'
                     name='name'
                     id='name'
-                    value={productData.name}
+                    value={productData.name || ''}
                     onChange={handleChange}
-                    required
+                    required={true}
                     className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                   />
                 </div>
@@ -225,9 +235,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     id='description'
                     name='description'
                     rows={4}
-                    value={productData.description}
+                    value={productData.description || ''}
                     onChange={handleChange}
-                    required
+                    required={true}
                     className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                   />
                 </div>
@@ -247,9 +257,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                       type='number'
                       name='price'
                       id='price'
-                      value={productData.price}
+                      value={productData.price || ''}
                       onChange={handleChange}
-                      required
+                      required={true}
                       className='mt-2 block w-full rounded-md border border-gray-300 pl-8 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                       placeholder='0.00'
                     />
@@ -266,9 +276,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   <select
                     name='stock'
                     id='stock'
-                    value={productData.stock.toString()}
+                    value={productData.stock.toString() || ''}
                     onChange={handleChange}
-                    required
+                    required={true}
                     className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                   >
                     <option value=''>Select stock quantity</option>
@@ -290,9 +300,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   <select
                     name='category'
                     id='category'
-                    value={productData.category}
+                    value={productData.category || ''}
                     onChange={handleChange}
-                    required
+                    required={true}
                     className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                   >
                     <option value=''>Select a category</option>
@@ -339,9 +349,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                     type='text'
                     name='brand'
                     id='brand'
-                    value={productData.brand}
+                    value={productData.brand || ''}
                     onChange={handleChange}
-                    required
+                    required={false}
                     className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                   />
                 </div>
@@ -356,9 +366,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   <select
                     name='bestSeller'
                     id='bestSeller'
-                    value={String(productData.bestSeller)}
+                    value={String(productData.bestSeller) || ''}
                     onChange={handleChange}
-                    required
+                    required={false}
                     className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                   >
                     <option value='true'>Yes</option>
@@ -414,7 +424,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   </div>
                   <div className='mt-2'>
                     <ImageCarousel
-                      images={productData.images}
+                      images={productData.images || []}
                       onRemove={handleRemoveImage}
                       heading='Existing Images'
                     />
@@ -431,9 +441,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   <select
                     name='discount.isDiscounted'
                     id='discount.isDiscounted'
-                    value={String(productData.discount.isDiscounted)}
+                    value={String(productData.discount.isDiscounted) || ''}
                     onChange={handleChange}
-                    required
+                    required={false}
                     className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                   >
                     <option value='true'>Yes</option>
@@ -453,9 +463,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                           type='number'
                           name='discount.discountPercent'
                           id='discount.discountPercent'
-                          value={productData.discount.discountPercent}
+                          value={productData.discount.discountPercent || ''}
                           onChange={handleChange}
-                          required
+                          required={false}
                           className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                           placeholder='0'
                         />
@@ -474,9 +484,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   <select
                     name='flashSale.isFlashSale'
                     id='flashSale.isFlashSale'
-                    value={String(productData.flashSale.isFlashSale)}
+                    value={String(productData.flashSale.isFlashSale) || ''}
                     onChange={handleChange}
-                    required
+                    required={false}
                     className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                   >
                     <option value='true'>Yes</option>
@@ -496,9 +506,9 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                           type='number'
                           name='flashSale.flashSalePrice'
                           id='flashSale.flashSalePrice'
-                          value={productData.flashSale.flashSalePrice}
+                          value={productData.flashSale.flashSalePrice || ''}
                           onChange={handleChange}
-                          required={productData.flashSale.isFlashSale}
+                          required={productData.flashSale.isFlashSale || ''}
                           className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                           placeholder='0'
                         />
@@ -515,9 +525,15 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                           type='datetime-local'
                           name='flashSale.flashSaleEndTime'
                           id='flashSale.flashSaleEndTime'
-                          value={productData.flashSale.flashSaleEndTime}
+                          value={
+                            productData.flashSale.flashSaleEndTime
+                              ? formatDate(
+                                  productData.flashSale.flashSaleEndTime
+                                )
+                              : ''
+                          }
                           onChange={handleChange}
-                          required={productData.flashSale.isFlashSale}
+                          required={productData.flashSale.isFlashSale || ''}
                           className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
                         />
                       </div>
