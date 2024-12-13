@@ -52,7 +52,7 @@ export const sendOTP = async (user) => {
   const otpMessage = hbs.compile(templateSource)({
     userName: user.name,
     otp,
-    companyUrl: 'https://yourcompany.com',
+    companyUrl: 'https://shuriken-store.vercel.app',
     currentDate: formattedDate,
   });
 
@@ -94,7 +94,7 @@ export const sendWelcomeEmail = async (user) => {
   // Generate the email content by passing dynamic data to the template
   const htmlContent = welcomeMessage({
     userName: user.name,
-    companyUrl: 'https://yourcompany.com',
+    companyUrl: 'https://shuriken-store.vercel.app',
     currentDate: formattedDate,
     year: new Date().getFullYear(), // Add the year for the footer
   });
@@ -121,6 +121,7 @@ export const sendPasswordReset = async (user, resetUrl) => {
   const resetMessage = hbs.compile(templateSource)({
     userName: user.name,
     resetUrl: resetUrl,
+    companyUrl: 'https://shuriken-store.vercel.app',
   });
 
   try {
@@ -137,11 +138,10 @@ export const sendPasswordReset = async (user, resetUrl) => {
     throw new Error('Failed to send password reset email');
   }
 };
+const currentDate = new Date();
+const formattedDate = formatDate(currentDate);
 
 export const sendPasswordResetSuccess = async (user) => {
-  const currentDate = new Date();
-  const formattedDate = formatDate(currentDate);
-
   const resetSuccessTemplatePath = path.join(
     __dirname,
     '../emails/templates/reset_password.hbs'
@@ -151,6 +151,8 @@ export const sendPasswordResetSuccess = async (user) => {
 
   const resetSuccessMessage = hbs.compile(templateSource)({
     userName: user.name,
+    companyUrl: 'https://shuriken-store.vercel.app',
+    currentDate: formattedDate,
   });
 
   try {
@@ -188,6 +190,8 @@ export const sendOrderConfirmation = async (user, order) => {
   const templateSource = fs.readFileSync(templatePath, 'utf-8');
   const orderConfirmationMessage = hbs.compile(templateSource)({
     userName: user.name,
+    companyUrl: 'https://shuriken-store.vercel.app',
+    currentDate: formattedDate,
     orderItems: plainOrder.orderItems,
     totalPrice: plainOrder.totalPrice,
     orderStatus: plainOrder.orderStatus,
@@ -239,6 +243,8 @@ export const sendOrderStatusUpdate = async (
   const templateSource = fs.readFileSync(statusUpdateTemplatePath, 'utf-8');
   const orderStatusUpdateMessage = hbs.compile(templateSource)({
     userName: user.name,
+    companyUrl: 'https://shuriken-store.vercel.app',
+    currentDate: formattedDate,
     orderItems: plainOrder.orderItems,
     totalPrice: plainOrder.totalPrice,
     orderStatus: plainOrder.orderStatus,

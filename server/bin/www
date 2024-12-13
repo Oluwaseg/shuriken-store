@@ -46,17 +46,15 @@ console.log('Socket.IO initialized');
 
 // Socket.IO Logic
 io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+  console.log('A user connected:', socket.id); // This should log when a user connects
+  // Emit an event to the client
+  socket.emit('newReview', { productId: '675b7fc72b196e4930cd1212' });
 
-  // socket.on('order-update', (data) => {
-  //   console.log('Order Update:', data);
-  //   io.emit('order-update', data); // Broadcast to all clients
-  // });
-
-  socket.emit('message', 'Welcome to the Socket.IO server!');
+  // You can also emit the 'updatedReview' event as needed
+  socket.emit('updatedReview', { productId: '675b7fc72b196e4930cd1212' });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
+    console.log('User disconnected:', socket.id); // This should log when a user disconnects
   });
 });
 

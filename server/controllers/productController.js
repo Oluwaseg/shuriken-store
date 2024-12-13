@@ -352,6 +352,14 @@ export const createReview = catchAsync(async (req, res, next) => {
     // Populate user details in the updated review
     await product.populate('reviews.user', 'name email avatar');
 
+    // Emit the updated review to connected clients
+    console.log('Emitting updateReview for product:', productId);
+
+    io.emit('updateReview', {
+      productId,
+      review: existingReview,
+    });
+
     await Activity.create({
       action: 'update',
       product: product._id,
@@ -381,7 +389,7 @@ export const createReview = catchAsync(async (req, res, next) => {
 
     await product.save();
 
-    // Emit the new review to connected clients
+    console.log('Emitting newReview for product:', productId);
     io.emit('newReview', {
       productId,
       review: newReview,
