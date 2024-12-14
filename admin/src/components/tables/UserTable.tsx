@@ -75,7 +75,11 @@ const UsersTable: React.FC = () => {
   };
 
   if (loading) {
-    return <PagePreloader />;
+    return (
+      <div className='min-h-screen flex items-center justify-center dark:bg-gray-900'>
+        <PagePreloader />
+      </div>
+    );
   }
 
   return (
@@ -83,7 +87,9 @@ const UsersTable: React.FC = () => {
       <Toaster position='top-right' />
       {/* Heading Section */}
       <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-2xl font-semibold text-gray-700'>User Table</h1>
+        <h1 className='text-2xl font-semibold text-gray-700 dark:text-white prata'>
+          User Table
+        </h1>
         <button
           className='px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600'
           onClick={() =>
@@ -96,43 +102,43 @@ const UsersTable: React.FC = () => {
       <div className='mt-8'>
         <div className='flex flex-col mt-8'>
           <div className='-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8'>
-            <div className='align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200'>
+            <div className='align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200 dark:border-gray-700'>
               <table className='min-w-full'>
                 <thead>
                   <tr>
-                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
                       #
                     </th>
-                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
                       Image
                     </th>
-                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
                       Name
                     </th>
-                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
                       Email
                     </th>
-                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
                       Role
                     </th>
-                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
                       Joined On
                     </th>
-                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
                       Verified
                     </th>
-                    <th className='px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider'>
+                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className='bg-white'>
+                <tbody className='bg-white dark:bg-gray-800'>
                   {users.map((user, index) => (
                     <tr key={user._id}>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
                         {index + 1}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
                         <img
                           src={
                             user.avatar[0]?.url ||
@@ -142,30 +148,30 @@ const UsersTable: React.FC = () => {
                           className='w-10 h-10 rounded-full object-cover'
                         />
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                      <td className='px-6 py-4 whitespace-nowrap border-b border-gray-200 dark:border-gray-700'>
                         {user.name}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
                         {user.email}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
                         {user.role}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
                         {user.isVerified ? (
                           <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800'>
                             Verified
                           </span>
                         ) : (
-                          <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800'>
+                          <span className='px-2 inline-flex whitespace-nowrap text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800'>
                             Not Verified
                           </span>
                         )}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
                         <div className='flex items-center space-x-4'>
                           <button
                             onClick={() => handleEditClick(user)}

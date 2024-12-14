@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { SyncLoader } from 'react-spinners';
-import { verifyPayment } from '../api/payment';
+import { verifyPayment } from '../../api/payment';
 
 const PaymentSuccessPage: React.FC = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
-import BlogList from '../components/template/BlogList';
-import FeaturedPost from '../components/template/FeaturedPost';
-import Sidebar from '../components/template/Sidebar';
+import BlogList from '../../components/template/BlogList';
+import FeaturedPost from '../../components/template/FeaturedPost';
+import Sidebar from '../../components/template/Sidebar';
 
 const Blog = () => {
   return (

@@ -7,7 +7,7 @@ import {
   FaPhone,
   FaTwitter,
 } from 'react-icons/fa';
-import { useFormValidation } from '../hooks/useFormValidation';
+import { useFormValidation } from '../../hooks/useFormValidation';
 
 const Contact: React.FC = () => {
   const { values, errors, handleChange, validateForm } = useFormValidation({

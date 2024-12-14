@@ -3,8 +3,8 @@ import { FaArrowLeft, FaCalendarAlt } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { SyncLoader } from 'react-spinners';
-import { AppDispatch, RootState } from '../app/store';
-import { fetchSingleOrder } from '../features/orders/orderSlice';
+import { AppDispatch, RootState } from '../../app/store';
+import { fetchSingleOrder } from '../../features/orders/orderSlice';
 
 const OrderDetails: React.FC = () => {
   const { orderId } = useParams<{ orderId: string }>();

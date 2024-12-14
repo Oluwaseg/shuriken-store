@@ -7,7 +7,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Nomina", sans-serif;
+    font-family: 'Nomina', sans-serif;
   }
 
   body {
@@ -19,7 +19,7 @@
   }
 
   .fonts {
-    font-family: "Calesta", serif;
+    font-family: 'Calesta', serif;
   }
 }
 
@@ -122,12 +122,16 @@
 @layer components {
   .preloader {
     @apply fixed inset-0 w-screen h-screen bg-opacity-80 flex items-center justify-center z-[9999];
-    background-color: theme("colors.primary");
+    background-color: theme('colors.primary');
+  }
+
+  .pageloader {
+    @apply flex items-center justify-center bg-opacity-80 bg-primary dark:bg-gray-900;
   }
 
   .spinner {
     @apply border-8 border-solid border-t-secondary rounded-full w-12 h-12;
-    border-color: theme("colors.secondary") transparent;
+    border-color: theme('colors.secondary') transparent;
     animation: spin 1s linear infinite;
   }
 }
@@ -139,4 +143,14 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+/* Hide scrollbars everywhere */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Edge */
 }

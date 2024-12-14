@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { FaChevronLeft, FaChevronRight, FaEye, FaTrash } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import PagePreloader from '../PagePreloader';
 import { deleteOrder, fetchOrders, updateOrderStatus } from './apis/orders';
 import { Order } from './types/type';
 
@@ -10,6 +11,7 @@ const ITEMS_PER_PAGE = 10;
 const OrderTable: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showPreloader, setShowPreloader] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   useEffect(() => {
@@ -24,8 +26,14 @@ const OrderTable: React.FC = () => {
         setLoading(false);
       }
     };
+    // Simulate preloader delay
+    const timer = setTimeout(() => {
+      setShowPreloader(false);
+      loadOrders();
+    }, 3000); // 3 seconds
 
-    loadOrders();
+    // Cleanup timeout
+    return () => clearTimeout(timer);
   }, []);
 
   const handleStatusChange = async (id: string, status: string) => {
@@ -70,10 +78,16 @@ const OrderTable: React.FC = () => {
     }
   };
 
+  if (showPreloader)
+    return (
+      <div className='min-h-screen flex items-center justify-center dark:bg-gray-900'>
+        <PagePreloader />
+      </div>
+    );
   if (loading)
     return (
-      <div className='flex justify-center items-center h-64'>
-        <div className='animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900 dark:border-gray-100'></div>
+      <div className='min-h-screen flex items-center justify-center dark:bg-gray-800'>
+        <PagePreloader />
       </div>
     );
 
@@ -105,9 +119,9 @@ const OrderTable: React.FC = () => {
 
   return (
     <div className='space-y-6'>
-      <div className='overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg'>
+      <div className='overflow-x-auto bg-white dark:bg-gray-900 rounded-lg shadow-lg'>
         <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
-          <thead className='bg-gray-50 dark:bg-gray-700'>
+          <thead className='bg-gray-50 dark:bg-gray-800'>
             <tr>
               {[
                 '#',

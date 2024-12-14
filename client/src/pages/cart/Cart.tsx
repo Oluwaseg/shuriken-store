@@ -2,16 +2,16 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoTrash } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
-import { getProductById } from '../api/product';
+import { getProductById } from '../../api/product';
 import {
   addOrUpdateCart,
   clearUserCart,
   fetchCart,
   removeCartItem,
   setLocalCart,
-} from '../features/cart/cartSlice';
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { Cart, Product, ProductsApiResponse } from '../types/type';
+} from '../../features/cart/cartSlice';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { Cart, Product, ProductsApiResponse } from '../../types/type';
 
 const CartPage: React.FC = () => {
   const [productDetails, setProductDetails] = useState<{

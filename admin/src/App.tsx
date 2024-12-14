@@ -7,6 +7,7 @@ import Analytics from './pages/Analytics';
 import Category from './pages/Category';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
+import NotFound from './pages/NotFound';
 import OrderDetailPage from './pages/OrderDetailPage';
 import Orders from './pages/Orders';
 import Products from './pages/Products';
@@ -134,6 +135,7 @@ const App: React.FC = () => {
           </ProtectedRoute>
         }
       />
+      <Route path='*' element={<NotFound />} />
     </Routes>
   );
 };
