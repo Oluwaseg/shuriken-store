@@ -57,23 +57,29 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
+      {/* Background Overlay */}
       <div
-        className={`fixed inset-0 bg-gray-800 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-gray-800 dark:bg-black bg-opacity-50 transition-opacity duration-300 ${
           isVisible ? 'opacity-75' : 'opacity-0'
         }`}
         onClick={handleClose}
       ></div>
+
+      {/* Modal Content */}
       <div
-        className={`bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg z-10 w-full max-w-md transform transition-transform duration-300 ${
+        className={`bg-body-light dark:bg-body-dark p-6 rounded-lg shadow-lg z-10 w-full max-w-md transform transition-transform duration-300 ${
           isVisible ? 'scale-100 translate-y-0' : 'scale-90 translate-y-4'
         }`}
       >
-        <h3 className='text-lg font-semibold mb-4'>Edit Category</h3>
+        <h3 className='text-lg font-semibold text-text-primary-light dark:text-text-primary-dark mb-4'>
+          Edit Category
+        </h3>
         <form onSubmit={handleSubmit} className='space-y-4'>
+          {/* Name Field */}
           <div>
             <label
               htmlFor='name'
-              className='block text-sm font-medium text-gray-700 dark:text-white'
+              className='block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark'
             >
               Name
             </label>
@@ -83,13 +89,15 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className='mt-1 block dark:bg-gray-800 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm'
+              placeholder='Enter Category Name'
+              className='mt-1 block w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md shadow-sm focus:outline-none focus:ring-accent-light focus:border-accent-light dark:focus:ring-accent-dark dark:focus:border-accent-dark bg-input-light dark:bg-input-dark text-text-primary-light dark:text-text-primary-dark'
             />
           </div>
+          {/* Description Field */}
           <div>
             <label
               htmlFor='description'
-              className='block text-sm font-medium text-gray-700 dark:text-white'
+              className='block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark'
             >
               Description
             </label>
@@ -97,21 +105,23 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
               id='description'
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className='mt-1 block dark:bg-gray-800 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm'
+              placeholder='Enter Category Description'
+              className='mt-1 block w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md shadow-sm focus:outline-none focus:ring-accent-light focus:border-accent-light dark:focus:ring-accent-dark dark:focus:border-accent-dark bg-input-light dark:bg-input-dark text-text-primary-light dark:text-text-primary-dark'
               rows={4}
             />
           </div>
+          {/* Buttons */}
           <div className='flex justify-end space-x-2'>
             <button
               type='button'
               onClick={handleClose}
-              className='px-4 py-2 bg-red-600 dark:bg-red-600 dark:hover:bg-red-800 text-white font-semibold rounded-md'
+              className='px-4 py-2 bg-border-light dark:bg-border-dark text-text-secondary-light dark:text-text-secondary-dark font-semibold rounded-md shadow-sm hover:bg-gray-200 dark:hover:bg-dark-secondary duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-light dark:focus:ring-accent-dark'
             >
               Cancel
             </button>
             <button
               type='submit'
-              className='px-4 py-2 bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 text-white font-semibold rounded-md'
+              className='px-4 py-2 bg-button-primary-light dark:bg-button-primary-dark text-white font-semibold rounded-md shadow-sm hover:bg-button-primary-hover-light dark:hover:bg-button-primary-hover-dark duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-light dark:focus:ring-accent-dark'
             >
               Save
             </button>

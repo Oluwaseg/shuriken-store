@@ -28,17 +28,17 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null); // Track which dropdown is open
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
 
   const navigate = useNavigate();
   const isDarkMode = useSelector(
     (state: RootState) => state.darkMode.isDarkMode
-  ); // Redux dark mode state
+  );
 
   const toggleTheme = () => {
-    dispatch(toggleDarkMode()); // Dispatch toggleDarkMode action
+    dispatch(toggleDarkMode());
   };
 
   const links = [
@@ -78,36 +78,31 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     toggleSidebar();
   };
 
-  // Handle logout
   const handleLogout = () => {
     dispatch(logoutUser())
       .unwrap()
       .then(() => {
-        navigate('/login'); // Navigate to login page after successful logout
+        navigate('/login');
       })
       .catch((error: { message: string }) => {
         console.error('Logout failed:', error.message);
-        // Optionally, show a toast for logout failure
       });
   };
 
   return (
     <>
-      {/* Overlay for mobile */}
       <div
-        className={`fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-20 transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 bg-body-dark/50 backdrop-blur-sm z-20 transition-opacity duration-300 lg:hidden ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={toggleSidebar}
       ></div>
 
-      {/* Sidebar */}
       <aside
         className={`fixed top-0 left-0 z-30 w-[280px] h-screen transition-all duration-300 transform ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } bg-white dark:bg-gray-800 text-gray-800 dark:text-white lg:translate-x-0 lg:static lg:h-auto overflow-y-auto`}
+        } bg-body-light dark:bg-body-dark text-text-primary-light dark:text-text-primary-dark lg:translate-x-0 lg:static lg:h-auto overflow-y-auto shadow-sm`}
       >
-        {/* Header */}
         <div className='flex items-center justify-between px-4 py-4'>
           <div className='flex items-center'>
             <div className={`relative w-12 h-12`}>
@@ -116,25 +111,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 <Shuriken className='w-1/2 h-1/2 object-contain' />
               </div>
             </div>
-
-            <span className='text-gray-800 dark:text-gray-200 text-2xl font-semibold ml-2 whitespace-nowrap'>
+            <span className='text-text-primary-light dark:text-text-primary-dark text-2xl font-semibold ml-2 whitespace-nowrap'>
               Admin Panel
             </span>
           </div>
-          {/* Theme Switch */}
           <button
             onClick={toggleTheme}
-            className='p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700'
+            className='p-2 rounded-full hover:bg-border-light dark:hover:bg-border-dark'
           >
             {isDarkMode ? (
-              <FaSun className='h-5 w-5 text-yellow-400' />
+              <FaSun className='h-5 w-5 text-accent-light' />
             ) : (
-              <FaMoon className='h-5 w-5 text-gray-500' />
+              <FaMoon className='h-5 w-5 text-accent-dark' />
             )}
           </button>
         </div>
 
-        {/* Navigation Links */}
         <nav className='mt-4 px-4 space-y-2'>
           {links.map((link) =>
             link.subLinks ? (
@@ -144,8 +136,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                   className={`flex items-center justify-between py-3 px-4 rounded-lg transition-colors duration-150 cursor-pointer ${
                     isSubLinkActive(link.subLinks) ||
                     openDropdown === link.label
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-white'
+                      ? 'bg-accent-light text-white dark:bg-accent-dark'
+                      : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-border-light dark:hover:bg-border-dark hover:text-text-primary-light dark:hover:text-text-primary-dark'
                   }`}
                 >
                   <div className='flex items-center'>
@@ -168,8 +160,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                         className={({ isActive }) =>
                           `block py-2 px-4 rounded-lg transition-colors duration-150 ${
                             isActive
-                              ? 'bg-indigo-600 text-white'
-                              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-white'
+                              ? 'bg-accent-light text-white dark:bg-accent-dark'
+                              : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-border-light dark:hover:bg-border-dark hover:text-text-primary-light dark:hover:text-text-primary-dark'
                           }`
                         }
                       >
@@ -187,8 +179,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 className={({ isActive }) =>
                   `flex items-center py-3 px-4 rounded-lg transition-colors duration-150 ${
                     isActive
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-white'
+                      ? 'bg-accent-light text-white dark:bg-accent-dark'
+                      : 'text-text-secondary-light dark:text-text-secondary-dark hover:bg-border-light dark:hover:bg-border-dark hover:text-text-primary-light dark:hover:text-text-primary-dark'
                   }`
                 }
               >
@@ -199,11 +191,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           )}
         </nav>
 
-        {/* Footer */}
-        <div className='sticky bottom-0 w-full border-t border-gray-200 dark:border-gray-700 mt-auto py-4 px-4 bg-white dark:bg-gray-800'>
+        <div className='sticky bottom-0 w-full border-t border-border-light dark:border-border-dark mt-auto py-4 px-4 bg-body-light dark:bg-body-dark'>
           <button
             onClick={handleLogout}
-            className='flex items-center py-3 px-4 rounded-lg transition-colors duration-150 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-white'
+            className='flex items-center py-3 px-4 rounded-lg transition-colors duration-150 hover:bg-border-light dark:hover:bg-border-dark hover:text-text-primary-light dark:hover:text-text-primary-dark'
           >
             <FaSignOutAlt className='h-5 w-5' />
             <span className='mx-3'>Sign Out</span>

@@ -14,7 +14,7 @@ const Layout = ({ children }: LayoutProps) => {
   };
 
   return (
-    <div className='flex h-screen bg-gray-100 dark:bg-gray-900 '>
+    <div className='flex h-screen bg-body-light dark:bg-body-dark '>
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       <div className='flex flex-col flex-1 overflow-hidden '>
         <Navbar toggleSidebar={toggleSidebar} />

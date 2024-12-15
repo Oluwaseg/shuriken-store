@@ -21,7 +21,6 @@ const CumulativeOrdersChart: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await fetchOrdersData();
-        console.log('Raw Data:', response);
 
         // Get the current date and filter based on the selected months
         const currentDate = new Date();

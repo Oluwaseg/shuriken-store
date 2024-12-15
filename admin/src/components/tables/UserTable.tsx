@@ -76,7 +76,7 @@ const UsersTable: React.FC = () => {
 
   if (loading) {
     return (
-      <div className='min-h-screen flex items-center justify-center dark:bg-gray-900'>
+      <div className='min-h-screen flex items-center justify-center bg-body-light dark:bg-body-dark'>
         <PagePreloader />
       </div>
     );
@@ -87,11 +87,11 @@ const UsersTable: React.FC = () => {
       <Toaster position='top-right' />
       {/* Heading Section */}
       <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-2xl font-semibold text-gray-700 dark:text-white prata'>
+        <h1 className='text-2xl font-semibold text-text-primary-light dark:text-text-primary-dark'>
           User Table
         </h1>
         <button
-          className='px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600'
+          className='px-4 py-2 bg-button-primary-light dark:bg-button-primary-dark text-body-light dark:text-body-dark text-sm font-medium rounded-md hover:bg-button-hover-light dark:hover:bg-button-hover-dark'
           onClick={() =>
             toast('Add user functionality coming soon!', { icon: '🚧' })
           }
@@ -102,43 +102,36 @@ const UsersTable: React.FC = () => {
       <div className='mt-8'>
         <div className='flex flex-col mt-8'>
           <div className='-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8'>
-            <div className='align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200 dark:border-gray-700'>
+            <div className='align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-border-light dark:border-border-dark'>
               <table className='min-w-full'>
                 <thead>
                   <tr>
-                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
-                      #
-                    </th>
-                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
-                      Image
-                    </th>
-                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
-                      Name
-                    </th>
-                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
-                      Email
-                    </th>
-                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
-                      Role
-                    </th>
-                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
-                      Joined On
-                    </th>
-                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
-                      Verified
-                    </th>
-                    <th className='px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-left text-xs leading-4 font-medium text-gray-500 dark:text-white uppercase tracking-wider'>
-                      Actions
-                    </th>
+                    {[
+                      '#',
+                      'Image',
+                      'Name',
+                      'Email',
+                      'Role',
+                      'Joined On',
+                      'Verified',
+                      'Actions',
+                    ].map((heading) => (
+                      <th
+                        key={heading}
+                        className='px-6 py-3 border-b border-border-light dark:border-border-dark bg-body-light dark:bg-dark-light text-left text-xs leading-4 font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider'
+                      >
+                        {heading}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
-                <tbody className='bg-white dark:bg-gray-800'>
+                <tbody className='bg-body-light dark:bg-dark-light'>
                   {users.map((user, index) => (
                     <tr key={user._id}>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-border-light dark:border-border-dark'>
                         {index + 1}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-border-light dark:border-border-dark'>
                         <img
                           src={
                             user.avatar[0]?.url ||
@@ -148,34 +141,34 @@ const UsersTable: React.FC = () => {
                           className='w-10 h-10 rounded-full object-cover'
                         />
                       </td>
-                      <td className='px-6 py-4 whitespace-nowrap border-b border-gray-200 dark:border-gray-700'>
+                      <td className='px-6 py-4 whitespace-nowrap border-b border-border-light dark:border-border-dark'>
                         {user.name}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-border-light dark:border-border-dark'>
                         {user.email}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-border-light dark:border-border-dark'>
                         {user.role}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-border-light dark:border-border-dark'>
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-border-light dark:border-border-dark'>
                         {user.isVerified ? (
-                          <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800'>
+                          <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-accent-light text-body-light'>
                             Verified
                           </span>
                         ) : (
-                          <span className='px-2 inline-flex whitespace-nowrap text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800'>
+                          <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 whitespace-nowrap'>
                             Not Verified
                           </span>
                         )}
                       </td>
-                      <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700'>
+                      <td className='px-6 py-4 whitespace-no-wrap border-b border-border-light dark:border-border-dark'>
                         <div className='flex items-center space-x-4'>
                           <button
                             onClick={() => handleEditClick(user)}
-                            className='text-blue-500 hover:text-blue-700'
+                            className='text-accent-light dark:text-accent-dark hover:text-accent-secondary-light dark:hover:text-accent-secondary-dark'
                           >
                             <FaEdit />
                           </button>

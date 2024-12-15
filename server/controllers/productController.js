@@ -221,7 +221,7 @@ export const updateProduct = catchAsync(async (req, res, next) => {
     );
 
     if (!updatedProduct) {
-      return next(new ErrorHandler('Product not found', 404));
+      return next(new ErrorHandler('Product not found after update', 404));
     }
 
     // Log activity
@@ -232,14 +232,11 @@ export const updateProduct = catchAsync(async (req, res, next) => {
       activity: `Updated product: ${updatedProduct.name}`,
     });
 
-    console.log('Updated Product:', updatedProduct);
-
     res.status(200).json({
       success: true,
       product: updatedProduct,
     });
   } catch (error) {
-    console.error('Error in updateProduct:', error);
     next(error);
   }
 });

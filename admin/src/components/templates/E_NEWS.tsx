@@ -43,12 +43,12 @@ const E_NEWS: React.FC = () => {
   }, []);
 
   return (
-    <div className='mt-8 bg-white dark:bg-gray-800 shadow-sm rounded-lg'>
+    <div className='mt-8 bg-body-light dark:bg-body-dark shadow-sm rounded-lg'>
       <div className='p-4 border-b flex items-center justify-between'>
         <div className='flex items-center'>
           <FaNewspaper className='text-blue-600 mr-2' />
           <h4 className='text-lg font-semibold text-gray-800 dark:text-white'>
-            Ecommerce News
+            E-commerce News
           </h4>
         </div>
       </div>

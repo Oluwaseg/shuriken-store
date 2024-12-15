@@ -1,5 +1,7 @@
 import React, { FormEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { FaSave } from 'react-icons/fa';
+import { IoMdClose } from 'react-icons/io';
 import apiClient from '../../services/apiClient';
 
 interface Category {
@@ -69,15 +71,24 @@ const EditSubcategoryModal: React.FC<EditSubcategoryModalProps> = ({
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-      <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full'>
-        <h2 className='text-2xl font-semibold dark:text-white mb-4'>
-          Edit Subcategory
-        </h2>
+      <div className='bg-body-light dark:bg-body-dark p-6 rounded-lg shadow-lg max-w-md w-full'>
+        <div className='flex justify-between items-center mb-4'>
+          <h2 className='text-2xl font-semibold text-text-primary-light dark:text-text-primary-dark'>
+            Edit Subcategory
+          </h2>
+          <button
+            onClick={onClose}
+            className='text-text-secondary-light dark:text-text-secondary-dark hover:text-accent-light dark:hover:text-accent-dark transition-colors'
+            aria-label='Close modal'
+          >
+            <IoMdClose size={24} />
+          </button>
+        </div>
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div>
             <label
               htmlFor='name'
-              className='block text-sm font-medium text-gray-700 dark:text-white'
+              className='block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1'
             >
               Name
             </label>
@@ -88,13 +99,13 @@ const EditSubcategoryModal: React.FC<EditSubcategoryModalProps> = ({
               onChange={(e) => setName(e.target.value)}
               required
               placeholder='Enter Subcategory Name'
-              className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm bg-primary dark:bg-gray-800 dark:text-white'
+              className='w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark focus:border-transparent bg-input-light dark:bg-input-dark text-text-light dark:text-text-dark placeholder-placeholder-light dark:placeholder-placeholder-dark'
             />
           </div>
           <div>
             <label
               htmlFor='category'
-              className='block text-sm font-medium text-gray-700 dark:text-white'
+              className='block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1'
             >
               Category
             </label>
@@ -103,7 +114,7 @@ const EditSubcategoryModal: React.FC<EditSubcategoryModalProps> = ({
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               required
-              className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm bg-primary dark:bg-gray-800 dark:text-white'
+              className='w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark focus:border-transparent bg-input-light dark:bg-input-dark text-text-light dark:text-text-dark'
             >
               <option value=''>Select Category</option>
               {categories.map((category) => (
@@ -116,7 +127,7 @@ const EditSubcategoryModal: React.FC<EditSubcategoryModalProps> = ({
           <div>
             <label
               htmlFor='description'
-              className='block text-sm font-medium text-gray-700 dark:text-white'
+              className='block text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1'
             >
               Description
             </label>
@@ -125,22 +136,23 @@ const EditSubcategoryModal: React.FC<EditSubcategoryModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder='Enter Subcategory Description'
-              className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm bg-primary dark:bg-gray-800 dark:text-white'
+              className='w-full px-3 py-2 border border-border-light dark:border-border-dark rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark focus:border-transparent bg-input-light dark:bg-input-dark text-text-light dark:text-text-dark placeholder-placeholder-light dark:placeholder-placeholder-dark'
               rows={4}
             />
           </div>
-          <div className='flex justify-end space-x-2'>
+          <div className='flex justify-end space-x-2 pt-4'>
             <button
               type='button'
               onClick={onClose}
-              className='px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded-md shadow-sm hover:bg-gray-400 duration-200 focus:outline-none'
+              className='px-4 py-2 bg-button-secondary-light dark:bg-button-secondary-dark text-text-secondary-light dark:text-text-secondary-dark font-semibold rounded-md shadow-sm hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-light dark:focus:ring-accent-dark'
             >
               Cancel
             </button>
             <button
               type='submit'
-              className='px-4 py-2 bg-secondary text-white font-semibold rounded-md shadow-sm hover:bg-secondary hover:bg-opacity-50 duration-200 focus:outline-none'
+              className='px-4 py-2 bg-button-primary-light dark:bg-button-primary-dark text-white font-semibold rounded-md shadow-sm hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-light dark:focus:ring-accent-dark flex items-center'
             >
+              <FaSave className='mr-2' />
               Save Changes
             </button>
           </div>

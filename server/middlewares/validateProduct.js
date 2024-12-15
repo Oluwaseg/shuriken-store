@@ -104,13 +104,14 @@ export const updateProductSchema = Joi.object({
 }).prefs({ convert: true, allowUnknown: true }); // Allow unknown fields for flexibility
 
 export const validateUpdateProduct = (req, res, next) => {
-  // Transforming discount fields correctly
   const transformedBody = {
     ...req.body,
     bestSeller: req.body.bestSeller === 'true',
     discount: {
       isDiscounted: req.body['discount.isDiscounted'] === 'true',
-      discountPercent: Number(req.body['discount.discountPercent']),
+      discountPercent: req.body['discount.discountPercent']
+        ? Number(req.body['discount.discountPercent'])
+        : 0,
     },
     flashSale: {
       isFlashSale: req.body['flashSale.isFlashSale'] === 'true',
@@ -119,9 +120,13 @@ export const validateUpdateProduct = (req, res, next) => {
         : 0,
       flashSaleEndTime: req.body['flashSale.flashSaleEndTime'] || null,
     },
+    removeImages: Array.isArray(req.body.removeImages)
+      ? req.body.removeImages
+      : req.body.removeImages
+      ? [req.body.removeImages]
+      : [],
   };
 
-  // Clean up old discount and flash sale fields
   delete transformedBody['discount.isDiscounted'];
   delete transformedBody['discount.discountPercent'];
   delete transformedBody['flashSale.isFlashSale'];
@@ -130,7 +135,6 @@ export const validateUpdateProduct = (req, res, next) => {
 
   req.body = transformedBody;
 
-  // Validation
   const { error } = updateProductSchema.validate(req.body, {
     abortEarly: false,
   });

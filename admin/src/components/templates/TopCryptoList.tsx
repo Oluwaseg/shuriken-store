@@ -50,9 +50,15 @@ const TopCryptoList: React.FC = () => {
         <table className='min-w-full'>
           <thead>
             <tr className='text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-              <th className='py-2'>Name</th>
-              <th className='py-2'>Price</th>
-              <th className='py-2'>24h Change</th>
+              <th className='py-2 text-text-primary-light dark:text-text-primary-dark whitespace-nowrap'>
+                Name
+              </th>
+              <th className='py-2 text-text-primary-light dark:text-text-primary-dark whitespace-nowrap'>
+                Price
+              </th>
+              <th className='py-2 text-text-primary-light dark:text-text-primary-dark whitespace-nowrap'>
+                24h Change
+              </th>
             </tr>
           </thead>
           <tbody className='text-sm'>

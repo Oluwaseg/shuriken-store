@@ -1,7 +1,6 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { MdClose } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
 import apiClient from '../../services/apiClient';
 import ImageCarousel from '../previews/ImageCarousel';
 
@@ -67,7 +66,6 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [fileInputKey, setFileInputKey] = useState<number>(Date.now());
   const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -202,15 +200,15 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75'>
-      <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto'>
+      <div className='bg-body-light dark:bg-dark-light rounded-lg shadow-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto'>
         <div
-          className='bg-gray-950 bg-opacity-75 fixed inset-0'
+          className='bg-dark-secondary fixed inset-0'
           onClick={closeModal}
         ></div>
-        <div className='relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-4xl w-full z-10'>
+        <div className='relative bg-body-light dark:bg-dark-light rounded-lg shadow-lg p-6 max-w-4xl w-full z-10'>
           <button
             onClick={closeModal}
-            className='absolute top-4 right-4 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
+            className='absolute top-4 right-4 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-text-primary-dark'
           >
             <MdClose size={24} />
           </button>
@@ -218,9 +216,9 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
           <form
             onSubmit={handleSubmit}
             encType='multipart/form-data'
-            className='space-y-4 bg-white dark:bg-gray-800'
+            className='space-y-4 bg-body-light dark:bg-dark-light'
           >
-            <h2 className='text-3xl font-semibold text-gray-900 dark:text-white mb-6'>
+            <h2 className='text-3xl font-semibold text-text-primary-light dark:text-text-primary-dark mb-6'>
               Create Product
             </h2>
 
@@ -228,7 +226,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
               <div className='col-span-full'>
                 <label
                   htmlFor='name'
-                  className='block text-sm font-medium text-gray-900 dark:text-white'
+                  className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                 >
                   Product Name
                 </label>
@@ -240,14 +238,14 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                   onChange={handleChange}
                   required
                   placeholder='Enter product name'
-                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                  className='mt-2 block w-full rounded-md border border-border-light dark:border-border-dark p-3 text-text-primary-light bg-body-light dark:bg-dark-light dark:text-text-primary-dark shadow-sm focus:border-accent-light focus:ring-accent-light dark:focus:border-accent-dark dark:focus:ring-accent-dark sm:text-sm focus:outline-none'
                 />
               </div>
 
               <div className='col-span-full'>
                 <label
                   htmlFor='description'
-                  className='block text-sm font-medium text-gray-900 dark:text-white'
+                  className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                 >
                   Description
                 </label>
@@ -259,19 +257,19 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                   onChange={handleChange}
                   required
                   placeholder='Enter product description'
-                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                  className='mt-2 block w-full rounded-md border border-border-light dark:border-border-dark p-3 text-text-primary-light bg-body-light dark:bg-dark-light dark:text-text-primary-dark shadow-sm focus:border-accent-light focus:ring-accent-light dark:focus:border-accent-dark dark:focus:ring-accent-dark sm:text-sm focus:outline-none'
                 />
               </div>
 
               <div>
                 <label
                   htmlFor='price'
-                  className='block text-sm font-medium text-gray-900 dark:text-white'
+                  className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                 >
                   Price
                 </label>
                 <div className='relative'>
-                  <span className='absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-sm'>
+                  <span className='absolute inset-y-0 left-0 pl-3 flex items-center text-text-secondary-light dark:text-text-secondary-dark text-sm'>
                     ₦
                   </span>
                   <input
@@ -281,7 +279,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     value={productData.price}
                     onChange={handleChange}
                     required
-                    className='mt-2 block w-full rounded-md border border-gray-300 pl-8 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                    className='mt-2 block w-full rounded-md border border-border-light dark:border-border-dark pl-8 p-3 text-text-primary-light bg-body-light dark:bg-dark-light dark:text-text-primary-dark shadow-sm focus:border-accent-light focus:ring-accent-light dark:focus:border-accent-dark dark:focus:ring-accent-dark sm:text-sm focus:outline-none'
                     placeholder='0.00'
                   />
                 </div>
@@ -290,7 +288,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
               <div>
                 <label
                   htmlFor='stock'
-                  className='block text-sm font-medium text-gray-900 dark:text-white'
+                  className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                 >
                   Stock
                 </label>
@@ -300,7 +298,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                   value={productData.stock}
                   onChange={handleChange}
                   required
-                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                  className='mt-2 block w-full rounded-md border border-border-light dark:border-border-dark p-3 text-text-primary-light bg-body-light dark:bg-dark-light dark:text-text-primary-dark shadow-sm focus:border-accent-light focus:ring-accent-light dark:focus:border-accent-dark dark:focus:ring-accent-dark sm:text-sm focus:outline-none'
                 >
                   <option value=''>Select stock quantity</option>
                   {[...Array(200).keys()].map((num) => (
@@ -314,7 +312,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
               <div>
                 <label
                   htmlFor='category'
-                  className='block text-sm font-medium text-gray-900 dark:text-white'
+                  className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                 >
                   Category
                 </label>
@@ -324,7 +322,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                   value={productData.category}
                   onChange={handleChange}
                   required
-                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                  className='mt-2 block w-full rounded-md border border-border-light dark:border-border-dark p-3 text-text-primary-light bg-body-light dark:bg-dark-light dark:text-text-primary-dark shadow-sm focus:border-accent-light focus:ring-accent-light dark:focus:border-accent-dark dark:focus:ring-accent-dark sm:text-sm focus:outline-none'
                 >
                   <option value=''>Select a category</option>
                   {categories.map((cat) => (
@@ -338,7 +336,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
               <div>
                 <label
                   htmlFor='subcategory'
-                  className='block text-sm font-medium text-gray-900 dark:text-white'
+                  className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                 >
                   Subcategory
                 </label>
@@ -347,7 +345,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                   id='subcategory'
                   value={productData.subcategory || ''}
                   onChange={handleChange}
-                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                  className='mt-2 block w-full rounded-md border border-border-light dark:border-border-dark p-3 text-text-primary-light bg-body-light dark:bg-dark-light dark:text-text-primary-dark shadow-sm focus:border-accent-light focus:ring-accent-light dark:focus:border-accent-dark dark:focus:ring-accent-dark sm:text-sm focus:outline-none'
                 >
                   <option value=''>Select a subcategory</option>
                   {subcategories.map((sub) => (
@@ -361,7 +359,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
               <div>
                 <label
                   htmlFor='brand'
-                  className='block text-sm font-medium text-gray-900 dark:text-white'
+                  className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                 >
                   Brand
                 </label>
@@ -373,14 +371,14 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                   onChange={handleChange}
                   required
                   placeholder='Enter product brand'
-                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                  className='mt-2 block w-full rounded-md border border-border-light dark:border-border-dark p-3 text-text-primary-light bg-body-light dark:bg-dark-light dark:text-text-primary-dark shadow-sm focus:border-accent-light focus:ring-accent-light dark:focus:border-accent-dark dark:focus:ring-accent-dark sm:text-sm focus:outline-none'
                 />
               </div>
 
               <div>
                 <label
                   htmlFor='bestSeller'
-                  className='block text-sm font-medium text-gray-900 dark:text-white'
+                  className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                 >
                   Best Seller
                 </label>
@@ -390,7 +388,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                   value={productData.bestSeller ? 'true' : 'false'}
                   onChange={handleChange}
                   required
-                  className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                  className='mt-2 block w-full rounded-md border border-border-light dark:border-border-dark p-3 text-text-primary-light bg-body-light dark:bg-dark-light dark:text-text-primary-dark shadow-sm focus:border-accent-light focus:ring-accent-light dark:focus:border-accent-dark dark:focus:ring-accent-dark sm:text-sm focus:outline-none'
                 >
                   <option value='false'>No</option>
                   <option value='true'>Yes</option>
@@ -398,7 +396,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-900 dark:text-white'>
+                <label className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'>
                   Discount
                 </label>
                 <div className='flex items-center mt-2'>
@@ -408,11 +406,11 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     name='isDiscounted'
                     checked={productData.discount.isDiscounted}
                     onChange={(e) => handleCheckboxChange(e, 'discount')}
-                    className='h-4 w-4 text-indigo-600 focus:ring-secondary border-gray-300 rounded'
+                    className='h-4 w-4 text-accent-light dark:text-accent-dark focus:ring-accent-light dark:focus:ring-accent-dark border-border-light dark:border-border-dark rounded'
                   />
                   <label
                     htmlFor='isDiscounted'
-                    className='ml-2 text-sm font-medium text-gray-900 dark:text-white'
+                    className='ml-2 text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                   >
                     Is Discounted
                   </label>
@@ -422,7 +420,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     <div>
                       <label
                         htmlFor='discountPercent'
-                        className='block text-sm font-medium text-gray-900 dark:text-white'
+                        className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                       >
                         Discount Percent
                       </label>
@@ -432,7 +430,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                         name='discountPercent'
                         value={productData.discount.discountPercent}
                         onChange={handleChange}
-                        className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                        className='mt-2 block w-full rounded-md border border-border-light dark:border-border-dark p-3 text-text-primary-light bg-body-light dark:bg-dark-light dark:text-text-primary-dark shadow-sm focus:border-accent-light focus:ring-accent-light dark:focus:border-accent-dark dark:focus:ring-accent-dark sm:text-sm focus:outline-none'
                         placeholder='0'
                       />
                     </div>
@@ -441,7 +439,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
               </div>
 
               <div>
-                <label className='block text-sm font-medium text-gray-900 dark:text-white'>
+                <label className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'>
                   Flash Sale
                 </label>
                 <div className='flex items-center mt-2'>
@@ -451,11 +449,11 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     name='isFlashSale'
                     checked={productData.flashSale.isFlashSale}
                     onChange={(e) => handleCheckboxChange(e, 'flashSale')}
-                    className='h-4 w-4 text-indigo-600 focus:ring-secondary border-gray-300 rounded'
+                    className='h-4 w-4 text-accent-light dark:text-accent-dark focus:ring-accent-light dark:focus:ring-accent-dark border-border-light dark:border-border-dark rounded'
                   />
                   <label
                     htmlFor='isFlashSale'
-                    className='ml-2 text-sm font-medium text-gray-900 dark:text-white'
+                    className='ml-2 text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                   >
                     Is Flash Sale
                   </label>
@@ -465,7 +463,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     <div>
                       <label
                         htmlFor='flashSalePrice'
-                        className='block text-sm font-medium text-gray-900 dark:text-white'
+                        className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                       >
                         Flash Sale Price
                       </label>
@@ -475,14 +473,14 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                         name='flashSalePrice'
                         value={productData.flashSale.flashSalePrice}
                         onChange={handleChange}
-                        className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                        className='mt-2 block w-full rounded-md border border-border-light dark:border-border-dark p-3 text-text-primary-light bg-body-light dark:bg-dark-light dark:text-text-primary-dark shadow-sm focus:border-accent-light focus:ring-accent-light dark:focus:border-accent-dark dark:focus:ring-accent-dark sm:text-sm focus:outline-none'
                         placeholder='0.00'
                       />
                     </div>
                     <div>
                       <label
                         htmlFor='flashSaleEndTime'
-                        className='block text-sm font-medium text-gray-900 dark:text-white'
+                        className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                       >
                         Flash Sale End Time
                       </label>
@@ -492,7 +490,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                         name='flashSaleEndTime'
                         value={productData.flashSale.flashSaleEndTime}
                         onChange={handleChange}
-                        className='mt-2 block w-full rounded-md border border-gray-300 p-3 text-gray-900 bg-primary dark:bg-gray-800 dark:text-white shadow-sm focus:border-secondary focus:ring-secondary sm:text-sm focus:outline-none'
+                        className='mt-2 block w-full rounded-md border border-border-light dark:border-border-dark p-3 text-text-primary-light bg-body-light dark:bg-dark-light dark:text-text-primary-dark shadow-sm focus:border-accent-light focus:ring-accent-light dark:focus:border-accent-dark dark:focus:ring-accent-dark sm:text-sm focus:outline-none'
                       />
                     </div>
                   </div>
@@ -502,7 +500,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
               <div className='col-span-full'>
                 <label
                   htmlFor='images'
-                  className='block text-sm font-medium text-gray-900 dark:text-white'
+                  className='block text-sm font-medium text-text-primary-light dark:text-text-primary-dark'
                 >
                   Images
                 </label>
@@ -513,7 +511,7 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                   multiple
                   key={fileInputKey}
                   onChange={handleFileChange}
-                  className='mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-gray-100 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200 '
+                  className='mt-2 block w-full text-sm text-text-secondary-light dark:text-text-secondary-dark file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-input-light dark:file:bg-input-dark file:text-sm file:font-semibold hover:file:bg-border-light dark:hover:file:bg-border-dark '
                 />
                 {images.length > 0 && (
                   <div className='mt-4'>
@@ -526,8 +524,8 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
             <div className='flex items-center justify-end gap-x-6'>
               <button
                 type='button'
-                className='text-sm font-semibold text-gray-900 dark:text-white'
-                onClick={() => navigate('/products')}
+                className='text-sm font-semibold text-text-primary-light dark:text-text-primary-dark'
+                onClick={closeModal}
               >
                 Cancel
               </button>
@@ -536,8 +534,8 @@ const CreateProductModal: React.FC<CreateProductModalProps> = ({
                 disabled={loading}
                 className={`rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-gray-300 ${
                   loading
-                    ? 'bg-green-400 cursor-not-allowed'
-                    : 'bg-secondary hover:bg-secondary hover:bg-opacity-75 duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-none ring-0'
+                    ? 'bg-accent-secondary-light dark:bg-accent-secondary-dark cursor-not-allowed'
+                    : 'bg-button-primary-light dark:bg-button-primary-dark hover:bg-button-hover-light dark:hover:bg-button-hover-dark duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-none ring-0'
                 }`}
               >
                 {loading ? 'Submitting...' : 'Create Product'}

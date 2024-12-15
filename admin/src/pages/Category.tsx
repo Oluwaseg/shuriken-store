@@ -1,5 +1,5 @@
-import { Helmet, HelmetProvider } from "react-helmet-async";
-import CategoryTable from "../components/tables/CategoryTable";
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+import CategoryTable from '../components/tables/CategoryTable';
 
 const Category = () => {
   return (
@@ -7,7 +7,7 @@ const Category = () => {
       <HelmetProvider>
         <Helmet>
           <title>Admin Category</title>
-          <meta name="description" content="Admin Category Page" />
+          <meta name='description' content='Admin Category Page' />
         </Helmet>
       </HelmetProvider>
       <CategoryTable />

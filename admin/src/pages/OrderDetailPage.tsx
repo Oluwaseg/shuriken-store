@@ -61,19 +61,19 @@ const OrderDetailPage: React.FC = () => {
 
   if (loading)
     return (
-      <div className='flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900'>
-        <div className='animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500'></div>
+      <div className='flex items-center justify-center min-h-screen bg-body-light dark:bg-body-dark'>
+        <div className='animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-accent-light'></div>
       </div>
     );
 
   if (error)
     return (
-      <div className='flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900'>
-        <div className='text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl'>
+      <div className='flex items-center justify-center min-h-screen bg-body-light dark:bg-body-dark'>
+        <div className='text-center p-8 bg-body-light dark:bg-dark-light rounded-lg shadow-xl'>
           <p className='text-xl text-red-600 font-semibold mb-4'>{error}</p>
           <Link
             to='/orders'
-            className='inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300'
+            className='inline-flex items-center px-4 py-2 bg-button-primary-light text-body-light dark:bg-button-primary-dark dark:text-body-dark rounded-md hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition-colors duration-300'
           >
             <FaArrowLeft className='mr-2' />
             Back to Orders
@@ -84,12 +84,12 @@ const OrderDetailPage: React.FC = () => {
 
   if (!orders)
     return (
-      <div className='flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900'>
-        <div className='text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-xl'>
+      <div className='flex items-center justify-center min-h-screen bg-body-light dark:bg-body-dark'>
+        <div className='text-center p-8 bg-body-light dark:bg-dark-light rounded-lg shadow-xl'>
           <p className='text-xl font-semibold mb-4'>No order found.</p>
           <Link
             to='/orders'
-            className='inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300'
+            className='inline-flex items-center px-4 py-2 bg-button-primary-light text-body-light dark:bg-button-primary-dark dark:text-body-dark rounded-md hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition-colors duration-300'
           >
             <FaArrowLeft className='mr-2' />
             Back to Orders
@@ -109,33 +109,33 @@ const OrderDetailPage: React.FC = () => {
           />
         </Helmet>
       </HelmetProvider>
-      <div className='min-h-screen bg-gray-100 dark:bg-gray-900 py-8'>
+      <div className='min-h-screen bg-body-light dark:bg-body-dark py-8'>
         <div className='container mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='mb-8 flex justify-between items-center'>
             <Link
               to='/orders'
-              className='inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300 shadow-sm'
+              className='inline-flex items-center px-4 py-2 bg-body-light dark:bg-dark-light text-text-primary-light dark:text-text-primary-dark rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300 shadow-sm'
             >
               <FaArrowLeft className='mr-2' />
               Back to Orders
             </Link>
             <button
               onClick={handlePrint}
-              className='inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300 shadow-sm'
+              className='inline-flex items-center px-4 py-2 bg-button-primary-light text-body-light dark:bg-button-primary-dark dark:text-body-dark rounded-md hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition-colors duration-300 shadow-sm'
             >
               <FaPrint className='mr-2' />
               Print Order
             </button>
           </div>
 
-          <div className='bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden'>
+          <div className='bg-body-light dark:bg-dark-light shadow-xl rounded-lg overflow-hidden'>
             <div className='p-6 sm:p-8'>
               <div className='flex justify-between items-center mb-6'>
-                <h1 className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
+                <h1 className='text-3xl font-bold text-text-primary-light dark:text-text-primary-dark'>
                   Order #{orders._id}
                 </h1>
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-semibold ₦{getStatusColor(
+                  className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(
                     orders.orderStatus
                   )}`}
                 >
@@ -145,11 +145,11 @@ const OrderDetailPage: React.FC = () => {
 
               <div className='grid gap-8 md:grid-cols-2'>
                 <div>
-                  <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>
+                  <h2 className='text-xl font-semibold text-text-primary-light dark:text-text-primary-dark mb-4'>
                     Shipping Information
                   </h2>
                   {orders.shippingInfo ? (
-                    <div className='space-y-2 text-gray-600 dark:text-gray-400'>
+                    <div className='space-y-2 text-text-secondary-light dark:text-text-secondary-dark'>
                       <p>
                         <strong>Address:</strong> {orders.shippingInfo.address}
                       </p>
@@ -171,18 +171,18 @@ const OrderDetailPage: React.FC = () => {
                       </p>
                     </div>
                   ) : (
-                    <p className='text-gray-500 dark:text-gray-400'>
+                    <p className='text-text-secondary-light dark:text-text-secondary-dark'>
                       No shipping information available.
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>
+                  <h2 className='text-xl font-semibold text-text-primary-light dark:text-text-primary-dark mb-4'>
                     Payment Information
                   </h2>
                   {orders.paymentInfo ? (
-                    <div className='space-y-2 text-gray-600 dark:text-gray-400'>
+                    <div className='space-y-2 text-text-secondary-light dark:text-text-secondary-dark'>
                       <p>
                         <strong>ID:</strong> {orders.paymentInfo.id}
                       </p>
@@ -191,95 +191,19 @@ const OrderDetailPage: React.FC = () => {
                       </p>
                     </div>
                   ) : (
-                    <p className='text-gray-500 dark:text-gray-400'>
+                    <p className='text-text-secondary-light dark:text-text-secondary-dark'>
                       No payment information available.
                     </p>
                   )}
                 </div>
               </div>
 
-              <div className='mt-8'>
-                <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>
-                  Order Items
-                </h2>
-                {orders.orderItems && orders.orderItems.length > 0 ? (
-                  <div className='overflow-x-auto'>
-                    <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
-                      <thead className='bg-gray-50 dark:bg-gray-700'>
-                        <tr>
-                          <th
-                            scope='col'
-                            className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
-                          >
-                            Product
-                          </th>
-                          <th
-                            scope='col'
-                            className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
-                          >
-                            Price
-                          </th>
-                          <th
-                            scope='col'
-                            className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
-                          >
-                            Quantity
-                          </th>
-                          <th
-                            scope='col'
-                            className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider'
-                          >
-                            Total
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className='bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700'>
-                        {orders.orderItems.map((item) => (
-                          <tr key={item._id}>
-                            <td className='px-6 py-4 whitespace-nowrap'>
-                              <div className='flex items-center'>
-                                <img
-                                  className='h-10 w-10 rounded-full object-cover'
-                                  src={item.image}
-                                  alt={item.name}
-                                />
-                                <div className='ml-4'>
-                                  <div className='text-sm font-medium text-gray-900 dark:text-gray-100'>
-                                    {item.name}
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                            <td className='px-6 py-4 whitespace-nowrap'>
-                              <div className='text-sm text-gray-500 dark:text-gray-400'>
-                                ₦{item.price.toFixed(2)}
-                              </div>
-                            </td>
-                            <td className='px-6 py-4 whitespace-nowrap'>
-                              <div className='text-sm text-gray-500 dark:text-gray-400'>
-                                {item.quantity}
-                              </div>
-                            </td>
-                            <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
-                              ₦{(item.price * item.quantity).toFixed(2)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className='text-gray-500 dark:text-gray-400'>
-                    No items in this order.
-                  </p>
-                )}
-              </div>
-
-              <div className='mt-8 bg-gray-50 dark:bg-gray-700 p-6 rounded-lg'>
-                <h2 className='text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4'>
+              {/* Order Summary Section */}
+              <div className='mt-8 bg-body-light dark:bg-dark-light p-6 rounded-lg'>
+                <h2 className='text-xl font-semibold text-text-primary-light dark:text-text-primary-dark mb-4'>
                   Order Summary
                 </h2>
-                <div className='space-y-2 text-gray-600 dark:text-gray-400'>
+                <div className='space-y-2 text-text-secondary-light dark:text-text-secondary-dark'>
                   <p className='flex justify-between'>
                     <span>Items Price:</span>
                     <span>₦{orders.itemsPrice.toFixed(2)}</span>
@@ -301,7 +225,8 @@ const OrderDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className='mt-8 text-sm text-gray-500 dark:text-gray-400'>
+              {/* Order Date */}
+              <div className='mt-8 text-sm text-text-secondary-light dark:text-text-secondary-dark'>
                 <p>
                   Order placed on: {new Date(orders.createdAt).toLocaleString()}
                 </p>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FaBars, FaBell, FaSearch } from 'react-icons/fa';
+import { FaBars, FaBell } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import { RootState } from '../../redux/store';
@@ -54,9 +54,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
 
   return (
     <nav
-      className={`bg-white ${
-        isDarkMode ? 'dark:bg-gray-800' : 'bg-white'
-      } text-gray-800 dark:text-white shadow-md fixed top-0 left-0 right-0 z-10 w-full`}
+      className={`bg-body-light dark:bg-body-dark text-text-primary-light dark:text-text-primary-dark shadow-sm fixed top-0 left-0 right-0 z-10 w-full`}
     >
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex items-center justify-between h-16'>
@@ -64,31 +62,10 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
           <div className='flex items-center'>
             <button
               onClick={toggleSidebar}
-              className='text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 lg:hidden'
+              className='text-text-secondary-light dark:text-text-secondary-dark focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-light dark:focus:ring-accent-dark lg:hidden'
             >
-              <FaBars className='h-6 w-6 dark:text-white' />
+              <FaBars className='h-6 w-6' />
             </button>
-          </div>
-
-          {/* Search bar */}
-          <div className='flex-1 flex justify-center px-2 lg:ml-6 lg:justify-end'>
-            <div className='max-w-lg w-full lg:max-w-xs'>
-              <label htmlFor='search' className='sr-only'>
-                Search
-              </label>
-              <div className='relative'>
-                <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-                  <FaSearch className='h-5 w-5 text-gray-400 dark:text-white' />
-                </div>
-                <input
-                  id='search'
-                  name='search'
-                  className='block w-full pl-10 pr-3 py-2 border border-gray-300  dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-                  placeholder='Search'
-                  type='search'
-                />
-              </div>
-            </div>
           </div>
 
           {/* Icons section */}
@@ -97,37 +74,35 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
             <div className='relative' id='notification-menu'>
               <button
                 onClick={toggleNotification}
-                className='p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                className='p-1 rounded-full text-text-secondary-light dark:text-text-secondary-dark hover:text-accent-light dark:hover:text-accent-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-light dark:focus:ring-accent-dark'
               >
-                <FaBell className='h-6 w-6 dark:text-white' />
+                <FaBell className='h-6 w-6' />
               </button>
               {isNotificationOpen && (
-                <div className='absolute right-[-10px] top-[50px] w-72 sm:w-80 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50'>
+                <div className='absolute right-[-10px] top-[50px] w-72 sm:w-80 rounded-md shadow-lg bg-body-light dark:bg-body-dark ring-1 ring-border-light dark:ring-border-dark focus:outline-none z-50'>
                   <div className='py-2'>
-                    <h3 className='text-sm font-medium text-gray-900 dark:text-white px-4 py-2'>
+                    <h3 className='text-sm font-medium text-text-primary-light dark:text-text-primary-dark px-4 py-2'>
                       Notifications
                     </h3>
-                    <div className='divide-y divide-gray-200'>
-                      <a href='#' className='block px-4 py-3 hover:bg-gray-100'>
-                        <p className='text-sm text-gray-700 dark:text-white'>
-                          New message from John Doe
-                        </p>
-                        <p className='text-xs text-gray-500 dark:text-white mt-1'>
-                          3 minutes ago
-                        </p>
+                    <div className='divide-y divide-border-light dark:divide-border-dark'>
+                      <a
+                        href='#'
+                        className='block px-4 py-3 hover:bg-accent-secondary-light dark:hover:bg-accent-secondary-dark'
+                      >
+                        <p className='text-sm'>New message from John Doe</p>
+                        <p className='text-xs mt-1'>3 minutes ago</p>
                       </a>
-                      <a href='#' className='block px-4 py-3 hover:bg-gray-100'>
-                        <p className='text-sm text-gray-700 dark:text-white'>
-                          Your report is ready
-                        </p>
-                        <p className='text-xs text-gray-500 dark:text-white mt-1'>
-                          1 hour ago
-                        </p>
+                      <a
+                        href='#'
+                        className='block px-4 py-3 hover:bg-accent-secondary-light dark:hover:bg-accent-secondary-dark'
+                      >
+                        <p className='text-sm'>Your report is ready</p>
+                        <p className='text-xs mt-1'>1 hour ago</p>
                       </a>
                     </div>
                     <a
                       href='#'
-                      className='block text-sm font-medium text-indigo-600 px-4 py-2 hover:text-indigo-500'
+                      className='block text-sm font-medium text-accent-light dark:text-accent-dark px-4 py-2 hover:text-button-hover-light dark:hover:text-button-hover-dark'
                     >
                       View all notifications
                     </a>
@@ -140,7 +115,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
             <div className='relative' id='profile-menu'>
               <button
                 onClick={toggleProfile}
-                className='max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                className='max-w-xs rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-light dark:focus:ring-accent-dark'
                 aria-haspopup='true'
               >
                 <img
@@ -151,13 +126,13 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
               </button>
               {isProfileOpen && (
                 <div
-                  className='absolute right-2 top-[50px] w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50'
+                  className='absolute right-2 top-[50px] w-48 rounded-md shadow-lg py-1 bg-body-light dark:bg-body-dark ring-1 ring-border-light dark:ring-border-dark z-50'
                   role='menu'
                   aria-orientation='vertical'
                 >
-                  <div className='block px-4 py-2 text-sm text-gray-700 dark:text-white'>
+                  <div className='block px-4 py-2 text-sm text-text-primary-light dark:text-text-primary-dark'>
                     <div className='font-semibold'>{user?.name || 'Guest'}</div>
-                    <div className='text-xs text-gray-500 dark:text-white'>
+                    <div className='text-xs text-text-secondary-light dark:text-text-secondary-dark'>
                       {user?.role || 'Role'}
                     </div>
                   </div>
@@ -165,7 +140,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
                   <NavLink
                     to={'/profile'}
                     className={
-                      'block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100'
+                      'block px-4 py-2 text-sm hover:bg-accent-secondary-light dark:hover:bg-accent-secondary-dark'
                     }
                   >
                     My Profile
@@ -173,7 +148,7 @@ const Navbar = ({ toggleSidebar }: NavbarProps) => {
                   <NavLink
                     to={'/settings'}
                     className={
-                      'block px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100'
+                      'block px-4 py-2 text-sm hover:bg-accent-secondary-light dark:hover:bg-accent-secondary-dark'
                     }
                   >
                     Settings

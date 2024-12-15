@@ -80,13 +80,13 @@ const OrderTable: React.FC = () => {
 
   if (showPreloader)
     return (
-      <div className='min-h-screen flex items-center justify-center dark:bg-gray-900'>
+      <div className='min-h-screen flex items-center justify-center dark:bg-body-dark'>
         <PagePreloader />
       </div>
     );
   if (loading)
     return (
-      <div className='min-h-screen flex items-center justify-center dark:bg-gray-800'>
+      <div className='min-h-screen flex items-center justify-center dark:bg-body-dark'>
         <PagePreloader />
       </div>
     );
@@ -94,7 +94,7 @@ const OrderTable: React.FC = () => {
   if (orders.length === 0)
     return (
       <div className='text-center py-10'>
-        <p className='text-xl text-gray-600 dark:text-gray-400'>
+        <p className='text-xl text-text-primary-light dark:text-text-primary-dark'>
           No orders found.
         </p>
       </div>
@@ -119,7 +119,7 @@ const OrderTable: React.FC = () => {
 
   return (
     <div className='space-y-6'>
-      <div className='overflow-x-auto bg-white dark:bg-gray-900 rounded-lg shadow-lg'>
+      <div className='overflow-x-auto bg-body-light dark:bg-body-dark rounded-lg shadow-lg'>
         <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
           <thead className='bg-gray-50 dark:bg-gray-800'>
             <tr>
@@ -135,14 +135,14 @@ const OrderTable: React.FC = () => {
               ].map((header) => (
                 <th
                   key={header}
-                  className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'
+                  className='px-6 py-3 text-left text-xs font-medium text-text-primary-light dark:text-text-primary-dark uppercase tracking-wider'
                 >
                   {header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className='bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700'>
+          <tbody className='bg-body-light divide-y divide-gray-200 dark:bg-body-dark dark:divide-gray-700'>
             {currentOrders.map((order, index) => (
               <tr
                 key={order._id}
@@ -167,7 +167,7 @@ const OrderTable: React.FC = () => {
                 <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100'>
                   <Link
                     to={`/orders/${order._id}`}
-                    className='text-blue-600 dark:text-blue-400 hover:underline'
+                    className='text-accent-light dark:text-accent-secondary-dark hover:underline'
                   >
                     {order._id}
                   </Link>
@@ -241,33 +241,28 @@ const OrderTable: React.FC = () => {
 
       {totalPages > 1 && (
         <div className='flex items-center justify-between mt-4'>
-          <div className='text-sm text-gray-700 dark:text-gray-300'>
-            Showing <span className='font-medium'>{startIndex + 1}</span> to{' '}
-            <span className='font-medium'>{endIndex}</span> of{' '}
-            <span className='font-medium'>{totalOrders}</span> results
+          <div className='text-sm'>
+            Showing {startIndex + 1} to {endIndex} of {totalOrders} orders
           </div>
-          <div className='flex items-center space-x-2'>
+          <div className='flex space-x-2'>
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className='relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
+              className='px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 disabled:opacity-50'
             >
-              <FaChevronLeft className='w-5 h-5 mr-2' />
-              Previous
+              <FaChevronLeft />
             </button>
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className='relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
+              className='px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 disabled:opacity-50'
             >
-              Next
-              <FaChevronRight className='w-5 h-5 ml-2' />
+              <FaChevronRight />
             </button>
           </div>
         </div>
       )}
-
-      <Toaster position='top-right' />
+      <Toaster />
     </div>
   );
 };

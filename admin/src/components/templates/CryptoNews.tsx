@@ -44,7 +44,7 @@ const CryptoNews: React.FC = () => {
   }, []);
 
   return (
-    <div className='bg-white dark:bg-gray-800 shadow-sm rounded-lg h-full'>
+    <div className='bg-body-light dark:bg-dark-light shadow-sm rounded-lg h-full'>
       <div className='p-4 border-b flex items-center justify-between'>
         <div className='flex items-center'>
           <FaBitcoin className='text-yellow-500 mr-2' />

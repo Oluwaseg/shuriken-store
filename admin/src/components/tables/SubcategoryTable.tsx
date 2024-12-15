@@ -33,7 +33,7 @@ const SubcategoryTable: React.FC = () => {
         );
         setSubcategories(response.data.subcategories);
       } catch (error) {
-        console.error('Error fetching subcategories', error);
+        toast.error('Error fetching subcategories.');
       }
     };
 
@@ -41,14 +41,7 @@ const SubcategoryTable: React.FC = () => {
   }, []);
 
   const handleEditClick = (subcategory: Subcategory) => {
-    const formattedSubcategory = {
-      ...subcategory,
-      category: {
-        id: subcategory.category.id,
-        name: subcategory.category.name,
-      },
-    };
-    setSelectedSubcategory(formattedSubcategory);
+    setSelectedSubcategory(subcategory);
     setEditModalOpen(true);
   };
 
@@ -76,71 +69,76 @@ const SubcategoryTable: React.FC = () => {
   };
 
   const truncateText = (text: string, maxLength: number) => {
-    if (text.length > maxLength) {
-      return text.slice(0, maxLength) + '...';
-    }
-    return text;
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
   };
 
   return (
-    <div className='max-w-7xl mx-auto p-4  dark:bg-transparent'>
-      <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-2xl font-semibold'>Subcategories</h2>
+    <div className='max-w-7xl mx-auto p-4 dark:bg-body-dark bg-body-light'>
+      {/* Header Section */}
+      <div className='flex justify-between items-center mb-6'>
+        <h2 className='text-2xl font-bold text-text-primary-light dark:text-text-primary-dark'>
+          Subcategories
+        </h2>
         <button
           onClick={() => setCreateModalOpen(true)}
-          className='px-4 py-2 bg-secondary text-white font-semibold rounded-md shadow-sm hover:bg-secondary hover:bg-opacity-50 duration-200 focus:outline-none'
+          className='flex items-center px-4 py-2 bg-button-primary-light dark:bg-button-primary-dark text-white font-semibold rounded-md shadow-md hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition duration-200'
         >
-          <FaPlus className='inline-block mr-2' /> Create Subcategory
+          <FaPlus className='mr-2' /> Create Subcategory
         </button>
       </div>
-      <div className='overflow-x-auto'>
-        <table className='min-w-full divide-y divide-gray-200 bg-white'>
-          <thead className='bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-white'>
+
+      {/* Table Section */}
+      <div className='overflow-x-auto rounded-lg border border-border-light dark:border-border-dark'>
+        <table className='min-w-full divide-y divide-border-light dark:divide-border-dark'>
+          <thead className='bg-accent-light dark:bg-accent-dark text-white'>
             <tr>
-              <th className='px-4 py-2 text-left text-sm font-semibold'>
+              <th className='px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider'>
                 Name
               </th>
-              <th className='px-4 py-2 text-left text-sm font-semibold'>
+              <th className='px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider'>
                 Category
               </th>
-              <th className='px-4 py-2 text-left text-sm font-semibold'>
+              <th className='px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider'>
                 Description
               </th>
-              <th className='px-4 py-2 text-left text-sm font-semibold whitespace-nowrap'>
+              <th className='px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider whitespace-nowrap'>
                 Created At
               </th>
-              <th className='px-4 py-2 text-left text-sm font-semibold'>
+              <th className='px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider'>
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className='bg-white divide-y divide-gray-300 dark:bg-gray-900 dark:border dark:border-gray-700'>
+          <tbody className='bg-body-light dark:bg-body-dark divide-y divide-border-light dark:divide-border-dark'>
             {subcategories.map((subcategory) => (
-              <tr key={subcategory.id}>
-                <td className='px-4 py-2 text-sm text-gray-900 dark:text-white dark:border'>
-                  {truncateText(subcategory.name, 10)}
+              <tr
+                key={subcategory.id}
+                className='hover:bg-gray-100 dark:hover:bg-dark-secondary'
+              >
+                <td className='px-6 py-4 text-sm text-text-primary-light dark:text-text-primary-dark'>
+                  {truncateText(subcategory.name, 20)}
                 </td>
-                <td className='px-4 py-2 text-sm text-gray-600 dark:text-white dark:border whitespace-nowrap'>
+                <td className='px-6 py-4 text-sm text-text-secondary-light dark:text-text-secondary-dark'>
                   {subcategory.category.name}
                 </td>
-                <td className='px-4 py-2 text-sm text-gray-600 dark:text-white dark:border'>
-                  {truncateText(subcategory.description, 10)}
+                <td className='px-6 py-4 text-sm text-text-secondary-light dark:text-text-secondary-dark'>
+                  {truncateText(subcategory.description, 50)}
                 </td>
-                <td className='px-4 py-2 text-sm text-gray-600 dark:text-white dark:border'>
+                <td className='px-6 py-4 text-sm text-text-secondary-light dark:text-text-secondary-dark'>
                   {new Date(subcategory.createdAt).toLocaleDateString()}
                 </td>
-                <td className='px-4 py-2 text-sm text-gray-600 dark:text-white dark:border'>
-                  <div className='flex space-x-2'>
+                <td className='px-6 py-4 text-sm'>
+                  <div className='flex space-x-4'>
                     <button
                       onClick={() => handleEditClick(subcategory)}
-                      className='text-blue-500 hover:text-blue-700 transition-colors'
+                      className='text-accent-light dark:text-accent-dark hover:underline'
                       aria-label='Edit'
                     >
                       <FaEdit />
                     </button>
                     <button
                       onClick={() => handleDeleteClick(subcategory)}
-                      className='text-red-500 hover:text-red-700 transition-colors'
+                      className='text-red-500 hover:underline'
                       aria-label='Delete'
                     >
                       <FaTrashAlt />
@@ -153,13 +151,13 @@ const SubcategoryTable: React.FC = () => {
         </table>
       </div>
 
+      {/* Modals */}
       {isCreateModalOpen && (
         <CreateSubcategoryModal
           onClose={handleCloseModals}
           onSave={refreshSubcategories}
         />
       )}
-
       {isEditModalOpen && selectedSubcategory && (
         <EditSubcategoryModal
           subcategory={selectedSubcategory}
@@ -167,7 +165,6 @@ const SubcategoryTable: React.FC = () => {
           onSave={refreshSubcategories}
         />
       )}
-
       {isDeleteModalOpen && selectedSubcategory && (
         <DeleteSubcategoryModal
           subcategory={selectedSubcategory}

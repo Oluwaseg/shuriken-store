@@ -4,8 +4,10 @@ import { Route, Routes } from 'react-router-dom';
 import Preloader from './components/Preloader';
 import Layout from './layouts/Layout';
 import Analytics from './pages/Analytics';
+import Calendar from './pages/Calendar';
 import Category from './pages/Category';
 import Dashboard from './pages/Dashboard';
+import Inbox from './pages/Inbox';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import OrderDetailPage from './pages/OrderDetailPage';
@@ -131,6 +133,26 @@ const App: React.FC = () => {
           <ProtectedRoute>
             <Layout>
               <Category />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/inbox'
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Inbox />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/calendar'
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <Calendar />
             </Layout>
           </ProtectedRoute>
         }

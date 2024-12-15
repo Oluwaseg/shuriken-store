@@ -11,11 +11,11 @@ import {
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { AppDispatch, RootState } from '../app/store';
+import { AppDispatch, RootState } from '../../app/store';
 import {
   cancelSingleOrder,
   fetchMyOrders,
-} from '../features/orders/orderSlice';
+} from '../../features/orders/orderSlice';
 
 const statusIcons: Record<string, React.ReactNode> = {
   Pending: <FiAlertCircle className='text-yellow-500' />,

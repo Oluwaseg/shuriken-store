@@ -8,10 +8,10 @@ export default {
         primary: '#ffffff',
         secondary: '#bc6c25',
         accent: 'rgba(71, 85, 105, 1)',
-        'body-light': '#FFFFFF', // Body background for light mode
-        'text-primary-light': '#333333', // Primary text for light mode
-        'text-secondary-light': '#757575', // Secondary text for light mode
-        'accent-light': '#008080', // Primary accent (Teal)
+        'body-light': '#FFFFFF',
+        'text-primary-light': '#333333',
+        'text-secondary-light': '#757575',
+        'accent-light': '#008080',
         'accent-secondary-light': '#50C878', // Secondary accent (Emerald Green)
         'button-primary-light': '#008080', // Primary button (Teal)
         'button-hover-light': '#007373', // Hover effect for primary button (Darker Teal)
