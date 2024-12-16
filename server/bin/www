@@ -6,9 +6,9 @@
 import debugModule from 'debug';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
 import app from '../app.js';
 import connectDB from '../config/db.js';
+import { initSocket } from '../socket.js';
 
 dotenv.config();
 
@@ -29,36 +29,8 @@ app.set('port', port);
 
 const server = createServer(app);
 
-// Initialize Socket.IO
-const io = new Server(server, {
-  cors: {
-    origin: [
-      process.env.ADMIN_URL,
-      process.env.CLIENT_URL,
-      process.env.ADMIN_DEVELOPMENT_URL,
-      process.env.CLIENT_DEVELOPMENT_URL,
-    ],
-    credentials: true,
-  },
-});
-
+initSocket(server);
 console.log('Socket.IO initialized');
-
-// Socket.IO Logic
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id); // This should log when a user connects
-  // Emit an event to the client
-  socket.emit('newReview', { productId: '675b7fc72b196e4930cd1212' });
-
-  // You can also emit the 'updatedReview' event as needed
-  socket.emit('updatedReview', { productId: '675b7fc72b196e4930cd1212' });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id); // This should log when a user disconnects
-  });
-});
-
-export { io };
 
 /**
  * Listen on provided port, on all network interfaces.

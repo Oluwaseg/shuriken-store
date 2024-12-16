@@ -1,9 +1,9 @@
 import cloudinary from 'cloudinary';
-import { io } from '../bin/www';
 import Activity from '../models/Activity.js';
 import Category from '../models/Category.js';
 import Product from '../models/Product.js';
 import Subcategory from '../models/SubCategory.js';
+import { getIO } from '../socket.js';
 import APIFeatures from '../utils/apiFeatures.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { ErrorHandler } from '../utils/errorHandler.js';
@@ -335,6 +335,8 @@ export const createReview = catchAsync(async (req, res, next) => {
     (review) => review.user.toString() === userId.toString()
   );
 
+  const io = getIO(); // Get the Socket.IO instance
+
   if (existingReview) {
     // Update existing review
     existingReview.rating = rating;
@@ -345,16 +347,16 @@ export const createReview = catchAsync(async (req, res, next) => {
       product.reviews.length;
 
     await product.save();
-
-    // Populate user details in the updated review
     await product.populate('reviews.user', 'name email avatar');
 
-    // Emit the updated review to connected clients
-    console.log('Emitting updateReview for product:', productId);
-
-    io.emit('updateReview', {
+    // Emit the updated review event with a message
+    io.emit('updatedReview', {
       productId,
-      review: existingReview,
+      message: `Review for product "${product.name}" has been updated`,
+    });
+    console.log('Event emitted: updatedReview', {
+      productId,
+      message: `Review for product "${product.name}" has been updated`,
     });
 
     await Activity.create({
@@ -385,11 +387,12 @@ export const createReview = catchAsync(async (req, res, next) => {
       product.numOfReviews;
 
     await product.save();
+    await product.populate('reviews.user', 'name email avatar');
 
-    console.log('Emitting newReview for product:', productId);
+    // Emit the new review event with a message
     io.emit('newReview', {
       productId,
-      review: newReview,
+      message: `A new review has been added for product "${product.name}"`,
     });
 
     await Activity.create({
@@ -398,9 +401,6 @@ export const createReview = catchAsync(async (req, res, next) => {
       user: userId,
       activity: `Added a review for product: ${product.name}`,
     });
-
-    // Populate user details in the new review
-    await product.populate('reviews.user', 'name email avatar');
 
     res.status(201).json({
       success: true,
