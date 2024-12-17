@@ -1,3 +1,5 @@
 node_modules
 .txt
 .env
+
+/src/pages/Chat.tsx

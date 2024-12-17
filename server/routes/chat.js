@@ -1,7 +1,7 @@
 // routes/chat.js
 import express from 'express';
 import { getChatHistory, sendMessage } from '../controllers/chatController.js';
-import { authorizeRoles } from '../middleware/authenticate.js';
+import { authorizeRoles } from '../middlewares/authenticate.js';
 
 const router = express.Router();
 
