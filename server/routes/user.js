@@ -18,6 +18,12 @@ import {
   userLogin,
   verifyOTP,
 } from '../controllers/userController.js';
+
+import {
+  deleteNotification,
+  getNotifications,
+  markAsRead,
+} from '../controllers/notificationController.js';
 import {
   authorizeRoles,
   isAuthenticated,
@@ -53,6 +59,19 @@ router.put(
   updateProfile
 );
 router.put('/user/password/update', isAuthenticated, updateUserPassword);
+
+// Notification Routes
+router.get('/user/notifications', isAuthenticated, getNotifications);
+router.put(
+  '/user/notifications/:notificationId/read',
+  isAuthenticated,
+  markAsRead
+);
+router.delete(
+  '/user/notifications/:notificationId',
+  isAuthenticated,
+  deleteNotification
+);
 
 // Admin Routes
 router.post('/admin/login', adminLogin);

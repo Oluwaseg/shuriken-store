@@ -19,7 +19,6 @@
     "express": "^4.21.0",
     "express-handlebars": "^8.0.1",
     "express-jwt": "^8.4.1",
-    "express-session": "^1.0.0",
     "express-validator": "^7.1.0",
     "hbs": "^4.2.0",
     "http-errors": "~1.6.3",

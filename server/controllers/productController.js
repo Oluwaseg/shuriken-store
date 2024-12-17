@@ -1,6 +1,7 @@
 import cloudinary from 'cloudinary';
 import Activity from '../models/Activity.js';
 import Category from '../models/Category.js';
+import Notification from '../models/Notification.js';
 import Product from '../models/Product.js';
 import Subcategory from '../models/SubCategory.js';
 import { getIO } from '../socket.js';
@@ -354,16 +355,21 @@ export const createReview = catchAsync(async (req, res, next) => {
       productId,
       message: `Review for product "${product.name}" has been updated`,
     });
-    console.log('Event emitted: updatedReview', {
-      productId,
-      message: `Review for product "${product.name}" has been updated`,
-    });
 
+    // Create activity log for admin/dashboard
     await Activity.create({
       action: 'update',
       product: product._id,
       user: userId,
       activity: `Updated review for product: ${product.name}`,
+    });
+
+    // Create a notification for the product owner or relevant user
+    const notificationMessage = `Your review for "${product.name}" has been updated.`;
+    await Notification.create({
+      user: product.user, // Assuming product has a user field for the owner
+      message: notificationMessage,
+      type: 'review', // You can have types like 'review', 'comment', etc.
     });
 
     res.status(200).json({
@@ -395,11 +401,20 @@ export const createReview = catchAsync(async (req, res, next) => {
       message: `A new review has been added for product "${product.name}"`,
     });
 
+    // Create activity log for admin/dashboard
     await Activity.create({
       action: 'create',
       product: product._id,
       user: userId,
       activity: `Added a review for product: ${product.name}`,
+    });
+
+    // Create a notification for the product owner or relevant user
+    const notificationMessage = `A new review has been added for your product: "${product.name}".`;
+    await Notification.create({
+      user: product.user, // Product owner gets notified
+      message: notificationMessage,
+      type: 'review', // You can have types like 'review', 'message', etc.
     });
 
     res.status(201).json({

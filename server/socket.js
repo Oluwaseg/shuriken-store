@@ -13,6 +13,26 @@ export const initSocket = (server) => {
   io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
+    // Listen for send_message event
+    socket.on('send_message', async (data) => {
+      const { senderId, recipientId, message } = data;
+
+      // Save the message in the database
+      try {
+        const newMessage = new Chat({
+          sender: senderId,
+          recipient: recipientId,
+          message,
+        });
+        await newMessage.save();
+
+        // Emit the message to the recipient
+        io.to(recipientId).emit('receive_message', newMessage);
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
+    });
+
     socket.on('disconnect', () => {
       console.log('User disconnected:', socket.id);
     });

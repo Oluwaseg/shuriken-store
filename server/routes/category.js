@@ -1,74 +1,74 @@
-import express from "express";
+import express from 'express';
 import {
   createCategory,
+  deleteCategory,
   getAllCategories,
+  getCategoriesWithProductCount,
   getCategoryById,
   updateCategory,
-  deleteCategory,
-  getCategoriesWithProductCount,
-} from "../controllers/categoryController.js";
+} from '../controllers/categoryController.js';
 import {
   createSubcategory,
+  deleteSubcategory,
   getAllSubcategories,
   getSubcategoriesByCategory,
   getSubcategoryById,
   updateSubcategory,
-  deleteSubcategory,
-} from "../controllers/subcategoryController.js";
+} from '../controllers/subcategoryController.js';
 import {
-  isAuthenticated,
   authorizeRoles,
-} from "../middlewares/authenticate.js";
+  isAuthenticated,
+} from '../middlewares/authenticate.js';
 
 const router = express.Router();
 
 router.post(
-  "/category",
+  '/category',
   isAuthenticated,
-  authorizeRoles("admin"),
+  authorizeRoles('admin'),
   createCategory
 );
-router.get("/category", getAllCategories);
-router.get("/categories", getCategoriesWithProductCount);
-router.get("/category/:id", getCategoryById);
+router.get('/category', getAllCategories);
+router.get('/categories', getCategoriesWithProductCount);
+router.get('/category/:id', getCategoryById);
 router.put(
-  "/category/:id",
+  '/category/:id',
   isAuthenticated,
-  authorizeRoles("admin"),
+  authorizeRoles('admin'),
   updateCategory
 );
 router.delete(
-  "/category/:id",
+  '/category/:id',
   isAuthenticated,
-  authorizeRoles("admin"),
+  authorizeRoles('admin'),
   deleteCategory
 );
 
 router.post(
-  "/subcategory",
+  '/subcategory',
   createSubcategory,
   isAuthenticated,
-  authorizeRoles("admin")
+  authorizeRoles('admin')
 );
 
-router.get("/subcategories", getAllSubcategories);
+router.get('/subcategories', getAllSubcategories);
 
-router.get("/subcategories/:categoryId", getSubcategoriesByCategory);
+router.get('/subcategories/:categoryId', getSubcategoriesByCategory);
 
-router.get("/subcategory/:id", getSubcategoryById);
+router.get('/subcategory/:id', getSubcategoryById);
 
 router.put(
-  "/subcategory/:id",
+  '/subcategory/:id',
   updateSubcategory,
   isAuthenticated,
-  authorizeRoles("admin")
+  authorizeRoles('admin')
 );
 
 router.delete(
-  "/subcategory/:id",
+  '/subcategory/:id',
   deleteSubcategory,
   isAuthenticated,
-  authorizeRoles("admin")
+  authorizeRoles('admin')
 );
 
 export default router;
