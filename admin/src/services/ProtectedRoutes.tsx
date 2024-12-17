@@ -1,8 +1,8 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
-import Spinner from "../components/Spinner";
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
+import PagePreloader from '../components/PagePreloader';
+import { RootState } from '../redux/store';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -13,13 +13,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-800">
-        <Spinner />
+      <div className='min-h-screen flex items-center justify-center dark:bg-body-dark'>
+        <PagePreloader />
       </div>
     );
   }
 
-  return token ? <>{children}</> : <Navigate to="/login" />;
+  return token ? <>{children}</> : <Navigate to='/login' />;
 };
 
 export default ProtectedRoute;

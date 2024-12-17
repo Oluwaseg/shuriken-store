@@ -1,11 +1,11 @@
-import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import axiosInstance from '../api/axiosInstance';
 import { store } from '../app/store';
 import { logout } from '../features/auth/authSlice';
 
 let isLoggingOut = false;
 
-axios.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (
@@ -28,4 +28,4 @@ axios.interceptors.response.use(
   }
 );
 
-export default axios;
+export default axiosInstance;
