@@ -24,6 +24,8 @@ const chatSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  deletedBySender: { type: Boolean, default: false },
+  deletedByRecipient: { type: Boolean, default: false },
 });
 
 const Chat = mongoose.model('Chat', chatSchema);

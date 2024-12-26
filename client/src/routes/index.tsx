@@ -8,6 +8,7 @@ import ResendOTP from '../pages/auth/ResendOtp';
 import ResetPassword from '../pages/auth/ResetPassword';
 import VerifyOtp from '../pages/auth/VerifyOtp';
 import Cart from '../pages/cart/Cart';
+import UserChatPage from '../pages/Chat';
 import CheckoutPage from '../pages/CheckoutPage/CheckoutPage';
 import Home from '../pages/Home';
 import OrderDetails from '../pages/order/OrderDetails';
@@ -51,6 +52,7 @@ const RoutesConfig: React.FC = () => {
       <Route path='/resend-otp' element={<ResendOTP />} />
       <Route path='/forgot-password' element={<ForgotPassword />} />
       <Route path='/reset-password/:token' element={<ResetPassword />} />
+      <Route path='/chat' element={<UserChatPage />} />
       <Route
         path='/help'
         element={

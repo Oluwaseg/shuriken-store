@@ -39,7 +39,6 @@
 
 .shuriken-svg {
   @apply text-accent-light dark:text-accent-dark;
-
   width: 60%;
   height: 60%;
   background-size: contain;

@@ -1,12 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import apiClient from '../services/apiClient';
-
-// Define TypeScript interfaces for the state and payload
-interface User {
-  id: string;
-  email: string;
-  name?: string;
-}
+import { User } from '../types';
 
 interface AuthState {
   user: User | null;

@@ -274,6 +274,8 @@ export const logout = catchAsync(async (req, res, next) => {
     res.cookie('token', null, {
       expires: new Date(Date.now()),
       httpOnly: true,
+      secure: true,
+      sameSite: 'Lax',
     });
 
     res.status(200).json({
@@ -587,3 +589,5 @@ export const updateUserShippingInfo = catchAsync(async (req, res, next) => {
     return next(new ErrorHandler('Failed to update shipping info', 500));
   }
 });
+
+export const activeUsers = {};

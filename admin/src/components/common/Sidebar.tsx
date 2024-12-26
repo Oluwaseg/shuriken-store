@@ -46,7 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
     { label: 'Analytics', path: '/analytics', icon: FaChartBar },
     { label: 'Customers', path: '/users', icon: BsPeopleFill },
     { label: 'Orders', path: '/orders', icon: HiOutlineDatabase },
-    { label: 'Inbox', path: '/inbox', icon: FaInbox },
+    { label: 'Chat', path: '/chat', icon: FaInbox },
     { label: 'Calendar', path: '/calendar', icon: FaCalendar },
     { label: 'Settings', path: '/settings', icon: FaCog },
     {

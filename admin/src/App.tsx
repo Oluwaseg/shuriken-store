@@ -6,6 +6,7 @@ import Layout from './layouts/Layout';
 import Analytics from './pages/Analytics';
 import Calendar from './pages/Calendar';
 import Category from './pages/Category';
+import ChatPage from './pages/Chat';
 import Dashboard from './pages/Dashboard';
 import Inbox from './pages/Inbox';
 import Login from './pages/Login';
@@ -143,6 +144,16 @@ const App: React.FC = () => {
           <ProtectedRoute>
             <Layout>
               <Inbox />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/chat'
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <ChatPage />
             </Layout>
           </ProtectedRoute>
         }

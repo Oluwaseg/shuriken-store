@@ -1,13 +1,15 @@
+import { motion } from 'framer-motion';
+import {
+  ChevronDown,
+  Heart,
+  MessageSquare,
+  ShoppingCart,
+  Star,
+  Trash2,
+  User2,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import {
-  FaHeart,
-  FaRegStar,
-  FaShoppingCart,
-  FaStar,
-  FaTrash,
-  FaUserCircle,
-} from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import RatingModal from '../../components/template/RatingModal';
 import RelatedProducts from '../../components/template/RelatedProducts';
@@ -20,6 +22,8 @@ import {
   removeReview,
 } from '../../features/product/productSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
+import { Review, User } from '../../types/type';
+
 const Product = () => {
   const { id } = useParams();
   const dispatch = useAppDispatch();
@@ -40,6 +44,13 @@ const Product = () => {
   const [showReviews, setShowReviews] = useState<boolean>(false);
   const [reviewsLimit, setReviewsLimit] = useState<number>(10);
   const [quantity, setQuantity] = useState<number>(1);
+
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  const toggleDescription = () => {
+    setIsDescriptionExpanded(!isDescriptionExpanded);
+  };
+
   useEffect(() => {
     if (id) {
       dispatch(fetchProductById(id));
@@ -89,6 +100,7 @@ const Product = () => {
   const handleShowMoreReviews = () => {
     setReviewsLimit((prevLimit) => prevLimit + 10);
   };
+
   const handleDeleteReview = async () => {
     if (!id) {
       toast.error('Product ID is missing.');
@@ -115,13 +127,12 @@ const Product = () => {
 
   const handleAddToCart = () => {
     if (product && product._id) {
-      // Dispatch the action to add or update the cart
       dispatch(
         addOrUpdateCart({
-          userId: user ? user._id : undefined, // Pass user ID if logged in
-          productId: product._id, // The product ID
-          quantity, // The selected quantity
-          price: product.price, // Product price
+          userId: user ? user._id : undefined,
+          productId: product._id,
+          quantity,
+          price: product.price,
         })
       )
         .unwrap()
@@ -138,258 +149,351 @@ const Product = () => {
 
   if (loading)
     return (
-      <div className='flex justify-center items-center'>
-        <div className='loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12'></div>{' '}
+      <div className='flex justify-center items-center h-screen'>
+        <motion.div
+          className='w-16 h-16 border-t-4 border-accent-light dark:border-accent-dark border-solid rounded-full'
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+        />
       </div>
     );
-  if (error) return <p>Error: {error}</p>;
+  if (error) return <p className='text-red-500 text-center'>Error: {error}</p>;
 
-  return (
-    <div className='bg-gray-100 dark:bg-gray-900 py-10 transition-colors duration-300'>
-      <div className='container mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='flex flex-col md:flex-row gap-8'>
-          {/* Left Side - Product Images */}
-          <div className='md:w-1/2'>
-            <div className='mb-4'>
+  const formatPrice = (price: number): string => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  const ReviewCard = ({
+    review,
+    user,
+    onDeleteReview,
+  }: {
+    review: Review;
+    user: User;
+    onDeleteReview: () => void;
+  }) => {
+    return (
+      <motion.div
+        key={review._id}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className='bg-input-light dark:bg-input-dark dark:border dark:border-accent-dark rounded-lg p-6 transition-all duration-300 hover:shadow-md'
+      >
+        <div className='flex items-start space-x-4'>
+          <div className='flex-shrink-0'>
+            {review.user.avatar?.[0]?.url ? (
               <img
-                src={mainImage || '/placeholder-image.jpg'}
-                alt={product?.name}
-                className='w-full h-auto rounded-lg shadow-md'
+                src={review.user.avatar[0].url}
+                alt={review.user.name}
+                className='w-12 h-12 rounded-full object-cover border-2 border-accent-light dark:border-accent-dark'
               />
+            ) : (
+              <User2 className='w-12 h-12 text-text-secondary-light dark:text-text-secondary-dark' />
+            )}
+          </div>
+          <div className='flex-grow'>
+            <div className='flex items-center justify-between'>
+              <h3 className='text-lg font-semibold text-text-primary-light dark:text-text-primary-dark'>
+                {review.user.name}
+              </h3>
+              <span className='text-sm text-text-secondary-light dark:text-text-secondary-dark'>
+                {new Date(review.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </span>
             </div>
-            <div className='flex gap-3 overflow-x-auto'>
-              {product?.images.map((img, index) => (
-                <img
-                  key={index}
-                  src={img.url}
-                  alt={`Thumbnail ${index + 1}`}
-                  className='w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md cursor-pointer opacity-60 hover:opacity-100 transition duration-300'
-                  onClick={() => setMainImage(img.url)}
+            <div className='flex items-center mt-1 mb-2'>
+              {Array.from({ length: 5 }, (_, i) => (
+                <Star
+                  key={i}
+                  className={`w-5 h-5 ${
+                    i < review.rating
+                      ? 'text-accent-light dark:text-accent-dark fill-current'
+                      : 'text-text-secondary-light dark:text-text-secondary-dark'
+                  }`}
                 />
               ))}
             </div>
-          </div>
-
-          {/* Right Side - Product Information */}
-          <div className='md:w-1/2 space-y-6'>
-            {/* Product Name */}
-            <h1 className='text-4xl font-bold text-gray-900 dark:text-gray-100'>
-              {product?.name}
-            </h1>
-
-            {/* Ratings - Modal Trigger */}
-            <div
-              className='flex items-center cursor-pointer'
-              onClick={openReviewModal}
-            >
-              {Array.from({ length: 5 }, (_, index) =>
-                index < (product?.ratings || 0) ? (
-                  <FaStar key={index} className='text-yellow-500' />
-                ) : (
-                  <FaRegStar key={index} className='text-yellow-500' />
-                )
-              )}
-              <span className='ml-2 text-gray-600 dark:text-gray-300'>
-                ({product?.numOfReviews} reviews)
-              </span>
-            </div>
-
-            {/* Price */}
-            <div className='text-3xl font-bold text-gray-900 dark:text-gray-100'>
-              ${product?.price}
-              {product?.discount?.isDiscounted && (
-                <span className='text-gray-500 ml-2 line-through text-lg dark:text-gray-400'>
-                  $
-                  {(
-                    product?.price /
-                    (1 - product.discount.discountPercent / 100)
-                  ).toFixed(2)}
-                </span>
-              )}
-            </div>
-
-            {/* Description */}
-            <p className='text-gray-700 dark:text-gray-300 leading-relaxed'>
-              {product?.description}
+            <p className='text-text-primary-light dark:text-text-primary-dark leading-relaxed'>
+              {review.comment}
             </p>
-
-            {/* Quantity Selector */}
-            <div className='flex items-center space-x-2'>
-              <label
-                htmlFor='quantity'
-                className='text-gray-700 dark:text-gray-300 font-medium'
+            {user && review.user._id === user._id && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className='mt-4 inline-flex items-center text-red-500 hover:text-red-700 transition-colors duration-200'
+                onClick={() => onDeleteReview()}
               >
-                Select Quantity
-              </label>
-              <select
-                id='quantity'
-                value={quantity} // Set the value from the state
-                onChange={(e) => setQuantity(Number(e.target.value))} // Update the state on change
-                className='border border-gray-300 rounded-md px-2 py-1 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200'
-              >
-                {product?.stock ? (
-                  Array.from({ length: product.stock }, (_, qty) => (
-                    <option key={qty + 1} value={qty + 1}>
-                      {qty + 1}
-                    </option>
-                  ))
-                ) : (
-                  <option value={0}>Out of Stock</option>
-                )}
-              </select>
-
-              {product?.stock !== undefined && (
-                <p className='text-gray-600 dark:text-gray-400 ml-4'>
-                  Stock left: {product.stock}
-                </p>
-              )}
-            </div>
-
-            {/* Buttons */}
-            <div className='flex space-x-4'>
-              <button
-                onClick={handleAddToCart}
-                className='bg-indigo-600 flex gap-2 items-center text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition duration-300'
-              >
-                <FaShoppingCart />
-                Add to Cart
-              </button>
-
-              <button className='bg-gray-200 flex gap-2 items-center text-gray-800 px-6 py-2 rounded-md hover:bg-gray-300 transition duration-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'>
-                <FaHeart />
-                Add to Wishlist
-              </button>
-            </div>
-
-            {/* Extra Information */}
-            <div className='text-sm text-gray-600 dark:text-gray-400 space-y-2'>
-              <p>100% Original products</p>
-              <p>Cash on delivery available on this product.</p>
-              <p>Easy return and exchange policy within 7 days.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Product Description & Reviews Section */}
-      <div className='mt-16 mx-2'>
-        <div className='flex space-x-4 border-b border-gray-300 dark:border-gray-700'>
-          <button
-            className={`py-2 px-4 ${
-              !showReviews
-                ? 'border-b-2 border-indigo-600 text-gray-700 dark:text-gray-200'
-                : 'text-gray-500 dark:text-gray-400'
-            }`}
-            onClick={() => setShowReviews(false)}
-          >
-            Description
-          </button>
-          <button
-            className={`py-2 px-4 ${
-              showReviews
-                ? 'border-b-2 border-indigo-600 text-gray-700 dark:text-gray-200'
-                : 'text-gray-500 dark:text-gray-400'
-            }`}
-            onClick={() => setShowReviews(true)}
-          >
-            Reviews ({product?.numOfReviews})
-          </button>
-        </div>
-
-        {/* Description Section */}
-        {!showReviews ? (
-          <div className='py-6 text-gray-700 dark:text-gray-300'>
-            <p>{product?.description}</p>
-          </div>
-        ) : (
-          <div className='py-6 text-gray-700 dark:text-gray-300'>
-            {reviewsLoading ? (
-              <p>Loading reviews...</p>
-            ) : reviewsError ? (
-              <p>Error loading reviews: {reviewsError}</p>
-            ) : reviews.length > 0 ? (
-              <>
-                <div className='space-y-8'>
-                  {reviews.slice(0, reviewsLimit).map((review) => (
-                    <div
-                      key={review._id}
-                      className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-all duration-300 hover:shadow-lg'
-                    >
-                      <div className='flex items-start space-x-4'>
-                        <div className='flex-shrink-0'>
-                          {review.user.avatar?.[0]?.url ? (
-                            <img
-                              src={review.user.avatar[0].url}
-                              alt={review.user.name}
-                              className='w-12 h-12 rounded-full object-cover border-2 border-indigo-500'
-                            />
-                          ) : (
-                            <FaUserCircle className='w-12 h-12 text-gray-400 dark:text-gray-600' />
-                          )}
-                        </div>
-                        <div className='flex-grow'>
-                          <div className='flex items-center justify-between'>
-                            <h3 className='text-lg font-semibold text-gray-800 dark:text-gray-100'>
-                              {review.user.name}
-                            </h3>
-                            <span className='text-sm text-gray-500 dark:text-gray-400'>
-                              {new Date(review.createdAt).toLocaleDateString(
-                                'en-US',
-                                {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric',
-                                }
-                              )}
-                            </span>
-                          </div>
-                          <div className='flex items-center mt-1 mb-2'>
-                            {Array.from({ length: 5 }, (_, i) => (
-                              <span key={i}>
-                                {i < review.rating ? (
-                                  <FaStar className='w-5 h-5 text-yellow-400' />
-                                ) : (
-                                  <FaRegStar className='w-5 h-5 text-gray-300 dark:text-gray-600' />
-                                )}
-                              </span>
-                            ))}
-                          </div>
-                          <p className='text-gray-700 dark:text-gray-300 leading-relaxed'>
-                            {review.comment}
-                          </p>
-                          {user && review.user._id === user._id && (
-                            <button
-                              className='mt-4 inline-flex items-center text-red-500 hover:text-red-700 transition-colors duration-200'
-                              onClick={() => handleDeleteReview()}
-                            >
-                              <FaTrash className='w-4 h-4 mr-2' />
-                              Delete Review
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  {reviews.length > reviewsLimit && (
-                    <div className='text-center'>
-                      <button
-                        className='bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-                        onClick={handleShowMoreReviews}
-                      >
-                        Show More Reviews
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <p>No reviews yet.</p>
+                <Trash2 className='w-4 h-4 mr-2' />
+                Delete Review
+              </motion.button>
             )}
           </div>
+        </div>
+      </motion.div>
+    );
+  };
+
+  return (
+    <div className='bg-body-light dark:bg-body-dark min-h-screen transition-colors duration-300'>
+      <div className='container mx-auto px-4 py-8'>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className='bg-white dark:bg-dark-light rounded-xl shadow-md overflow-hidden'
+        >
+          <div className='md:flex'>
+            {/* Left Side - Product Images */}
+            <div className='md:w-1/2 p-6'>
+              <motion.img
+                src={mainImage || '/placeholder-image.jpg'}
+                alt={product?.name}
+                className='w-full h-auto rounded-lg shadow-md'
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.3 }}
+              />
+              <div className='mt-4 flex gap-3 overflow-x-auto'>
+                {product?.images.map((img, index) => (
+                  <motion.img
+                    key={index}
+                    src={img.url}
+                    alt={`Thumbnail ${index + 1}`}
+                    className='w-20 h-20 object-cover rounded-md cursor-pointer'
+                    whileHover={{ scale: 1.05 }}
+                    onClick={() => setMainImage(img.url)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Right Side - Product Information */}
+            <div className='md:w-1/2 p-6'>
+              <h1 className='text-3xl font-bold text-text-primary-light dark:text-text-primary-dark mb-4'>
+                {product?.name}
+              </h1>
+
+              <div
+                className='flex items-center cursor-pointer mb-4'
+                onClick={openReviewModal}
+              >
+                {Array.from({ length: 5 }, (_, index) => (
+                  <Star
+                    key={index}
+                    className={`w-5 h-5 ${
+                      index < (product?.ratings || 0)
+                        ? 'text-accent-light dark:text-accent-dark fill-current'
+                        : 'text-text-secondary-light dark:text-text-secondary-dark'
+                    }`}
+                  />
+                ))}
+                <span className='ml-2 text-text-secondary-light dark:text-text-secondary-dark'>
+                  ({product?.numOfReviews} reviews)
+                </span>
+              </div>
+
+              <div className='text-3xl font-bold text-text-primary-light dark:text-text-primary-dark mb-4'>
+                ₦
+                {product?.price !== undefined
+                  ? formatPrice(Math.round(product.price))
+                  : 'N/A'}
+                {product?.discount?.isDiscounted && (
+                  <span className='text-text-secondary-light dark:text-text-secondary-dark ml-2 line-through text-lg'>
+                    ₦
+                    {formatPrice(
+                      Math.round(
+                        product.price /
+                          (1 - product.discount.discountPercent / 100)
+                      )
+                    )}
+                  </span>
+                )}
+              </div>
+
+              <div className='text-text-primary-light dark:text-text-primary-dark mb-6'>
+                <div
+                  className={`leading-relaxed ${
+                    isDescriptionExpanded ? '' : 'line-clamp-2'
+                  }`}
+                >
+                  {product?.description}
+                </div>
+                {product?.description &&
+                  product.description.split(' ').length > 20 && (
+                    <button
+                      onClick={toggleDescription}
+                      className='text-accent-light dark:text-accent-dark font-medium mt-2'
+                    >
+                      {isDescriptionExpanded
+                        ? 'Show less'
+                        : 'Read full description below'}
+                    </button>
+                  )}
+              </div>
+
+              <div className='flex items-center space-x-4 mb-6'>
+                <label
+                  htmlFor='quantity'
+                  className='text-text-primary-light dark:text-text-primary-dark font-medium'
+                >
+                  Quantity
+                </label>
+                <div className='relative'>
+                  <select
+                    id='quantity'
+                    value={quantity}
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                    className='block appearance-none w-full bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark text-text-primary-light dark:text-text-primary-dark py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:border-accent-light dark:focus:border-accent-dark'
+                  >
+                    {product?.stock ? (
+                      Array.from({ length: product.stock }, (_, qty) => (
+                        <option key={qty + 1} value={qty + 1}>
+                          {qty + 1}
+                        </option>
+                      ))
+                    ) : (
+                      <option value={0}>Out of Stock</option>
+                    )}
+                  </select>
+                  <div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-primary-light dark:text-text-primary-dark'>
+                    <ChevronDown className='w-4 h-4' />
+                  </div>
+                </div>
+                {product?.stock !== undefined && (
+                  <p className='text-text-secondary-light dark:text-text-secondary-dark'>
+                    Stock left: {product.stock}
+                  </p>
+                )}
+              </div>
+
+              <div className='flex space-x-4 mb-6'>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleAddToCart}
+                  className='bg-button-primary-light dark:bg-button-primary-dark text-white px-6 py-2 rounded-md hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition duration-300 flex items-center space-x-2'
+                >
+                  <ShoppingCart className='w-5 h-5' />
+                  <span>Add to Cart</span>
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className='bg-input-light dark:bg-input-dark text-text-primary-light dark:text-text-primary-dark px-6 py-2 rounded-md hover:bg-border-light dark:hover:bg-border-dark transition duration-300 flex items-center space-x-2'
+                >
+                  <Heart className='w-5 h-5' />
+                  <span>Wishlist</span>
+                </motion.button>
+              </div>
+
+              <div className='text-sm text-text-secondary-light dark:text-text-secondary-dark space-y-2'>
+                <p>✓ 100% Original products</p>
+                <p>✓ Cash on delivery available</p>
+                <p>✓ Easy 7-day return & exchange policy</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Improved Product Description & Reviews Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className='mt-12 bg-white dark:bg-dark-light rounded-xl shadow-md overflow-hidden'
+        >
+          <div className='flex border-b border-border-light dark:border-border-dark'>
+            <button
+              className={`py-4 px-6 font-semibold transition-colors duration-200 ${
+                !showReviews
+                  ? 'border-b-2 border-accent-light dark:border-accent-dark text-accent-light dark:text-accent-dark'
+                  : 'text-text-secondary-light dark:text-text-secondary-dark hover:text-accent-light dark:hover:text-accent-dark'
+              }`}
+              onClick={() => setShowReviews(false)}
+            >
+              Description
+            </button>
+            <button
+              className={`py-4 px-6 font-semibold transition-colors duration-200 ${
+                showReviews
+                  ? 'border-b-2 border-accent-light dark:border-accent-dark text-accent-light dark:text-accent-dark'
+                  : 'text-text-secondary-light dark:text-text-secondary-dark hover:text-accent-light dark:hover:text-accent-dark'
+              }`}
+              onClick={() => setShowReviews(true)}
+            >
+              Reviews ({product?.numOfReviews})
+            </button>
+          </div>
+
+          <div className='p-6'>
+            {!showReviews ? (
+              <p className='text-text-primary-light dark:text-text-primary-dark leading-relaxed'>
+                {product?.description}
+              </p>
+            ) : (
+              <div className='space-y-8'>
+                {reviewsLoading ? (
+                  <p>Loading reviews...</p>
+                ) : reviewsError ? (
+                  <p className='text-red-500'>
+                    Error loading reviews: {reviewsError}
+                  </p>
+                ) : reviews.length > 0 ? (
+                  <>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                      {reviews.slice(0, reviewsLimit).map((review) => (
+                        <ReviewCard
+                          key={review._id}
+                          review={review}
+                          user={user as User}
+                          onDeleteReview={handleDeleteReview}
+                        />
+                      ))}
+                    </div>
+                    {reviews.length > reviewsLimit && (
+                      <div className='text-center mt-8'>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className='bg-button-primary-light dark:bg-button-primary-dark text-white px-6 py-2 rounded-md hover:bg-button-hover-light dark:hover:bg-button-hover-dark transition duration-300 focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark focus:ring-offset-2'
+                          onClick={handleShowMoreReviews}
+                        >
+                          Show More Reviews
+                        </motion.button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className='text-center py-8'>
+                    <MessageSquare className='w-16 h-16 text-text-secondary-light dark:text-text-secondary-dark mx-auto mb-4' />
+                    <p className='text-text-secondary-light dark:text-text-secondary-dark'>
+                      No reviews yet. Be the first to review this product!
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Related Products Section */}
+        {relatedProduct && relatedProduct.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className='mt-12'
+          >
+            <RelatedProducts products={relatedProduct} />
+          </motion.div>
         )}
       </div>
-      {/* Related Products Section */}
-      <RelatedProducts products={relatedProduct || []} />
+
       {/* Render Modal */}
       {isModalOpen && (
         <RatingModal
@@ -398,7 +502,7 @@ const Product = () => {
           userRating={userRating}
           setUserRating={setUserRating}
           onSubmitReview={handleSubmitReview}
-          existingReview={existingReview || undefined}
+          existingReview={existingReview}
         />
       )}
     </div>

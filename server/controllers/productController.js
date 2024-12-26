@@ -478,13 +478,6 @@ export const getProductReviews = catchAsync(async (req, res, next) => {
   // Populate user details in the reviews
   await product.populate('reviews.user', 'name email avatar');
 
-  await Activity.create({
-    action: 'view',
-    product: product._id,
-    user: req.user.id,
-    activity: `Viewed reviews for product: ${product.name}`,
-  });
-
   res.status(200).json({
     success: true,
     reviews: product.reviews,

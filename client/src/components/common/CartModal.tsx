@@ -69,8 +69,6 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
     onClose();
   };
 
-  useEffect(() => {}, [cart]);
-
   const handleQuantityChange = async (
     itemId: string | Product,
     newQuantity: number
@@ -84,15 +82,12 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
       return;
     }
 
-    // Update only if quantity is more than zero
     if (newQuantity <= 0) {
       return handleRemoveItem(productId);
     }
 
-    // If user is authenticated, update the cart in the backend
     if (isAuthenticated && userInfo?.id) {
       try {
-        // First, update the cart
         await dispatch(
           addOrUpdateCart({
             userId: userInfo.id,
@@ -101,11 +96,8 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
             price: product.price,
           })
         );
-
-        // Then, refetch the cart to get the latest state
         await dispatch(fetchCart(userInfo.id));
 
-        // Optional: Re-fetch product details only if necessary
         if (!productDetails[productId]) {
           const updatedProduct = await getProductById(productId);
           if (updatedProduct?.product) {
@@ -120,7 +112,6 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
         toast.error('Error updating cart');
       }
     } else {
-      // Handle the local cart (unauthenticated users)
       try {
         const localCart: Cart = JSON.parse(
           localStorage.getItem('cart') || 'null'
@@ -131,10 +122,8 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
         );
 
         if (existingItem) {
-          // Update the quantity of the existing item
           existingItem.quantity = newQuantity;
         } else {
-          // Push a new item if it doesn't exist (shouldn't happen if you handle correctly)
           localCart.items.push({
             product: itemId,
             quantity: newQuantity,
@@ -142,13 +131,9 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
           });
         }
 
-        // Save to localStorage
         localStorage.setItem('cart', JSON.stringify(localCart));
-
-        // Update the local cart in the Redux state
         dispatch(setLocalCart(localCart));
 
-        // Manually update product details if missing
         if (!productDetails[productId]) {
           const updatedProduct = await getProductById(productId);
           if (updatedProduct?.product) {
@@ -235,15 +220,15 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-start justify-end pt-20 pr-4 z-50'>
       <div
         ref={modalRef}
-        className='bg-white dark:bg-gray-800 shadow-xl rounded-lg w-full max-w-md overflow-hidden'
+        className='bg-body-light dark:bg-body-dark shadow-xl rounded-lg w-full max-w-md overflow-hidden'
       >
-        <div className='p-4 border-b dark:border-gray-700 flex justify-between items-center'>
-          <h2 className='text-xl font-semibold text-gray-800 dark:text-white'>
+        <div className='p-4 border-b border-border-light dark:border-border-dark flex justify-between items-center'>
+          <h2 className='text-xl font-semibold text-text-primary-light dark:text-text-primary-dark'>
             Your Cart
           </h2>
           <button
             onClick={onClose}
-            className='text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-colors'
+            className='text-text-secondary-light hover:text-text-primary-light dark:text-text-secondary-dark dark:hover:text-text-primary-dark transition-colors'
           >
             <IoClose size={24} />
           </button>
@@ -251,7 +236,7 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
         <ScrollArea className='h-[60vh]'>
           {cart && cart.items && cart.items.length > 0 ? (
-            <ul className='divide-y dark:divide-gray-700'>
+            <ul className='divide-y divide-border-light dark:divide-border-dark'>
               {cart.items.map((item) => {
                 const product =
                   typeof item.product === 'string'
@@ -266,7 +251,7 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                     }
                     className='p-4 flex items-center space-x-4'
                   >
-                    <div className='flex-shrink-0 w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-md overflow-hidden'>
+                    <div className='flex-shrink-0 w-16 h-16 bg-input-light dark:bg-input-dark rounded-md overflow-hidden'>
                       {product?.images && (
                         <img
                           src={product.images[0].url}
@@ -276,10 +261,10 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                       )}
                     </div>
                     <div className='flex-1 min-w-0'>
-                      <p className='text-sm font-medium text-gray-900 dark:text-white truncate'>
+                      <p className='text-sm font-medium text-text-primary-light dark:text-text-primary-dark truncate'>
                         {product ? product.name : 'Loading...'}
                       </p>
-                      <div className='text-sm text-gray-500 dark:text-gray-400'>
+                      <div className='text-sm text-text-secondary-light dark:text-text-secondary-dark'>
                         <div className='flex items-center space-x-2'>
                           <button
                             onClick={() =>
@@ -289,7 +274,7 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                               )
                             }
                             disabled={item.quantity <= 1}
-                            className='text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white'
+                            className='text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-text-primary-dark'
                           >
                             -
                           </button>
@@ -301,7 +286,7 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                                 item.quantity + 1
                               )
                             }
-                            className='text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white'
+                            className='text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-text-primary-dark'
                           >
                             +
                           </button>
@@ -311,7 +296,7 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                               onClick={() =>
                                 handleRemoveItem(item.product as string)
                               }
-                              className='text-red-500 hover:text-red-700 dark:text-red-300 dark:hover:text-red-500'
+                              className='text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
                             >
                               <IoTrash size={20} />
                             </button>
@@ -319,7 +304,7 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                         </div>
                       </div>
                     </div>
-                    <div className='flex-shrink-0 text-sm font-medium text-gray-900 dark:text-white'>
+                    <div className='flex-shrink-0 text-sm font-medium text-text-primary-light dark:text-text-primary-dark'>
                       $
                       {product
                         ? (product.price * item.quantity).toFixed(2)
@@ -330,14 +315,14 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
               })}
             </ul>
           ) : (
-            <p className='p-4 text-gray-500 dark:text-gray-400 text-center'>
+            <p className='p-4 text-text-secondary-light dark:text-text-secondary-dark text-center'>
               Your cart is empty.
             </p>
           )}
         </ScrollArea>
 
-        <div className='p-4 border-t dark:border-gray-700'>
-          <p className='text-sm font-semibold text-gray-900 dark:text-white'>
+        <div className='p-4 border-t border-border-light dark:border-border-dark'>
+          <p className='text-sm font-semibold text-text-primary-light dark:text-text-primary-dark'>
             Total: ${totalPrice?.toFixed(2)}
           </p>
           <div className='mt-4 flex space-x-2'>
@@ -349,7 +334,7 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
             </button>
             <button
               onClick={handleViewAll}
-              className='w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors'
+              className='w-full bg-accent-light dark:bg-accent-dark text-white dark:text-black px-4 py-2 rounded-md hover:bg-accent-secondary-light dark:hover:bg-accent-secondary-dark transition-colors'
             >
               View Cart
             </button>

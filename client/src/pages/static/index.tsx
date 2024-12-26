@@ -1,10 +1,9 @@
 import Hero from '../../components/common/Hero';
+import BestSellers from '../../components/landing_page/BestSeller';
+import Latest from '../../components/landing_page/Latest';
+import NewsLetter from '../../components/landing_page/NewsLetter';
+import OurPolicy from '../../components/landing_page/OurPolicy';
 import ScrollButton from '../../components/lib/ScrollButton';
-import BestSellers from '../../components/template/BestSeller';
-import Latest from '../../components/template/Latest';
-import NewsLetter from '../../components/template/NewsLetter';
-import OurPolicy from '../../components/template/OurPolicy';
-import ProductGrid from '../../components/template/Product';
 
 const index = () => {
   return (
@@ -13,7 +12,6 @@ const index = () => {
       <Latest />
       <OurPolicy />
       <BestSellers />
-      <ProductGrid />
       <NewsLetter />
       <ScrollButton />
     </div>
