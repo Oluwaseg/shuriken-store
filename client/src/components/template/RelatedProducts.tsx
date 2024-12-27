@@ -48,6 +48,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const truncateText = (text: string, maxLength: number): string => {
     return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
   };
+  const formatPrice = (price: number): string => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -107,15 +110,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </p>
         <div className='flex justify-between items-center mb-4'>
           <p className='text-2xl font-bold text-accent-light dark:text-accent-dark'>
-            ${product.price.toFixed(2)}
+            ${formatPrice(product.price)}
           </p>
           {product.discount?.isDiscounted && (
             <span className='text-sm text-text-secondary-light dark:text-text-secondary-dark line-through'>
-              $
-              {(
-                product.price /
-                (1 - product.discount.discountPercent / 100)
-              ).toFixed(2)}
+              ₦
+              {formatPrice(
+                product.price * (1 - product.discount.discountPercent / 100)
+              )}
             </span>
           )}
         </div>
