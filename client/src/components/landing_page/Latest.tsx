@@ -47,6 +47,10 @@ const Latest: React.FC = () => {
     );
   }
 
+  const formatPrice = (price: number): string => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   return (
     <section className='py-16 px-4 max-w-7xl mx-auto'>
       <div className='text-center mb-12'>
@@ -115,19 +119,20 @@ const Latest: React.FC = () => {
                 {product.discount?.isDiscounted ? (
                   <>
                     <p className='text-accent-light dark:text-accent-dark font-bold'>
-                      $
-                      {(
+                      ₦
+                      {formatPrice(
                         product.price -
-                        (product.price * product.discount.discountPercent) / 100
-                      ).toLocaleString()}
+                          (product.price * product.discount.discountPercent) /
+                            100
+                      )}
                     </p>
                     <p className='text-text-secondary-light dark:text-text-secondary-dark line-through text-sm'>
-                      ${product.price.toLocaleString()}
+                      ${formatPrice(product.price)}
                     </p>
                   </>
                 ) : (
                   <p className='text-accent-light dark:text-accent-dark font-bold'>
-                    ${product.price.toLocaleString()}
+                    ${formatPrice(product.price)}
                   </p>
                 )}
               </div>
