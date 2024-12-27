@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchLatestProducts } from '../../features/product/productSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
+import PagePreloader from '../PagePreloader';
 
 const Latest: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -32,8 +33,8 @@ const Latest: React.FC = () => {
 
   if (loading) {
     return (
-      <div className='flex items-center justify-center min-h-[400px]'>
-        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-light dark:border-accent-dark'></div>
+      <div className='min-h-[400px] flex items-center justify-center dark:bg-body-dark'>
+        <PagePreloader />
       </div>
     );
   }

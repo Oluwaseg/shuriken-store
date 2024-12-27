@@ -68,7 +68,7 @@ const Navbar: React.FC = () => {
 
   const navLinks = isAuthenticated
     ? [
-        { to: '/home', text: 'Home' },
+        { to: '/', text: 'Home' },
         { to: '/products', text: 'Products' },
         { to: '/blog', text: 'Blog' },
         { to: '/contact', text: 'Contact' },

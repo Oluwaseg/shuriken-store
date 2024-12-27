@@ -31,28 +31,34 @@ const PaymentSuccessPage: React.FC = () => {
   }, [navigate]);
 
   return (
-    <div className='min-h-screen flex justify-center items-center bg-gray-50'>
-      <div className='max-w-md w-full bg-white shadow-lg rounded-lg p-8'>
+    <div className='min-h-screen flex justify-center items-center bg-body-light dark:bg-body-dark'>
+      <div className='max-w-md w-full bg-card-light dark:bg-card-dark shadow-lg rounded-lg p-8'>
         <div className='flex flex-col items-center'>
           {loading ? (
             <div className='flex flex-col items-center'>
-              <SyncLoader color='#4B9CE2' size={15} />
-              <h3 className='mt-4 text-xl text-gray-700'>
+              <SyncLoader
+                color='var(--accent-light)'
+                cssOverride={{
+                  color: 'rgba(75, 156, 226, 1)',
+                }}
+                size={15}
+              />
+              <h3 className='mt-4 text-xl text-text-secondary-light dark:text-text-secondary-dark'>
                 Processing your payment...
               </h3>
             </div>
           ) : (
             <div className='text-center'>
-              <h2 className='text-2xl font-bold text-green-600'>
+              <h2 className='text-2xl font-bold text-success-light dark:text-success-dark'>
                 Payment Verified!
               </h2>
-              <p className='text-lg mt-4 text-gray-600'>
+              <p className='text-lg mt-4 text-text-secondary-light dark:text-text-secondary-dark'>
                 Your payment has been successfully processed. You can now view
                 your orders.
               </p>
               <button
                 onClick={() => navigate('/orders')}
-                className='mt-6 w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                className='mt-6 w-full bg-button-primary-light hover:bg-button-hover-light dark:bg-button-primary-dark dark:hover:bg-button-hover-dark text-white py-3 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
               >
                 View Orders
               </button>

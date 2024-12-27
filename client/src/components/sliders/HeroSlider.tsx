@@ -1,10 +1,12 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick-theme.css';
 import 'slick-carousel/slick/slick.css';
 import { fetchLatestProducts } from '../../features/product/productSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
+import PagePreloader from '../PagePreloader';
 
 const HeroSlider: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -52,8 +54,8 @@ const HeroSlider: React.FC = () => {
 
   if (loading) {
     return (
-      <div className='flex items-center justify-center h-80 md:h-96 lg:h-112'>
-        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-light dark:border-accent-dark'></div>
+      <div className='h-80 md:h-96 lg:h-112 flex items-center justify-center dark:bg-body-dark'>
+        <PagePreloader />
       </div>
     );
   }
@@ -117,9 +119,8 @@ const HeroSlider: React.FC = () => {
                       </span>
                     )}
                   </div>
-
-                  <a
-                    href={`/product/${product._id}`}
+                  <Link
+                    to={`/product/${product._id}`}
                     className='inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-accent-light dark:bg-accent-dark rounded-full hover:bg-accent-secondary-light dark:hover:bg-accent-secondary-dark transition-colors duration-300'
                   >
                     Shop Now
@@ -136,7 +137,7 @@ const HeroSlider: React.FC = () => {
                         d='M14 5l7 7m0 0l-7 7m7-7H3'
                       />
                     </svg>
-                  </a>
+                  </Link>
                 </motion.div>
               </div>
             </div>

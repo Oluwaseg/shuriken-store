@@ -1,6 +1,7 @@
+import { motion } from 'framer-motion';
+import { CreditCard, Lock, Package, Truck } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { FaLock, FaShoppingCart, FaTruck } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { initializePayment } from '../../api/payment';
 import { fetchCart } from '../../features/cart/cartSlice';
@@ -27,7 +28,7 @@ const CheckoutPage: React.FC = () => {
     0
   );
   const tax = subtotal * 0.1;
-  const shipping = 15.0;
+  const shipping = 8500;
   const total = subtotal + tax + shipping;
 
   const dispatch = useAppDispatch();
@@ -70,12 +71,10 @@ const CheckoutPage: React.FC = () => {
     }
 
     if (isAuthenticated && userInfo?.id) {
-      // Initialize checkout
       await dispatch(initializeCheckout({ userId: userInfo.id, shippingInfo }));
 
       if (!error) {
         try {
-          // Call the backend to initialize payment
           const paymentResponse = await initializePayment(
             userInfo.id,
             userInfo.email
@@ -85,7 +84,6 @@ const CheckoutPage: React.FC = () => {
             paymentResponse.success &&
             paymentResponse.data.authorization_url
           ) {
-            // Redirect to Paystack authorization URL
             window.location.href = paymentResponse.data.authorization_url;
           } else {
             toast.error('Payment initialization failed. Please try again.');
@@ -100,162 +98,204 @@ const CheckoutPage: React.FC = () => {
     }
   };
 
+  const formatPrice = (price: number): string => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   return (
-    <div className='min-h-screen bg-gray-100'>
-      <div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
-        <div className='grid lg:grid-cols-3 gap-8'>
+    <div className='min-h-screen bg-primary dark:bg-body-dark'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className='grid lg:grid-cols-3 gap-8'
+        >
           {/* Shipping Info */}
-          <div className='lg:col-span-2 bg-white shadow-lg rounded-lg p-6'>
-            <h2 className='text-2xl font-bold text-gray-900 mb-6 flex items-center'>
-              <FaTruck className='text-indigo-600 mr-3' />
-              Shipping Information
-            </h2>
-            <form className='space-y-6'>
-              <div className='space-y-1'>
-                <label
-                  htmlFor='address'
-                  className='text-sm font-medium text-gray-700'
-                >
-                  Street Address
-                </label>
-                <input
-                  type='text'
-                  id='address'
-                  name='address'
-                  placeholder='Enter your street address'
-                  value={shippingInfo.address}
-                  onChange={handleShippingInfoChange}
-                  className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
-                />
-              </div>
-              <div className='grid grid-cols-2 gap-4'>
+          <div className='lg:col-span-2 bg-body-light dark:bg-dark-light rounded-2xl shadow-xl overflow-hidden'>
+            <div className='p-6 sm:p-8'>
+              <h2 className='text-2xl font-bold text-text-primary-light dark:text-text-primary-dark mb-6 flex items-center'>
+                <Truck className='text-accent-light dark:text-accent-dark mr-3' />
+                Shipping Information
+              </h2>
+              <form className='space-y-6'>
                 <div className='space-y-1'>
                   <label
-                    htmlFor='city'
-                    className='text-sm font-medium text-gray-700'
+                    htmlFor='address'
+                    className='text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark'
                   >
-                    City
+                    Street Address
                   </label>
                   <input
                     type='text'
-                    id='city'
-                    name='city'
-                    placeholder='City'
-                    value={shippingInfo.city}
+                    id='address'
+                    name='address'
+                    placeholder='Enter your street address'
+                    value={shippingInfo.address}
                     onChange={handleShippingInfoChange}
-                    className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                    className='w-full px-4 py-3 rounded-xl bg-input-light dark:bg-input-dark text-text-primary-light dark:text-text-primary-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
                   />
+                </div>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div className='space-y-1'>
+                    <label
+                      htmlFor='city'
+                      className='text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark'
+                    >
+                      City
+                    </label>
+                    <input
+                      type='text'
+                      id='city'
+                      name='city'
+                      placeholder='City'
+                      value={shippingInfo.city}
+                      onChange={handleShippingInfoChange}
+                      className='w-full px-4 py-3 rounded-xl bg-input-light dark:bg-input-dark text-text-primary-light dark:text-text-primary-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
+                    />
+                  </div>
+                  <div className='space-y-1'>
+                    <label
+                      htmlFor='state'
+                      className='text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark'
+                    >
+                      State
+                    </label>
+                    <input
+                      type='text'
+                      id='state'
+                      name='state'
+                      placeholder='State'
+                      value={shippingInfo.state}
+                      onChange={handleShippingInfoChange}
+                      className='w-full px-4 py-3 rounded-xl bg-input-light dark:bg-input-dark text-text-primary-light dark:text-text-primary-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
+                    />
+                  </div>
+                </div>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div className='space-y-1'>
+                    <label
+                      htmlFor='postalCode'
+                      className='text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark'
+                    >
+                      Postal Code
+                    </label>
+                    <input
+                      type='text'
+                      id='postalCode'
+                      name='postalCode'
+                      placeholder='Postal Code'
+                      value={shippingInfo.postalCode}
+                      onChange={handleShippingInfoChange}
+                      className='w-full px-4 py-3 rounded-xl bg-input-light dark:bg-input-dark text-text-primary-light dark:text-text-primary-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
+                    />
+                  </div>
+                  <div className='space-y-1'>
+                    <label
+                      htmlFor='country'
+                      className='text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark'
+                    >
+                      Country
+                    </label>
+                    <input
+                      type='text'
+                      id='country'
+                      name='country'
+                      placeholder='Country'
+                      value={shippingInfo.country}
+                      onChange={handleShippingInfoChange}
+                      className='w-full px-4 py-3 rounded-xl bg-input-light dark:bg-input-dark text-text-primary-light dark:text-text-primary-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
+                    />
+                  </div>
                 </div>
                 <div className='space-y-1'>
                   <label
-                    htmlFor='state'
-                    className='text-sm font-medium text-gray-700'
+                    htmlFor='phoneNo'
+                    className='text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark'
                   >
-                    State
+                    Phone Number
                   </label>
                   <input
                     type='text'
-                    id='state'
-                    name='state'
-                    placeholder='State'
-                    value={shippingInfo.state}
+                    id='phoneNo'
+                    name='phoneNo'
+                    placeholder='Phone Number'
+                    value={shippingInfo.phoneNo}
                     onChange={handleShippingInfoChange}
-                    className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
+                    className='w-full px-4 py-3 rounded-xl bg-input-light dark:bg-input-dark text-text-primary-light dark:text-text-primary-dark border border-border-light dark:border-border-dark focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark'
                   />
                 </div>
-              </div>
-              <div className='grid grid-cols-2 gap-4'>
-                <div className='space-y-1'>
-                  <label
-                    htmlFor='postalCode'
-                    className='text-sm font-medium text-gray-700'
-                  >
-                    Postal Code
-                  </label>
-                  <input
-                    type='text'
-                    id='postalCode'
-                    name='postalCode'
-                    placeholder='Postal Code'
-                    value={shippingInfo.postalCode}
-                    onChange={handleShippingInfoChange}
-                    className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
-                  />
-                </div>
-                <div className='space-y-1'>
-                  <label
-                    htmlFor='country'
-                    className='text-sm font-medium text-gray-700'
-                  >
-                    Country
-                  </label>
-                  <input
-                    type='text'
-                    id='country'
-                    name='country'
-                    placeholder='Country'
-                    value={shippingInfo.country}
-                    onChange={handleShippingInfoChange}
-                    className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
-                  />
-                </div>
-              </div>
-              <div className='space-y-1'>
-                <label
-                  htmlFor='phoneNo'
-                  className='text-sm font-medium text-gray-700'
-                >
-                  Phone Number
-                </label>
-                <input
-                  type='text'
-                  id='phoneNo'
-                  name='phoneNo'
-                  placeholder='Phone Number'
-                  value={shippingInfo.phoneNo}
-                  onChange={handleShippingInfoChange}
-                  className='w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500'
-                />
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
 
           {/* Order Summary */}
-          <div className='bg-white shadow-lg rounded-lg p-6'>
-            <h2 className='text-2xl font-bold text-gray-900 mb-6 flex items-center'>
-              <FaShoppingCart className='text-indigo-600 mr-3' />
-              Order Summary
-            </h2>
-            <div className='space-y-4 text-gray-600'>
-              <div className='flex justify-between'>
-                <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+          <div className='bg-body-light dark:bg-dark-light rounded-2xl shadow-xl overflow-hidden'>
+            <div className='p-6 sm:p-8'>
+              <h2 className='text-2xl font-bold text-text-primary-light dark:text-text-primary-dark mb-6 flex items-center'>
+                <Package className='text-accent-light dark:text-accent-dark mr-3' />
+                Order Summary
+              </h2>
+              <div className='space-y-4 text-text-secondary-light dark:text-text-secondary-dark'>
+                <div className='flex justify-between'>
+                  <span>Subtotal</span>
+                  <span>₦{formatPrice(subtotal)}</span>
+                </div>
+                <div className='flex justify-between'>
+                  <span>Tax</span>
+                  <span>₦{formatPrice(tax)}</span>
+                </div>
+                <div className='flex justify-between'>
+                  <span>Shipping</span>
+                  <span>₦{formatPrice(shipping)}</span>
+                </div>
+                <div className='border-t border-border-light dark:border-border-dark pt-4 flex justify-between text-lg font-bold text-text-primary-light dark:text-text-primary-dark'>
+                  <span>Total</span>
+                  <span>₦{formatPrice(total)}</span>
+                </div>
               </div>
-              <div className='flex justify-between'>
-                <span>Tax</span>
-                <span>${tax.toFixed(2)}</span>
-              </div>
-              <div className='flex justify-between'>
-                <span>Shipping</span>
-                <span>${shipping.toFixed(2)}</span>
-              </div>
-              <div className='border-t border-gray-200 pt-4 flex justify-between text-lg font-bold'>
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
+              <button
+                onClick={handleCheckout}
+                disabled={loading}
+                className='mt-6 w-full bg-accent-light hover:bg-accent-secondary-light dark:bg-accent-dark dark:hover:bg-accent-secondary-dark text-white py-4 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-light dark:focus:ring-accent-dark disabled:opacity-50 disabled:cursor-not-allowed'
+              >
+                {loading ? (
+                  <span className='flex items-center justify-center'>
+                    <svg
+                      className='animate-spin -ml-1 mr-3 h-5 w-5 text-white'
+                      xmlns='http://www.w3.org/2000/svg'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                    >
+                      <circle
+                        className='opacity-25'
+                        cx='12'
+                        cy='12'
+                        r='10'
+                        stroke='currentColor'
+                        strokeWidth='4'
+                      ></circle>
+                      <path
+                        className='opacity-75'
+                        fill='currentColor'
+                        d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
+                      ></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  <span className='flex items-center justify-center'>
+                    <CreditCard className='mr-2' />
+                    Confirm and Pay
+                  </span>
+                )}
+              </button>
+              <p className='mt-4 text-sm text-text-secondary-light dark:text-text-secondary-dark flex justify-center items-center'>
+                <Lock className='mr-2' /> Secure Checkout
+              </p>
             </div>
-            <button
-              onClick={handleCheckout}
-              disabled={loading}
-              className='mt-6 w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition focus:outline-none focus:ring-2 focus:ring-indigo-500'
-            >
-              {loading ? 'Processing...' : 'Confirm and Pay'}
-            </button>
-            <p className='mt-4 text-sm text-gray-500 flex justify-center items-center'>
-              <FaLock className='mr-2' /> Secure Checkout
-            </p>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

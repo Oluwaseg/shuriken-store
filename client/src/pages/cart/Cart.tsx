@@ -1,6 +1,7 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { IoTrash } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { getProductById } from '../../api/product';
 import {
@@ -22,6 +23,7 @@ const CartPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  // Existing useEffects and handlers remain unchanged
   useEffect(() => {
     if (isAuthenticated && userInfo?.id) {
       dispatch(fetchCart(userInfo.id));
@@ -59,8 +61,6 @@ const CartPage: React.FC = () => {
     }
   }, [cart, isAuthenticated, productDetails]);
 
-  useEffect(() => {}, [cart]);
-
   const handleQuantityChange = async (
     itemId: string | Product,
     newQuantity: number
@@ -74,15 +74,12 @@ const CartPage: React.FC = () => {
       return;
     }
 
-    // Update only if quantity is more than zero
     if (newQuantity <= 0) {
       return handleRemoveItem(productId);
     }
 
-    // If user is authenticated, update the cart in the backend
     if (isAuthenticated && userInfo?.id) {
       try {
-        // First, update the cart
         await dispatch(
           addOrUpdateCart({
             userId: userInfo.id,
@@ -91,11 +88,8 @@ const CartPage: React.FC = () => {
             price: product.price,
           })
         );
-
-        // Then, refetch the cart to get the latest state
         await dispatch(fetchCart(userInfo.id));
 
-        // Optional: Re-fetch product details only if necessary
         if (!productDetails[productId]) {
           const updatedProduct = await getProductById(productId);
           if (updatedProduct?.product) {
@@ -110,7 +104,6 @@ const CartPage: React.FC = () => {
         toast.error('Error updating cart');
       }
     } else {
-      // Handle the local cart (unauthenticated users)
       try {
         const localCart: Cart = JSON.parse(
           localStorage.getItem('cart') || 'null'
@@ -121,10 +114,8 @@ const CartPage: React.FC = () => {
         );
 
         if (existingItem) {
-          // Update the quantity of the existing item
           existingItem.quantity = newQuantity;
         } else {
-          // Push a new item if it doesn't exist (shouldn't happen if you handle correctly)
           localCart.items.push({
             product: itemId,
             quantity: newQuantity,
@@ -132,13 +123,9 @@ const CartPage: React.FC = () => {
           });
         }
 
-        // Save to localStorage
         localStorage.setItem('cart', JSON.stringify(localCart));
-
-        // Update the local cart in the Redux state
         dispatch(setLocalCart(localCart));
 
-        // Manually update product details if missing
         if (!productDetails[productId]) {
           const updatedProduct = await getProductById(productId);
           if (updatedProduct?.product) {
@@ -205,157 +192,194 @@ const CartPage: React.FC = () => {
 
   const subtotal = totalPrice;
   const tax = subtotal * 0.1;
-  const SHIPPING_COST = 15.0;
+  const SHIPPING_COST = 8500;
   const total = subtotal + tax + SHIPPING_COST;
+
+  const formatPrice = (price: number): string => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   return (
-    <div className='container mx-auto py-10 px-4 lg:px-8'>
-      <h1 className='text-3xl font-semibold mb-6 text-gray-800 dark:text-white'>
-        Shopping Cart
-      </h1>
+    <div className='min-h-screen bg-primary dark:bg-body-dark'>
+      <div className='container mx-auto py-10 px-4 sm:px-6 lg:px-8'>
+        <h1 className='text-3xl font-bold mb-8 text-text-primary-light dark:text-text-primary-dark'>
+          Your Shopping Cart
+        </h1>
 
-      {cart?.items?.length ? (
-        <div className='grid lg:grid-cols-12 gap-8'>
-          {/* Cart Items */}
-          <div className='lg:col-span-8 space-y-6'>
-            {cart?.items?.map((item) => {
-              console.log('Cart item', item);
-              const product =
-                typeof item.product === 'string'
-                  ? productDetails[item.product]
-                  : item.product;
-
-              return (
-                <div
-                  key={
+        {cart?.items?.length ? (
+          <div className='grid lg:grid-cols-12 gap-8'>
+            {/* Cart Items */}
+            <div className='lg:col-span-8 space-y-6'>
+              <AnimatePresence>
+                {cart?.items?.map((item) => {
+                  const product =
                     typeof item.product === 'string'
-                      ? item.product
-                      : product?._id
-                  }
-                  className='flex items-center justify-between bg-white dark:bg-gray-800 p-4 rounded-md shadow-sm'
-                >
-                  <div className='flex items-center space-x-4'>
-                    <div className='w-20 h-20 rounded-md overflow-hidden bg-gray-200 dark:bg-gray-700'>
-                      {product?.images && (
-                        <img
-                          src={product.images[0].url}
-                          alt={product.name}
-                          className='w-full h-full object-cover'
-                        />
-                      )}
-                    </div>
-                    <div>
-                      <h3 className='text-lg font-medium text-gray-900 dark:text-white'>
-                        {product?.name || 'Loading...'}
-                      </h3>
-                      <p className='text-sm text-gray-500 dark:text-gray-400'>
-                        Price: ${product?.price.toFixed(2)}
-                      </p>
-                      <div className='mt-2 flex items-center space-x-2'>
-                        <button
-                          onClick={() =>
-                            handleQuantityChange(
-                              item.product as string,
-                              item.quantity - 1
-                            )
-                          }
-                          className='px-2 py-1 text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded'
-                          disabled={item.quantity === 1}
-                        >
-                          -
-                        </button>
-                        <span className='text-gray-600 dark:text-gray-300'>
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() =>
-                            handleQuantityChange(
-                              item.product as string,
-                              item.quantity + 1
-                            )
-                          }
-                          className='px-2 py-1 text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded'
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className='flex items-center space-x-4'>
-                    <p className='text-lg font-medium text-gray-800 dark:text-white'>
-                      ${((product?.price || 0) * item.quantity).toFixed(2)}
-                    </p>
-                    <button
-                      onClick={() => handleRemoveItem(item.product as string)}
-                      className='text-red-600 hover:text-red-800'
+                      ? productDetails[item.product]
+                      : item.product;
+
+                  return (
+                    <motion.div
+                      key={
+                        typeof item.product === 'string'
+                          ? item.product
+                          : product?._id
+                      }
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className='bg-body-light dark:bg-dark-light rounded-lg shadow-md overflow-hidden'
                     >
-                      <IoTrash size={20} />
-                    </button>
+                      <div className='p-6 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6'>
+                        <div className='w-24 h-24 rounded-md overflow-hidden bg-input-light dark:bg-input-dark flex-shrink-0'>
+                          {product?.images && (
+                            <img
+                              src={product.images[0].url}
+                              alt={product.name}
+                              className='w-full h-full object-cover'
+                            />
+                          )}
+                        </div>
+                        <div className='flex-grow'>
+                          <h3 className='text-lg font-semibold text-text-primary-light dark:text-text-primary-dark'>
+                            {product?.name || 'Loading...'}
+                          </h3>
+                          <p className='text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1'>
+                            Price: ₦{' '}
+                            {product?.price !== undefined
+                              ? formatPrice(Math.round(product.price))
+                              : 'N/A'}
+                          </p>
+                          <div className='mt-4 flex items-center space-x-4'>
+                            <div className='flex items-center space-x-2'>
+                              <button
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item.product as string,
+                                    item.quantity - 1
+                                  )
+                                }
+                                className='p-1 rounded-full bg-input-light dark:bg-input-dark text-text-primary-light dark:text-text-primary-dark hover:bg-accent-light hover:text-white dark:hover:bg-accent-dark transition-colors'
+                                disabled={item.quantity === 1}
+                              >
+                                <Minus size={16} />
+                              </button>
+                              <span className='text-text-primary-light dark:text-text-primary-dark font-medium'>
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item.product as string,
+                                    item.quantity + 1
+                                  )
+                                }
+                                className='p-1 rounded-full bg-input-light dark:bg-input-dark text-text-primary-light dark:text-text-primary-dark hover:bg-accent-light hover:text-white dark:hover:bg-accent-dark transition-colors'
+                              >
+                                <Plus size={16} />
+                              </button>
+                            </div>
+                            <button
+                              onClick={() =>
+                                handleRemoveItem(item.product as string)
+                              }
+                              className='text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors'
+                            >
+                              <Trash2 size={20} />
+                            </button>
+                          </div>
+                        </div>
+                        <div className='text-right'>
+                          <p className='text-lg font-semibold text-text-primary-light dark:text-text-primary-dark'>
+                            ₦
+                            {formatPrice((product?.price || 0) * item.quantity)}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+
+            {/* Cart Summary */}
+            <div className='lg:col-span-4'>
+              <div className='bg-body-light dark:bg-dark-light rounded-lg shadow-md p-6 sticky top-6'>
+                <h2 className='text-2xl font-semibold text-text-primary-light dark:text-text-primary-dark mb-6'>
+                  Order Summary
+                </h2>
+                <div className='space-y-4'>
+                  <div className='flex justify-between text-text-secondary-light dark:text-text-secondary-dark'>
+                    <span>Subtotal</span>
+                    <span>₦{formatPrice(subtotal)}</span>
+                  </div>
+                  <div className='flex justify-between text-text-secondary-light dark:text-text-secondary-dark'>
+                    <span>Tax (10%)</span>
+                    <span>₦{formatPrice(tax)}</span>
+                  </div>
+                  <div className='flex justify-between text-text-secondary-light dark:text-text-secondary-dark'>
+                    <span>Shipping</span>
+                    <span>₦{formatPrice(SHIPPING_COST)}</span>
+                  </div>
+                  <div className='border-t border-border-light dark:border-border-dark pt-4'>
+                    <div className='flex justify-between text-xl font-semibold text-text-primary-light dark:text-text-primary-dark'>
+                      <span>Total</span>
+                      <span>₦{formatPrice(total)}</span>
+                    </div>
                   </div>
                 </div>
-              );
-            })}
+                <div className='mt-8 space-y-4'>
+                  {userInfo ? (
+                    <button
+                      onClick={() => navigate('/checkout')}
+                      className='w-full py-3 px-4 bg-accent-light hover:bg-accent-secondary-light dark:bg-accent-dark dark:hover:bg-accent-secondary-dark text-white font-semibold rounded-lg transition-colors duration-200 ease-in-out'
+                    >
+                      Proceed to Checkout
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() =>
+                        toast.error('Please sign in to proceed to checkout.')
+                      }
+                      className='w-full py-3 px-4 bg-accent-light hover:bg-accent-secondary-light dark:bg-accent-dark dark:hover:bg-accent-secondary-dark text-white font-semibold rounded-lg transition-colors duration-200 ease-in-out'
+                    >
+                      Sign In to Checkout
+                    </button>
+                  )}
+                  <button
+                    onClick={handleClearCart}
+                    className='w-full py-3 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors duration-200 ease-in-out'
+                  >
+                    Clear Cart
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-
-          {/* Cart Summary */}
-          <div className='lg:col-span-4 bg-gray-100 dark:bg-gray-800 p-6 rounded-md shadow-md'>
-            <h2 className='text-2xl font-semibold text-gray-900 dark:text-white mb-4'>
-              Order Summary
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className='text-center py-16'
+          >
+            <ShoppingCart
+              size={64}
+              className='mx-auto text-text-secondary-light dark:text-text-secondary-dark mb-6'
+            />
+            <h2 className='text-2xl font-semibold text-text-primary-light dark:text-text-primary-dark mb-2'>
+              Your cart is empty
             </h2>
-            <div className='flex justify-between text-gray-700 dark:text-gray-300 mb-2'>
-              <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
-            </div>
-            <div className='flex justify-between text-gray-700 dark:text-gray-300 mb-2'>
-              <span>Tax (10%)</span>
-              <span>${tax.toFixed(2)}</span>
-            </div>
-            <div className='flex justify-between text-gray-700 dark:text-gray-300 mb-4'>
-              <span>Shipping</span>
-              <span>${SHIPPING_COST.toFixed(2)}</span>
-            </div>
-            <hr className='my-4' />
-            <div className='flex justify-between text-xl font-semibold text-gray-900 dark:text-white'>
-              <span>Total</span>
-              <span>${total.toFixed(2)}</span>
-            </div>
-            {userInfo ? (
-              <>
-                <button
-                  onClick={() => navigate('/checkout')}
-                  className='w-full mt-6 bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition-colors'
-                >
-                  Proceed to Checkout
-                </button>
-                <button
-                  onClick={handleClearCart}
-                  className='w-full mt-2 bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors'
-                >
-                  Clear Cart
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() =>
-                    toast.error('Please sign in to proceed to checkout.')
-                  }
-                  className='w-full mt-6 bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition-colors'
-                >
-                  Proceed to Checkout
-                </button>
-                <button
-                  onClick={handleClearCart}
-                  className='w-full mt-2 bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors'
-                >
-                  Clear Cart
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      ) : (
-        <p>Your cart is empty.</p>
-      )}
+            <p className='text-text-secondary-light dark:text-text-secondary-dark mb-8'>
+              Looks like you haven't added any items to your cart yet.
+            </p>
+            <button
+              onClick={() => navigate('/')}
+              className='px-6 py-3 bg-accent-light hover:bg-accent-secondary-light dark:bg-accent-dark dark:hover:bg-accent-secondary-dark text-white font-semibold rounded-lg transition-colors duration-200 ease-in-out'
+            >
+              Continue Shopping
+            </button>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 };

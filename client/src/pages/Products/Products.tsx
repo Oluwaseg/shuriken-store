@@ -140,12 +140,8 @@ const Products = () => {
 };
 
 const LoadingSpinner = () => (
-  <div className='flex justify-center items-center h-screen'>
-    <motion.div
-      className='w-16 h-16 border-4 border-accent-light dark:border-accent-dark rounded-full border-t-transparent'
-      animate={{ rotate: 360 }}
-      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-    />
+  <div className='h-screen flex items-center justify-center dark:bg-body-dark'>
+    <PagePreloader />
   </div>
 );
 
@@ -306,6 +302,7 @@ const SortDropdown = ({
   </select>
 );
 
+import PagePreloader from '../../components/PagePreloader';
 import { Product } from '../../types/type';
 const formatPrice = (price: number): string => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

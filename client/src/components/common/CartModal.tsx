@@ -1,6 +1,7 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import { Loader2, Minus, Plus, ShoppingCart, Trash2, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { IoClose, IoTrash } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { getProductById } from '../../api/product';
 import {
@@ -18,6 +19,7 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   isOpen,
   onClose,
 }) => {
+  // Existing state and hooks remain unchanged
   const [productDetails, setProductDetails] = useState<{
     [key: string]: Product | undefined;
   }>({});
@@ -27,6 +29,7 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   const navigate = useNavigate();
   const modalRef = useRef<HTMLDivElement>(null);
 
+  // All existing useEffects and handlers remain unchanged
   useEffect(() => {
     if (isOpen && isAuthenticated && userInfo?.id) {
       dispatch(fetchCart(userInfo.id));
@@ -206,8 +209,6 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
-
   const totalPrice = cart?.items?.reduce((total, item) => {
     const product =
       typeof item.product === 'string'
@@ -216,132 +217,224 @@ const CartModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
     return total + (product?.price || 0) * item.quantity;
   }, 0);
 
+  const formatPrice = (price: number): string => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-start justify-end pt-20 pr-4 z-50'>
-      <div
-        ref={modalRef}
-        className='bg-body-light dark:bg-body-dark shadow-xl rounded-lg w-full max-w-md overflow-hidden'
-      >
-        <div className='p-4 border-b border-border-light dark:border-border-dark flex justify-between items-center'>
-          <h2 className='text-xl font-semibold text-text-primary-light dark:text-text-primary-dark'>
-            Your Cart
-          </h2>
-          <button
-            onClick={onClose}
-            className='text-text-secondary-light hover:text-text-primary-light dark:text-text-secondary-dark dark:hover:text-text-primary-dark transition-colors'
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className='fixed inset-0 bg-black/30 backdrop-blur-sm flex items-start justify-end z-50'
+        >
+          <motion.div
+            ref={modalRef}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className='h-full w-full sm:w-[28rem] bg-body-light dark:bg-body-dark shadow-2xl flex flex-col'
           >
-            <IoClose size={24} />
-          </button>
-        </div>
+            {/* Header */}
+            <div className='p-4 border-b border-border-light dark:border-border-dark bg-white/50 dark:bg-dark-light/50 backdrop-blur-md'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-3'>
+                  <ShoppingCart className='w-5 h-5 text-accent-light dark:text-accent-dark' />
+                  <h2 className='text-lg font-semibold text-text-primary-light dark:text-text-primary-dark'>
+                    Shopping Cart
+                  </h2>
+                </div>
+                <button
+                  onClick={onClose}
+                  className='p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors'
+                >
+                  <X className='w-5 h-5 text-text-primary-light dark:text-text-primary-dark' />
+                </button>
+              </div>
+              <p className='mt-1 text-sm text-text-secondary-light dark:text-text-secondary-dark'>
+                {cart?.items?.length || 0} items in your cart
+              </p>
+            </div>
 
-        <ScrollArea className='h-[60vh]'>
-          {cart && cart.items && cart.items.length > 0 ? (
-            <ul className='divide-y divide-border-light dark:divide-border-dark'>
-              {cart.items.map((item) => {
-                const product =
-                  typeof item.product === 'string'
-                    ? productDetails[item.product]
-                    : item.product;
-                return (
-                  <li
-                    key={
-                      product
-                        ? String(product._id || item.product)
-                        : String(item.product)
-                    }
-                    className='p-4 flex items-center space-x-4'
-                  >
-                    <div className='flex-shrink-0 w-16 h-16 bg-input-light dark:bg-input-dark rounded-md overflow-hidden'>
-                      {product?.images && (
-                        <img
-                          src={product.images[0].url}
-                          alt={product.name}
-                          className='w-full h-full object-cover'
-                        />
-                      )}
-                    </div>
-                    <div className='flex-1 min-w-0'>
-                      <p className='text-sm font-medium text-text-primary-light dark:text-text-primary-dark truncate'>
-                        {product ? product.name : 'Loading...'}
-                      </p>
-                      <div className='text-sm text-text-secondary-light dark:text-text-secondary-dark'>
-                        <div className='flex items-center space-x-2'>
-                          <button
-                            onClick={() =>
-                              handleQuantityChange(
-                                item.product as string,
-                                item.quantity - 1
-                              )
-                            }
-                            disabled={item.quantity <= 1}
-                            className='text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-text-primary-dark'
-                          >
-                            -
-                          </button>
-                          <span>{item.quantity}</span>
-                          <button
-                            onClick={() =>
-                              handleQuantityChange(
-                                item.product as string,
-                                item.quantity + 1
-                              )
-                            }
-                            className='text-text-secondary-light dark:text-text-secondary-dark hover:text-text-primary-light dark:hover:text-text-primary-dark'
-                          >
-                            +
-                          </button>
+            {/* Cart Items */}
+            <ScrollArea className='flex-1 overflow-y-auto'>
+              {cart && cart.items && cart.items.length > 0 ? (
+                <motion.ul
+                  initial='hidden'
+                  animate='visible'
+                  variants={{
+                    visible: {
+                      transition: {
+                        staggerChildren: 0.05,
+                      },
+                    },
+                  }}
+                  className='divide-y divide-border-light dark:divide-border-dark'
+                >
+                  {cart.items.map((item) => {
+                    const product =
+                      typeof item.product === 'string'
+                        ? productDetails[item.product]
+                        : item.product;
+                    return (
+                      <motion.li
+                        key={
+                          product
+                            ? String(product._id || item.product)
+                            : String(item.product)
+                        }
+                        variants={{
+                          hidden: { opacity: 0, y: 20 },
+                          visible: { opacity: 1, y: 0 },
+                        }}
+                        className='p-4 flex gap-4'
+                      >
+                        {/* Product Image */}
+                        <div className='relative w-20 h-20 rounded-lg overflow-hidden bg-input-light dark:bg-input-dark'>
+                          {product?.images ? (
+                            <img
+                              src={product.images[0].url}
+                              alt={product.name}
+                              className='w-full h-full object-cover'
+                            />
+                          ) : (
+                            <div className='w-full h-full flex items-center justify-center'>
+                              <Loader2 className='w-6 h-6 animate-spin text-text-secondary-light dark:text-text-secondary-dark' />
+                            </div>
+                          )}
+                        </div>
 
+                        {/* Product Details */}
+                        <div className='flex-1 min-w-0 flex flex-col justify-between'>
                           <div>
+                            <h3 className='font-medium text-text-primary-light dark:text-text-primary-dark truncate'>
+                              {product ? product.name : 'Loading...'}
+                            </h3>
+                            <p className='text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1'>
+                              ₦
+                              {product
+                                ? formatPrice(product.price || 0)
+                                : '-.--'}{' '}
+                              each
+                            </p>
+                          </div>
+
+                          {/* Quantity Controls */}
+                          <div className='flex items-center justify-between mt-2'>
+                            <div className='flex items-center gap-1'>
+                              <button
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item.product as string,
+                                    item.quantity - 1
+                                  )
+                                }
+                                disabled={item.quantity <= 1}
+                                className='p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 transition-colors'
+                              >
+                                <Minus className='w-4 h-4' />
+                              </button>
+                              <span className='w-8 text-center text-sm font-medium'>
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item.product as string,
+                                    item.quantity + 1
+                                  )
+                                }
+                                className='p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                              >
+                                <Plus className='w-4 h-4' />
+                              </button>
+                            </div>
                             <button
                               onClick={() =>
                                 handleRemoveItem(item.product as string)
                               }
-                              className='text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
+                              className='p-1 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors'
                             >
-                              <IoTrash size={20} />
+                              <Trash2 className='w-4 h-4' />
                             </button>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className='flex-shrink-0 text-sm font-medium text-text-primary-light dark:text-text-primary-dark'>
-                      $
-                      {product
-                        ? (product.price * item.quantity).toFixed(2)
-                        : '-.--'}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p className='p-4 text-text-secondary-light dark:text-text-secondary-dark text-center'>
-              Your cart is empty.
-            </p>
-          )}
-        </ScrollArea>
 
-        <div className='p-4 border-t border-border-light dark:border-border-dark'>
-          <p className='text-sm font-semibold text-text-primary-light dark:text-text-primary-dark'>
-            Total: ${totalPrice?.toFixed(2)}
-          </p>
-          <div className='mt-4 flex space-x-2'>
-            <button
-              onClick={handleClearCart}
-              className='w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors'
-            >
-              Clear Cart
-            </button>
-            <button
-              onClick={handleViewAll}
-              className='w-full bg-accent-light dark:bg-accent-dark text-white dark:text-black px-4 py-2 rounded-md hover:bg-accent-secondary-light dark:hover:bg-accent-secondary-dark transition-colors'
-            >
-              View Cart
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+                        {/* Item Total */}
+                        <div className='text-right'>
+                          <p className='font-medium text-text-primary-light dark:text-text-primary-dark'>
+                            ₦
+                            {product
+                              ? formatPrice(
+                                  (product.price || 0) * item.quantity
+                                )
+                              : '-.--'}
+                          </p>
+                        </div>
+                      </motion.li>
+                    );
+                  })}
+                </motion.ul>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className='h-full flex flex-col items-center justify-center p-8 text-center'
+                >
+                  <ShoppingCart className='w-16 h-16 text-text-secondary-light dark:text-text-secondary-dark opacity-20' />
+                  <p className='mt-4 text-text-primary-light dark:text-text-primary-dark font-medium'>
+                    Your cart is empty
+                  </p>
+                  <p className='mt-2 text-sm text-text-secondary-light dark:text-text-secondary-dark'>
+                    Add items to your cart to see them here
+                  </p>
+                </motion.div>
+              )}
+            </ScrollArea>
+
+            {/* Footer */}
+            {(cart?.items?.length ?? 0) > 0 && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className='border-t border-border-light dark:border-border-dark bg-white/50 dark:bg-dark-light/50 backdrop-blur-md'
+              >
+                {/* Summary */}
+                <div className='p-4 space-y-4'>
+                  <div className='flex items-center justify-between text-text-primary-light dark:text-text-primary-dark'>
+                    <span className='font-medium'>Total</span>
+                    <span className='text-lg font-semibold'>
+                      ₦{formatPrice(totalPrice || 0)}
+                    </span>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className='grid grid-cols-2 gap-3'>
+                    <button
+                      onClick={handleClearCart}
+                      className='px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors'
+                    >
+                      Clear Cart
+                    </button>
+                    <button
+                      onClick={handleViewAll}
+                      className='px-4 py-2 text-sm font-medium text-white bg-accent-light hover:bg-accent-secondary-light dark:bg-accent-dark dark:hover:bg-accent-secondary-dark rounded-lg transition-colors'
+                    >
+                      Checkout
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

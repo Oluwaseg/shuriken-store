@@ -134,14 +134,7 @@ const Product = () => {
           quantity,
           price: product.price,
         })
-      )
-        .unwrap()
-        .then(() => {
-          toast.success('Product added to cart successfully!');
-        })
-        .catch((error) => {
-          toast.error(`Error adding product to cart: ${error}`);
-        });
+      ).unwrap();
     } else {
       toast.error('Product not found.');
     }

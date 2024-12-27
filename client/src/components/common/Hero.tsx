@@ -29,7 +29,7 @@ const Hero = () => {
         </div>
 
         {/* Right side - Slider */}
-        <div className='w-full'>
+        <div className='w-full hidden sm:block'>
           <HeroSlider />
         </div>
       </div>
