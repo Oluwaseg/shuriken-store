@@ -127,12 +127,12 @@ const Latest: React.FC = () => {
                       )}
                     </p>
                     <p className='text-text-secondary-light dark:text-text-secondary-dark line-through text-sm'>
-                      ${formatPrice(product.price)}
+                      ₦{formatPrice(product.price)}
                     </p>
                   </>
                 ) : (
                   <p className='text-accent-light dark:text-accent-dark font-bold'>
-                    ${formatPrice(product.price)}
+                    ₦{formatPrice(product.price)}
                   </p>
                 )}
               </div>
