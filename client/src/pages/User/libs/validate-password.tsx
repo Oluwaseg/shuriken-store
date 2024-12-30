@@ -1,14 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { motion } from 'framer-motion';
+import { Check, Eye, EyeOff, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-  FaCheckCircle,
-  FaEye,
-  FaEyeSlash,
-  FaLock,
-  FaTimesCircle,
-} from 'react-icons/fa';
-import ClipLoader from 'react-spinners/ClipLoader';
 import * as Yup from 'yup';
 import { fetchUpdateUserPassword } from '../../../features/user/userSlice';
 import { useAppDispatch } from '../../../hooks';
@@ -57,7 +51,7 @@ export const UpdateUserPassword: React.FC = () => {
     reset();
   };
 
-  const toggleShowPassword = (field: keyof PasswordData) => {
+  const toggleShowPassword = (field: keyof typeof showPassword) => {
     setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
@@ -70,18 +64,13 @@ export const UpdateUserPassword: React.FC = () => {
   ];
 
   return (
-    <div className='lg:col-span-2 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg'>
-      <h3 className='text-2xl font-bold mb-6 text-gray-800 dark:text-white'>
-        Update Password
-      </h3>
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+    <div className='space-y-4'>
+      <h2 className='text-lg font-semibold mb-3'>Update Password</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className='space-y-3'>
         {(['currentPassword', 'newPassword', 'confirmPassword'] as const).map(
           (field) => (
             <div key={field}>
-              <label
-                className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2'
-                htmlFor={field}
-              >
+              <label className='block text-sm font-medium mb-1' htmlFor={field}>
                 {field === 'currentPassword'
                   ? 'Current Password'
                   : field === 'newPassword'
@@ -91,78 +80,75 @@ export const UpdateUserPassword: React.FC = () => {
               <div className='relative'>
                 <input
                   type={showPassword[field] ? 'text' : 'password'}
-                  placeholder='••••••••'
-                  className={`bg-gray-50 dark:bg-gray-700 border ${
+                  {...register(field)}
+                  className={`w-full px-3 py-2 border rounded-md bg-input-light dark:bg-input-dark ${
                     errors[field]
                       ? 'border-red-500'
-                      : 'border-gray-300 dark:border-gray-600'
-                  } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5`}
-                  {...register(field)}
+                      : 'border-border-light dark:border-border-dark'
+                  } focus:outline-none focus:ring-2 focus:ring-accent-light dark:focus:ring-accent-dark`}
                 />
                 <button
                   type='button'
-                  className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500'
                   onClick={() => toggleShowPassword(field)}
+                  className='absolute inset-y-0 right-0 flex items-center pr-3'
                 >
                   {showPassword[field] ? (
-                    <FaEyeSlash className='h-5 w-5' />
+                    <EyeOff className='h-4 w-4 text-gray-400' />
                   ) : (
-                    <FaEye className='h-5 w-5' />
+                    <Eye className='h-4 w-4 text-gray-400' />
                   )}
                 </button>
               </div>
               {errors[field] && (
-                <p className='text-red-500 text-xs mt-1'>
+                <p className='mt-1 text-xs text-red-500'>
                   {errors[field]?.message}
                 </p>
               )}
             </div>
           )
         )}
-        <div className='space-y-2'>
-          <p className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-            Password requirements:
-          </p>
+
+        <div className='bg-gray-100 dark:bg-dark-secondary p-3 rounded-md'>
+          <h3 className='text-sm font-medium mb-2'>Password Requirements:</h3>
           <ul className='space-y-1'>
             {passwordRequirements.map((req, index) => (
-              <li key={index} className='flex items-center space-x-2'>
+              <motion.li
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className='flex items-center space-x-2'
+              >
                 {req.regex.test(newPassword || '') ? (
-                  <FaCheckCircle className='text-green-500' />
+                  <Check className='h-3 w-3 text-green-500' />
                 ) : (
-                  <FaTimesCircle className='text-red-500' />
+                  <X className='h-3 w-3 text-red-500' />
                 )}
                 <span
-                  className={`text-sm ${
+                  className={`text-xs ${
                     req.regex.test(newPassword || '')
-                      ? 'text-green-500'
-                      : 'text-red-500'
+                      ? 'text-green-600'
+                      : 'text-red-600'
                   }`}
                 >
                   {req.text}
                 </span>
-              </li>
+              </motion.li>
             ))}
           </ul>
         </div>
-        <button
+
+        <motion.button
           type='submit'
           disabled={isSubmitting}
-          className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex justify-center items-center ${
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className={`w-full bg-button-primary-light hover:bg-button-hover-light dark:bg-button-primary-dark dark:hover:bg-button-hover-dark text-white py-2 px-4 rounded-md font-medium ${
             isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
-          {isSubmitting ? (
-            <>
-              <ClipLoader size={20} color='white' />
-              <span className='ml-2'>Updating...</span>
-            </>
-          ) : (
-            <>
-              <FaLock className='mr-2' />
-              <span>Update Password</span>
-            </>
-          )}
-        </button>
+          {isSubmitting ? 'Updating...' : 'Update Password'}
+        </motion.button>
       </form>
     </div>
   );
