@@ -25,6 +25,7 @@ import PrivacyPolicy from '../pages/static/PrivacyPolicy';
 import TermsAndConditions from '../pages/static/TermsAndConditions';
 import Unsubscribe from '../pages/static/Unsubscribe';
 import Profile from '../pages/User/Profile';
+import Setting from '../pages/User/Setting';
 import ProtectedRoute from '../utils/Verify-Route';
 
 const RoutesConfig: React.FC = () => {
@@ -104,6 +105,14 @@ const RoutesConfig: React.FC = () => {
             <Layout>
               <Profile />
             </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path='/settings'
+        element={
+          <ProtectedRoute>
+            <Setting />
           </ProtectedRoute>
         }
       />
