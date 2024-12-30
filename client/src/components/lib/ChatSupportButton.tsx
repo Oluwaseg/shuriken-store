@@ -9,7 +9,7 @@ const ChatSupportButton: React.FC = () => {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className='fixed bottom-28 right-8 bg-accent-light dark:bg-accent-dark text-white rounded-full p-3 shadow-lg transition-colors'
+        className='fixed bottom-4 right-4 bg-accent-light dark:bg-accent-dark text-white rounded-full p-3 shadow-lg transition-colors'
       >
         <MessageCircle size={24} />
       </button>
