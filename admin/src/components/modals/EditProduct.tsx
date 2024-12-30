@@ -251,7 +251,7 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
                   </label>
                   <div className='relative'>
                     <span className='absolute inset-y-0 left-0 pl-3 flex items-center text-text-secondary-light dark:text-text-secondary-dark text-sm'>
-                      $
+                      ₦
                     </span>
                     <input
                       type='number'
