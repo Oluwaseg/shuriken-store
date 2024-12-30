@@ -94,16 +94,16 @@ export const getCartByUserId = catchAsync(async (req, res, next) => {
       select: 'name price images',
     });
 
-    if (!cart) {
-      return res.status(404).json({
-        success: false,
-        message: 'Cart not found',
-      });
-    }
+    // if (!cart) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: 'Cart not found',
+    //   });
+    // }
 
     res.status(200).json({
       success: true,
-      cart,
+      cart: cart || { items: [] },
     });
   } catch (error) {
     console.error('Error fetching cart:', error.message);
