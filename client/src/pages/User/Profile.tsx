@@ -1,9 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { motion } from 'framer-motion';
+import { Camera, CloudUpload, Edit, Save } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaCamera, FaCloudUploadAlt, FaEdit } from 'react-icons/fa';
-
-import SyncLoader from 'react-spinners/SyncLoader';
+import { SyncLoader } from 'react-spinners';
 import * as yup from 'yup';
 import {
   fetchUpdateProfile,
@@ -11,8 +11,7 @@ import {
 } from '../../features/user/userSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import countriesData from './libs/country.json';
-import { Socials } from './libs/socialInfo';
-import { UpdateUserPassword } from './libs/validate-password';
+
 type Country = {
   name: string;
   code: string;
@@ -36,12 +35,13 @@ const schema = yup.object().shape({
     postalCode: yup.string().required('Postal Code is required'),
   }),
 });
+
 interface FormDataValues {
   name: string;
   username: string;
   email: string;
   bio?: string;
-  birthday?: string;
+  birthday: string;
   shippingInfo: {
     address: string;
     city: string;
@@ -58,8 +58,13 @@ const Profile = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>(
     userInfo?.shippingInfo?.country || ''
   );
-
   const [states, setStates] = useState<string[]>([]);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    userInfo?.avatar?.[0]?.url || 'https://via.placeholder.com/120'
+  );
+  const [loading, setLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   const formattedBirthday = userInfo?.birthday
     ? new Date(userInfo?.birthday).toISOString().split('T')[0]
@@ -70,7 +75,7 @@ const Profile = () => {
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm({
+  } = useForm<FormDataValues>({
     resolver: yupResolver(schema),
     defaultValues: {
       name: userInfo?.name || '',
@@ -78,7 +83,6 @@ const Profile = () => {
       email: userInfo?.email || '',
       bio: userInfo?.bio || '',
       birthday: formattedBirthday || '',
-
       shippingInfo: {
         address: userInfo?.shippingInfo?.address || '',
         city: userInfo?.shippingInfo?.city || '',
@@ -89,12 +93,7 @@ const Profile = () => {
       },
     },
   });
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(
-    userInfo?.avatar?.[0]?.url || 'https://via.placeholder.com/120'
-  );
-  const [loading, setLoading] = useState(false);
-  const [submitLoading, setSubmitLoading] = useState(false);
+
   useEffect(() => {
     if (selectedCountry) {
       const countryData = countries.find((c) => c.name === selectedCountry);
@@ -148,11 +147,11 @@ const Profile = () => {
     const country = event.target.value;
     setSelectedCountry(country);
     setStates(countries.find((c) => c.name === country)?.states || []);
-    setValue('shippingInfo.state', ''); // Reset state when country changes
+    setValue('shippingInfo.state', '');
   };
 
   const onSubmit = async (data: FormDataValues) => {
-    setSubmitLoading(true); // Set loading before submitting
+    setSubmitLoading(true);
     setTimeout(async () => {
       console.log('Submitted Data:', data);
       const formData = new FormData();
@@ -163,17 +162,14 @@ const Profile = () => {
         } else if (value instanceof Date) {
           formData.append(key, value.toISOString());
         } else if (typeof value === 'object' && value !== null) {
-          // For nested objects, recursively append each sub-value
           Object.entries(value).forEach(([subKey, subValue]) => {
             if (typeof subValue === 'string') {
               formData.append(`${key}[${subKey}]`, subValue);
             } else if (subValue instanceof Date) {
               formData.append(`${key}[${subKey}]`, subValue.toISOString());
             } else if (subValue instanceof Blob) {
-              // Handle Blob type
               formData.append(`${key}[${subKey}]`, subValue);
             } else {
-              // Ensure nested values are properly serialized
               formData.append(`${key}[${subKey}]`, String(subValue));
             }
           });
@@ -181,24 +177,31 @@ const Profile = () => {
       });
 
       await dispatch(fetchUpdateProfile(formData));
-      setSubmitLoading(false); // Reset the loading state after submit
-    }, 3000); // Delay for 3 seconds before submitting the form
+      setSubmitLoading(false);
+    }, 3000);
   };
 
   return (
-    <div className='bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-300 min-h-screen p-6'>
-      {/* Main container for profile */}
-      <div className='max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12'>
+    <div className='bg-body-light dark:bg-body-dark text-text-primary-light dark:text-text-primary-dark min-h-screen p-6'>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className='max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12'
+      >
         {/* Left Section (Profile & Language) */}
         <div className='lg:col-span-1 flex flex-col gap-6'>
           {/* Profile Card */}
-          <div className='flex flex-col items-center bg-gray-200 dark:bg-gray-700 p-6 rounded-lg shadow-lg relative'>
-            {/* Nested div for image and upload */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className='flex flex-col items-center bg-primary dark:bg-dark-light p-6 rounded-lg shadow-lg relative'
+          >
             <div className='relative'>
-              <img
+              <motion.img
+                whileHover={{ scale: 1.1 }}
                 src={imagePreview || 'https://via.placeholder.com/120'}
                 alt='Profile'
-                className='w-32 h-32 rounded-full mb-4 shadow-md transition-opacity duration-300 ease-in-out hover:opacity-75'
+                className='w-32 h-32 rounded-full mb-4 shadow-md'
               />
               <input
                 type='file'
@@ -207,56 +210,58 @@ const Profile = () => {
                 className='absolute inset-0 w-full h-full opacity-0 cursor-pointer'
                 id='imageUpload'
               />
-              <label
+              <motion.label
+                whileHover={{ scale: 1.1 }}
                 htmlFor='imageUpload'
                 className='absolute inset-0 bottom-4 flex items-center justify-center text-white bg-black bg-opacity-50 rounded-full cursor-pointer opacity-0 hover:opacity-100 transition-opacity duration-300'
               >
-                <FaEdit className='mr-1' />
+                <Edit className='mr-1' size={16} />
                 Edit
-              </label>
+              </motion.label>
             </div>
-            <h1 className='text-xl font-bold mb-2 dark:text-white'>
-              {userInfo.name}
-            </h1>
-            <p className='mb-4 dark:text-white'>{userInfo.username}</p>
+            <h1 className='text-xl font-bold mb-2'>{userInfo.name}</h1>
+            <p className='mb-4'>{userInfo.username}</p>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleSaveImage}
               disabled={loading || !image}
-              className={`flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-opacity duration-300 ${
+              className={`flex items-center justify-center bg-button-primary-light dark:bg-button-primary-dark hover:bg-button-hover-light dark:hover:bg-button-hover-dark text-white px-4 py-2 rounded-md transition-all duration-300 ${
                 loading || !image ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
               {loading ? (
                 <div className='flex items-center'>
                   Updating...
-                  <div className=' ml-2'>
-                    <SyncLoader size={10} color='white' />
-                  </div>
+                  <SyncLoader size={10} color='white' className='ml-2' />
                 </div>
               ) : image ? (
                 <>
                   Upload Image
-                  <FaCloudUploadAlt className='ml-2' />
+                  <CloudUpload className='ml-2' size={16} />
                 </>
               ) : (
                 <>
-                  <FaCamera className='mr-2' />
+                  <Camera className='mr-2' size={16} />
                   Change Picture
                 </>
               )}
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
 
           {/* Language & Time */}
-          <div className='bg-gray-200 dark:bg-gray-700 p-6 rounded-lg shadow-lg'>
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className='bg-primary dark:bg-dark-light p-6 rounded-lg shadow-lg'
+          >
             <h2 className='text-lg font-semibold mb-6'>Language & Time</h2>
             <label className='block text-sm mb-2' htmlFor='language'>
               Select Language
             </label>
             <select
               id='language'
-              className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+              className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark'
             >
               <option>English (US)</option>
               <option>French</option>
@@ -267,23 +272,32 @@ const Profile = () => {
             </label>
             <select
               id='timezone'
-              className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+              className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark'
             >
               <option>GMT+0 Greenwich Mean Time</option>
               <option>GMT+1 Central European Time</option>
             </select>
 
-            <button className='bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded-md mt-8'>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className='bg-button-primary-light dark:bg-button-primary-dark hover:bg-button-hover-light dark:hover:bg-button-hover-dark text-white w-full py-2 rounded-md mt-8 transition-all duration-300'
+            >
               Save all
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         </div>
 
         {/* Middle Section - General Information */}
-        <div className='lg:col-span-2'>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className='lg:col-span-2'
+        >
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className='bg-gray-200 dark:bg-gray-700 p-8 rounded-lg shadow-lg'
+            className='bg-primary dark:bg-dark-light p-8 rounded-lg shadow-lg'
           >
             <h2 className='text-2xl font-semibold mb-6'>General Information</h2>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -293,7 +307,7 @@ const Profile = () => {
                 </label>
                 <input
                   {...register('name')}
-                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                  className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark'
                 />
                 <p className='text-red-500'>{errors.name?.message}</p>
               </div>
@@ -304,22 +318,9 @@ const Profile = () => {
                 </label>
                 <input
                   {...register('username')}
-                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                  className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark'
                 />
                 <p className='text-red-500'>{errors.username?.message}</p>
-              </div>
-
-              <div>
-                <label className='block text-sm mb-2' htmlFor='email'>
-                  Email
-                </label>
-                <input
-                  {...register('email')}
-                  type='email'
-                  disabled
-                  className='w-full p-2 rounded-md bg-gray-400 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
-                />
-                <p className='text-red-500'>{errors.email?.message}</p>
               </div>
 
               <div>
@@ -328,7 +329,7 @@ const Profile = () => {
                 </label>
                 <textarea
                   {...register('bio')}
-                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 resize-none'
+                  className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark resize-none'
                 />
               </div>
 
@@ -341,11 +342,11 @@ const Profile = () => {
                   type='date'
                   defaultValue={formattedBirthday || ''}
                   onChange={(e) => {
-                    const selectedDate = e.target.value; // This will always be in 'yyyy-mm-dd' format.
+                    const selectedDate = e.target.value;
                     console.log('Birthday Input Changed:', selectedDate);
-                    setValue('birthday', selectedDate); // Store as a string in the correct format.
+                    setValue('birthday', selectedDate);
                   }}
-                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                  className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark'
                 />
                 <p className='text-red-500'>{errors.birthday?.message}</p>
               </div>
@@ -356,7 +357,7 @@ const Profile = () => {
                 </label>
                 <input
                   {...register('shippingInfo.address')}
-                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                  className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark'
                 />
                 <p className='text-red-500'>
                   {errors.shippingInfo?.address?.message}
@@ -369,7 +370,7 @@ const Profile = () => {
                 </label>
                 <input
                   {...register('shippingInfo.city')}
-                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                  className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark'
                 />
                 <p className='text-red-500'>
                   {errors.shippingInfo?.city?.message}
@@ -384,7 +385,7 @@ const Profile = () => {
                   {...register('shippingInfo.country')}
                   onChange={handleCountryChange}
                   value={selectedCountry}
-                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                  className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark'
                 >
                   <option value=''>Select a country</option>
                   {countries.map((country) => (
@@ -393,7 +394,6 @@ const Profile = () => {
                     </option>
                   ))}
                 </select>
-
                 <p className='text-red-500'>
                   {errors.shippingInfo?.country?.message}
                 </p>
@@ -403,11 +403,10 @@ const Profile = () => {
                 <label className='block text-sm mb-2' htmlFor='state'>
                   State
                 </label>
-
                 <select
                   {...register('shippingInfo.state')}
                   disabled={!states.length}
-                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                  className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark'
                 >
                   <option value=''>Select a state</option>
                   {states.map((state) => (
@@ -427,7 +426,7 @@ const Profile = () => {
                 </label>
                 <input
                   {...register('shippingInfo.phoneNo')}
-                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                  className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark'
                 />
                 <p className='text-red-500'>
                   {errors.shippingInfo?.phoneNo?.message}
@@ -440,7 +439,7 @@ const Profile = () => {
                 </label>
                 <input
                   {...register('shippingInfo.postalCode')}
-                  className='w-full p-2 rounded-md bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600'
+                  className='w-full p-2 rounded-md bg-input-light dark:bg-input-dark border border-border-light dark:border-border-dark'
                 />
                 <p className='text-red-500'>
                   {errors.shippingInfo?.postalCode?.message}
@@ -448,10 +447,12 @@ const Profile = () => {
               </div>
             </div>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type='submit'
               disabled={submitLoading}
-              className={`w-full bg-blue-600 text-white py-2 rounded-md mt-6 flex justify-center items-center transition-opacity duration-300 ${
+              className={`w-full bg-button-primary-light dark:bg-button-primary-dark text-white py-2 rounded-md mt-6 flex justify-center items-center transition-all duration-300 ${
                 submitLoading ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
@@ -461,16 +462,15 @@ const Profile = () => {
                   <SyncLoader size={10} color='white' />
                 </>
               ) : (
-                'Save Changes'
+                <>
+                  Save Changes
+                  <Save className='ml-2' size={16} />
+                </>
               )}
-            </button>
+            </motion.button>
           </form>
-        </div>
-
-        {/* Right Section - Social & Password Info */}
-        <Socials />
-        <UpdateUserPassword />
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };
