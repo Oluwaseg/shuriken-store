@@ -124,11 +124,14 @@ export const register = catchAsync(async (req, res, next) => {
     };
 
     let avatar = defaultAvatar;
+
     if (req.file) {
       avatar = {
         public_id: req.file.filename,
         url: req.file.path,
       };
+    } else {
+      console.log('No file received, using default avatar.');
     }
 
     const user = await User.create({
