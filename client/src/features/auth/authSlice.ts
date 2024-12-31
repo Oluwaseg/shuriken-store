@@ -36,6 +36,8 @@ export const register = createAsyncThunk(
       formData.append('password', userData.password);
       if (userData.avatar) {
         formData.append('avatar', userData.avatar);
+      } else {
+        console.log('No file attached');
       }
 
       const response = await axiosInstance.post('/user/register', formData, {
