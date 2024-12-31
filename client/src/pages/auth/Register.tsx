@@ -32,6 +32,7 @@ const RegisterPage: React.FC = () => {
     register: formRegister,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<FormData>();
 
@@ -127,10 +128,11 @@ const RegisterPage: React.FC = () => {
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  setPreview(file.name);
                   setPreview(URL.createObjectURL(file));
+                  setValue('avatar', file);
                 } else {
                   setPreview(null);
+                  setValue('avatar', undefined);
                 }
               }}
             />
