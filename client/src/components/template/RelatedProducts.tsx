@@ -110,7 +110,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </p>
         <div className='flex justify-between items-center mb-4'>
           <p className='text-2xl font-bold text-accent-light dark:text-accent-dark'>
-            ${formatPrice(product.price)}
+            ₦{formatPrice(product.price)}
           </p>
           {product.discount?.isDiscounted && (
             <span className='text-sm text-text-secondary-light dark:text-text-secondary-dark line-through'>
