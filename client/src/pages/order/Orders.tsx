@@ -159,6 +159,17 @@ const OrderPage: React.FC = () => {
             >
               {error}
             </motion.div>
+          ) : !orders ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className='flex justify-center items-center h-64'
+            >
+              <div className='text-center text-placeholder-light dark:text-placeholder-dark'>
+                No orders found.
+              </div>
+            </motion.div>
           ) : filteredOrders.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
